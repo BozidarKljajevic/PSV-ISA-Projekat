@@ -5,3 +5,9 @@ INSERT INTO public.pacijent(
 	INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
 	VALUES (nextval('pacijent_id_seq'), 'Jovana Obrenovica 83A', '+382/68 899675', 'Crna Gora', 'Pljevlja', 'Sveti vid', 3.5, 'Vrlo lepo');
+
+
+INSERT INTO public.admin_klinike(
+	id, adresa, broj_telefona, drzava, grad, ime, lozinka, mail, prezime)
+	VALUES (nextval('admin_klinike_id_seq'),'Janka Veselinovica 17', '0691411997', 'Srbija', 'Novi Sad', 'Damjan', 'damjanbanjac', 'damjanbanjac14@gmail.com', 'Banjac');
+
