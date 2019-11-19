@@ -1,10 +1,17 @@
 package com.example.demo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class AdminKlinike {
@@ -36,7 +43,10 @@ public class AdminKlinike {
 
 	@Column(name = "brojTelefona", nullable = false)
 	private String brojTelefona;
-
+	
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Klinika klinika;
+	
 	
 	public Long getId() {
 		return id;
@@ -110,4 +120,11 @@ public class AdminKlinike {
 		this.brojTelefona = brojTelefona;
 	}
 	
+	public Klinika getKlinika() {
+		return klinika;
+	}
+
+	public void setKlinika(Klinika klinika) {
+		this.klinika = klinika;
+	}
 }

@@ -14,7 +14,7 @@ import com.example.demo.service.AdminKlinikeService;
 
 @RestController
 @RequestMapping(value = "adminKlinike")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:8081")
 public class AdminKlinikeController {
 
 	@Autowired
