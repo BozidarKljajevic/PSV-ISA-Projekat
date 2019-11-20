@@ -39,7 +39,7 @@ public class KlinikaController {
 	@PutMapping(value = "/izmeniPodatkeKlinike", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<KlinikaDTO> izmeniPodatkeKlinike(@RequestBody KlinikaDTO klinikaDTO){
 		
-		try {
+		try { 
 			klinikaService.izmeniKliniku(klinikaDTO);
 		} catch (ValidationException e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
