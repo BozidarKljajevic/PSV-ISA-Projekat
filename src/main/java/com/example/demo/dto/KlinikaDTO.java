@@ -13,9 +13,17 @@ public class KlinikaDTO {
 	private String brojTelefona;
 	private Double ocena;
 	
+	
+	
+	public KlinikaDTO() {
+		
+	}
+
+
 	public KlinikaDTO(Klinika klinika) {
 		this.id = klinika.getId();
 		this.naziv = klinika.getNaziv();
+		this.opis = klinika.getOpis();
 		this.adresa = klinika.getAdresa();
 		this.grad = klinika.getGrad();
 		this.drzava = klinika.getDrzava();
