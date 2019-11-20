@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +21,7 @@ import com.example.demo.service.AdminKlinikeService;
 
 @RestController
 @RequestMapping(value = "adminKlinike")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:8081")
 public class AdminKlinikeController {
 
 	@Autowired
@@ -42,11 +43,22 @@ public class AdminKlinikeController {
 		AdminKlinikeDTO admindto = new AdminKlinikeDTO();
 		try {
 			admindto = adminKlinikeService.dodajAdminaKlinike(adminDTO);
+		}catch (ValidationException e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>(admindto, HttpStatus.OK);
+	}
+	
+	@PutMapping(value = "/izmeniPodatkeAdminaKlinike", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<AdminKlinikeDTO> izmeniPodatkeAdminaKlinike(@RequestBody AdminKlinikeDTO adminKlinikeDTO){
+		
+		try {
+			adminKlinikeService.izmeniAdminKlinike(adminKlinikeDTO);
 		} catch (ValidationException e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return new ResponseEntity<>(admindto, HttpStatus.OK);
+		return new ResponseEntity<>(adminKlinikeDTO, HttpStatus.OK);
 	}
 	
 }

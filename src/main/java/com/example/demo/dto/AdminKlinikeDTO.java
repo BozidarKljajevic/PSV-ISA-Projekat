@@ -3,6 +3,7 @@ package com.example.demo.dto;
 import com.example.demo.model.AdminKlinike;
 
 
+
 public class AdminKlinikeDTO {
 
 	private Long id;
@@ -13,6 +14,7 @@ public class AdminKlinikeDTO {
 	private String grad;
 	private String drzava;
 	private String brojTelefona;
+	private KlinikaDTO idKlinike;
 	
 	public AdminKlinikeDTO() {
 		
@@ -27,6 +29,7 @@ public class AdminKlinikeDTO {
 		this.grad = adminK.getGrad();
 		this.drzava = adminK.getDrzava();
 		this.brojTelefona = adminK.getBrojTelefona();
+		idKlinike = new KlinikaDTO(adminK.getKlinika());
 	}
 
 	public AdminKlinikeDTO(Long id, String mail, String ime, String prezime, String adresa, String grad, String drzava,
@@ -104,5 +107,13 @@ public class AdminKlinikeDTO {
 
 	public void setBrojTelefona(String brojTelefona) {
 		this.brojTelefona = brojTelefona;
+	}
+	
+	public KlinikaDTO getIdKlinike() {
+		return idKlinike;
+	}
+
+	public void setKlinikaId(KlinikaDTO idKlinike) {
+		this.idKlinike = idKlinike ;
 	}
 }

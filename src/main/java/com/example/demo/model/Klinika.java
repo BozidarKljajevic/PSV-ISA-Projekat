@@ -1,10 +1,16 @@
 package com.example.demo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Klinika {
@@ -33,6 +39,9 @@ public class Klinika {
 	
 	@Column(name = "ocena", nullable = false)
 	private Double ocena;
+	
+	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<AdminKlinike> adminiKlinike = new HashSet<AdminKlinike>();
 	
 	public Long getId() {
 		return id;
@@ -96,5 +105,12 @@ public class Klinika {
 
 	public void setOcena(Double ocena) {
 		this.ocena = ocena;
+	}
+	public Set<AdminKlinike> getAdminKlinike(){
+		return adminiKlinike;
+	}
+	
+	public void setAdminKlinike(Set<AdminKlinike> adminKlinike) {
+		this.adminiKlinike=adminKlinike;
 	}
 }
