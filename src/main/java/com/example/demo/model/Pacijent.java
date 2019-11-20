@@ -13,7 +13,7 @@ public class Pacijent {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "mail", nullable = false, unique = true)
+	@Column(name = "mail",   nullable = false, unique = true)
 	private String mail;
 	
 	@Column(name = "sifra", nullable = false)

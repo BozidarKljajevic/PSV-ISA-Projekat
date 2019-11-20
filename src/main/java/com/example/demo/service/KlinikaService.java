@@ -1,11 +1,12 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import com.example.demo.dto.KlinikaDTO;
 
@@ -22,6 +23,22 @@ public class KlinikaService {
 		return klinikaRepository.findById(id).orElseGet(null);
 	}
 	
+	public KlinikaDTO dodajKliniku(KlinikaDTO klinikaDTO) {
+		Klinika klinika = new Klinika();
+		
+		klinika.setNaziv(klinikaDTO.getNaziv());
+		klinika.setOpis(klinikaDTO.getOpis());
+		klinika.setAdresa(klinikaDTO.getAdresa());
+		klinika.setGrad(klinikaDTO.getGrad());
+		klinika.setDrzava(klinikaDTO.getDrzava());
+		klinika.setBrojTelefona(klinikaDTO.getBrojTelefona());
+		klinika.setOcena(klinikaDTO.getOcena());
+		klinikaRepository.save(klinika);
+		
+		KlinikaDTO klinikadto=new KlinikaDTO(klinika);
+		return klinikadto;
+	}
+
 	public void izmeniKliniku(KlinikaDTO klinikaDTO) {
 		Klinika klinika = klinikaRepository.findById(klinikaDTO.getId()).orElse(null);
 		
@@ -39,6 +56,9 @@ public class KlinikaService {
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Klinika sa tim idijem nepostoji");
 		}
-		
+	}
+
+	public List<Klinika> findAll() {
+		return klinikaRepository.findAll();
 	}
 }
