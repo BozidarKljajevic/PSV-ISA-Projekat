@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 
@@ -54,5 +56,9 @@ public class KlinikaService {
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Klinika sa tim idijem nepostoji");
 		}
+	}
+
+	public List<Klinika> findAll() {
+		return klinikaRepository.findAll();
 	}
 }

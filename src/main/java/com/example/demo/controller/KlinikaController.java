@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.ValidationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,5 +63,19 @@ public class KlinikaController {
 		}
 		
 		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/sveKlinike")
+	public ResponseEntity<List<KlinikaDTO>> getSveKlinike() {
+		
+		List<Klinika> klinike = klinikaService.findAll();
+
+		// convert courses to DTOs
+		List<KlinikaDTO> klinikeDTO = new ArrayList<>();
+		for (Klinika klinika : klinike) {
+			klinikeDTO.add(new KlinikaDTO(klinika));
+		}
+
+		return new ResponseEntity<>(klinikeDTO, HttpStatus.OK);
 	}
 }

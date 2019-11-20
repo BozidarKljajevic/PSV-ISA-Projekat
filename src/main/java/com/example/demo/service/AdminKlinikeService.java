@@ -12,12 +12,16 @@ import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.repository.AdminKlinikeRepository;
+import com.example.demo.repository.KlinikaRepository;
 
 @Service
 public class AdminKlinikeService {
 
 	@Autowired
 	private AdminKlinikeRepository adminKlinikeRepository;
+	
+	@Autowired
+	private KlinikaRepository klinikaRepository;
 	
 	public AdminKlinike findOne(Long id) {
 		return adminKlinikeRepository.findById(id).orElseGet(null);
@@ -33,6 +37,8 @@ public class AdminKlinikeService {
 		admin.setGrad(adminklinikeDTO.getGrad());
 		admin.setDrzava(adminklinikeDTO.getDrzava());
 		admin.setBrojTelefona(adminklinikeDTO.getBrojTelefona());
+		admin.setSifra(adminklinikeDTO.getIme());
+		admin.setKlinika(klinikaRepository.getOne(adminklinikeDTO.getIdKlinike().getId()));
 		adminKlinikeRepository.save(admin);
 		
 		AdminKlinikeDTO admindto=new AdminKlinikeDTO(admin);
