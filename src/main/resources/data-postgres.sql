@@ -14,3 +14,7 @@ INSERT INTO public.admin_klinike(
 INSERT INTO public.admin_centra(
 	mail, lozinka)
 	VALUES ('admin', 'admin');
+	
+INSERT INTO public.medicinsko_osoblje(
+	id, adresa, broj_telefona, drzava, grad, ime, lekar, lozinka, mail, prezime, radno_do, radno_od, klinika_id)
+	VALUES (nextval('medicinsko_osoblje_id_seq'), 'Koste Racina 15', '+381/64-7554699', 'Srbija', 'Beograd', 'John', true, 'johnisner', 'damjanbanjac@gmail.com', 'Isner', '20:00', '10:00', 1);
