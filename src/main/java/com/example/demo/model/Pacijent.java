@@ -37,8 +37,6 @@ public class Pacijent {
 	@Column(name = "brojTelefona", nullable = false)
 	private String brojTelefona;
 
-	@Column(name = "aktivan", nullable = false)
-	private Boolean aktivan;
 
 	public Long getId() {
 		return id;
@@ -112,11 +110,4 @@ public class Pacijent {
 		this.brojTelefona = brojTelefona;
 	}
 
-	public Boolean getAktivan() {
-		return aktivan;
-	}
-
-	public void setAktivan(Boolean aktivan) {
-		this.aktivan = aktivan;
-	}
 }
