@@ -14,3 +14,10 @@ INSERT INTO public.admin_klinike(
 INSERT INTO public.admin_centra(
 	mail, lozinka)
 	VALUES ('admin', 'admin');
+	
+INSERT INTO public.neaktivan_pacijent(
+	id, adresa, broj_telefona, drzava, grad, ime, mail, prezime, sifra)
+	VALUES (nextval('neaktivan_pacijent_id_seq'), 'Janka Čmelnika 5', '+381/65-5504964', 'Srbija', 'Prijepolje', 'Milivoje', 'panticmilivoje@gmail.com', 'Pantic', 'xyz');
+	INSERT INTO public.neaktivan_pacijent(
+	id, adresa, broj_telefona, drzava, grad, ime, mail, prezime, sifra)
+	VALUES (nextval('neaktivan_pacijent_id_seq'), 'Janka Čmelnika 5', '+381/65-5504964', 'Srbija', 'Prijepolje', 'Milivoje2', 'panticmilivoje2@gmail.com', 'Pantic', 'xyz');	
