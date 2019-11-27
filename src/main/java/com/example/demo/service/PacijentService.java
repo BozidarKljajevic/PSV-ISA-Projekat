@@ -27,6 +27,9 @@ public class PacijentService {
 		return pacijentRepository.findById(id).orElseGet(null);
 	}
 	
+	public NeaktivanPacijent findOneN(Long id) {
+		return neaktivanPacijentRepository.findById(id).orElseGet(null);
+	}
 	
 	public List<NeaktivanPacijent> findAll() {
 		return neaktivanPacijentRepository.findAll();
@@ -52,5 +55,9 @@ public class PacijentService {
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Pacijent sa zadatim ID-jem Zdravsvenog Osiguranika ne postoji");
 		}
+	}
+	
+	public void remove(Long id) {
+		neaktivanPacijentRepository.deleteById(id);
 	}
 }
