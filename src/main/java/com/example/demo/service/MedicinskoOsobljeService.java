@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 
@@ -26,6 +28,9 @@ public class MedicinskoOsobljeService {
 		return medicinskoOsobljeRepository.findById(id).orElseGet(null);
 	}
 	
+	public List<MedicinskoOsoblje> findAll() {
+		return medicinskoOsobljeRepository.findAll();
+	}
 	
 	public MedicinskoOsobljeDTO dodajMedicinskoOsoblje(MedicinskoOsobljeDTO medicinskoOsobljeDTO) {
 		MedicinskoOsoblje medOsoblje = new MedicinskoOsoblje();
@@ -42,7 +47,7 @@ public class MedicinskoOsobljeService {
 		medOsoblje.setRadnoOd(medicinskoOsobljeDTO.getRadnoOd());
 		medOsoblje.setSifra(medicinskoOsobljeDTO.getIme());
 		medOsoblje.setLekar(medicinskoOsobljeDTO.getLekar());
-		medOsoblje.setKlinika(klinikaRepository.getOne(medicinskoOsobljeDTO.getIdKlinike().getId()));
+		//medOsoblje.setKlinika(klinikaRepository.getOne(medicinskoOsobljeDTO.getIdKlinike().getId()));
 		medicinskoOsobljeRepository.save(medOsoblje);
 		
 		MedicinskoOsobljeDTO medicinskoOsobljeDTO2 = new MedicinskoOsobljeDTO(medOsoblje);
@@ -69,6 +74,11 @@ public class MedicinskoOsobljeService {
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Medicinsko osoblje sa tim idijem nepostoji");
 		}
+	}
+	
+	
+	public void remove(Long id) {
+		medicinskoOsobljeRepository.deleteById(id);
 	}
 	
 	public void izmeniMedicinskoOsobljeAdmin(MedicinskoOsobljeDTO medicinskoOsobljeDTO) {

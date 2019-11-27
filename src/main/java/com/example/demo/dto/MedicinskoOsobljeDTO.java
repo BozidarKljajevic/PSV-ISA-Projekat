@@ -35,7 +35,7 @@ public class MedicinskoOsobljeDTO {
 		this.lekar = medOsoblje.getLekar();
 		this.radnoOd = medOsoblje.getRadnoOd();
 		this.radnoDo = medOsoblje.getRadnoDo();
-		idKlinike = new KlinikaDTO(medOsoblje.getKlinika());
+		//idKlinike = new KlinikaDTO(medOsoblje.getKlinika());
 	}
 
 	public MedicinskoOsobljeDTO(Long id, String mail, String ime, String prezime, String adresa, String grad, String drzava,
@@ -118,13 +118,13 @@ public class MedicinskoOsobljeDTO {
 		this.brojTelefona = brojTelefona;
 	}
 	
-	public KlinikaDTO getIdKlinike() {
-		return idKlinike;
-	}
+	//public KlinikaDTO getIdKlinike() {
+		//return idKlinike;
+	//}
 
-	public void setKlinikaId(KlinikaDTO idKlinike) {
-		this.idKlinike = idKlinike ;
-	}
+	//public void setKlinikaId(KlinikaDTO idKlinike) {
+		////this.idKlinike = idKlinike ;
+	//}
 	
 	public Boolean getLekar() {
 		return lekar;
