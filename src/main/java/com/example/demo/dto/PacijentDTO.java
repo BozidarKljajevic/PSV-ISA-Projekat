@@ -39,6 +39,17 @@ public class PacijentDTO {
 		this.drzava = pacijent.getDrzava();
 		this.brojTelefona = pacijent.getBrojTelefona();
 	}
+	
+	public PacijentDTO(RegisterDTO pacijent) {
+		this.id = pacijent.getId();
+		this.mail = pacijent.getMail();
+		this.ime = pacijent.getIme();
+		this.prezime = pacijent.getPrezime();
+		this.adresa = pacijent.getAdresa();
+		this.grad = pacijent.getGrad();
+		this.drzava = pacijent.getDrzava();
+		this.brojTelefona = pacijent.getBrojTelefona();
+	}
 
 	public PacijentDTO(Long id, String mail, String ime, String prezime, String adresa, String grad, String drzava,
 			String brojTelefona) {

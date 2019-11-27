@@ -18,6 +18,7 @@ import com.example.demo.model.AdminCentra;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.MedicinskoOsoblje;
 import com.example.demo.model.Pacijent;
+import com.example.demo.service.PacijentService;
 import com.example.demo.service.RegistracijaPrijavaService;
 
 @RestController
@@ -79,6 +80,7 @@ public class RegistracijaPrijavaController {
 
 	@PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void Register(@RequestBody RegisterDTO user) {
-
+		
+		registracijaPrijavaService.register(user);
 	}
 }
