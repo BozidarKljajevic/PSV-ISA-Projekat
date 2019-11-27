@@ -13,7 +13,7 @@ INSERT INTO public.admin_klinike(
 
 INSERT INTO public.admin_centra(
 	mail, lozinka)
-	VALUES ('admin', 'admin');
+	VALUES ('admin@admin.com', 'admin');
 	
 
 INSERT INTO public.neaktivan_pacijent(

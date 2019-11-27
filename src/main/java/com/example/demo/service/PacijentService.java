@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PacijentDTO;
+import com.example.demo.dto.RegisterDTO;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.NeaktivanPacijent;
 import com.example.demo.model.Pacijent;
@@ -20,6 +21,7 @@ public class PacijentService {
 
 	@Autowired
 	private PacijentRepository pacijentRepository;
+	
 	@Autowired
 	private NeaktivanPacijentRepository neaktivanPacijentRepository;
 	
