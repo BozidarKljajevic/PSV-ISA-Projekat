@@ -7,8 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Pacijent {
-	
+public class NeaktivanPacijent {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -110,4 +110,5 @@ public class Pacijent {
 		this.brojTelefona = brojTelefona;
 	}
 
+	
 }
