@@ -43,6 +43,9 @@ public class Klinika {
 	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<AdminKlinike> adminiKlinike = new HashSet<AdminKlinike>();
 	
+	//@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	//private Set<MedicinskoOsoblje> medicinskaOsoblja = new HashSet<MedicinskoOsoblje>();
+	
 	public Long getId() {
 		return id;
 	}
@@ -113,4 +116,12 @@ public class Klinika {
 	public void setAdminKlinike(Set<AdminKlinike> adminKlinike) {
 		this.adminiKlinike=adminKlinike;
 	}
+	
+	//public Set<MedicinskoOsoblje> getMedicinskoOsoblje(){
+		//return medicinskaOsoblja;
+	//}
+	
+	//public void setMedicinskoOsoblje(Set<MedicinskoOsoblje> medicinskaOsoblja) {
+		//this.medicinskaOsoblja=medicinskaOsoblja;
+	//}
 }

@@ -1,11 +1,11 @@
 INSERT INTO public.pacijent(
+
 	id, adresa, broj_telefona, drzava, grad, ime, mail, prezime, sifra)
 	VALUES (nextval('pacijent_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', 'Novi Sad', 'Damjan', 'panticdamjan@fmail.com', 'Pantic', '1234');
 	
 INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
-	VALUES (nextval('klinika_id_seq'), 'Jovana Obrenovica 83A', '+381/61-5534209', 'Crna Gora', 'Pljevlja', 'Sveti vid', 3.5, 'Vrlo lepo');
-
+	VALUES (nextval('klinika_id_seq'), 'Jovana Obrenovica 83A', '+381/61-5534209', 'Crna Gora', 'Pljevlja', 'Sveti vid', 3.5, 'Vrlo lepo');	
 
 INSERT INTO public.admin_klinike(
 	id, adresa, broj_telefona, drzava, grad, ime, lozinka, mail, prezime,klinika_id)
@@ -24,6 +24,9 @@ INSERT INTO public.neaktivan_pacijent(
 	VALUES (nextval('neaktivan_pacijent_id_seq'), 'Janka Čmelnika 5', '+381/65-5504964', 'Srbija', 'Prijepolje', 'Milivoje2', 'panticmilivoje2@gmail.com', 'Pantic', 'xyz');	
 
 INSERT INTO public.medicinsko_osoblje(
-	id, adresa, broj_telefona, drzava, grad, ime, lekar, lozinka, mail, prezime, radno_do, radno_od, klinika_id)
-	VALUES (nextval('medicinsko_osoblje_id_seq'), 'Koste Racina 15', '+381/64-7554699', 'Srbija', 'Beograd', 'John', true, 'johnisner', 'damjanbanjac@gmail.com', 'Isner', '20:00', '10:00', 1);
+	id, adresa, broj_telefona, drzava, grad, ime, lekar, lozinka, mail, prezime, radno_do, radno_od)
+	VALUES (nextval('medicinsko_osoblje_id_seq'), 'Koste Racina 15', '+381/64-7554699', 'Srbija', 'Beograd', 'John', true, 'johnisner', 'damjanbanjac@gmail.com', 'Isner', '20:00', '10:00');
+
+
+
 
