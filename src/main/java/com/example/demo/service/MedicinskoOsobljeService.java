@@ -68,8 +68,8 @@ public class MedicinskoOsobljeService {
 			medicinskoOsoblje.setBrojTelefona(medicinskoOsobljeDTO.getBrojTelefona());
 			medicinskoOsoblje.setGrad(medicinskoOsobljeDTO.getGrad());
 			medicinskoOsoblje.setDrzava(medicinskoOsobljeDTO.getDrzava());
-			//medicinskoOsoblje.setRadnoOd(medicinskoOsobljeDTO.getRadnoOd());
-			//medicinskoOsoblje.setRadnoDo(medi);
+			medicinskoOsoblje.setRadnoOd(medicinskoOsobljeDTO.getRadnoOd());
+			medicinskoOsoblje.setRadnoDo(medicinskoOsobljeDTO.getRadnoDo());
 			medicinskoOsobljeRepository.save(medicinskoOsoblje);
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Medicinsko osoblje sa tim idijem nepostoji");
