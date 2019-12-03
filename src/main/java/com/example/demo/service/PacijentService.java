@@ -29,6 +29,10 @@ public class PacijentService {
 		return pacijentRepository.findById(id).orElseGet(null);
 	}
 	
+	public Pacijent findOne(String mail) {
+		return pacijentRepository.findByMail(mail);
+	}
+	
 	public NeaktivanPacijent findOneN(Long id) {
 		return neaktivanPacijentRepository.findById(id).orElseGet(null);
 	}

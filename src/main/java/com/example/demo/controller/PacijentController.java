@@ -34,10 +34,10 @@ public class PacijentController {
 	@Autowired
 	private PacijentService pacijentService;
 	
-	@GetMapping(value = "/postojeciPacijent")
-	public ResponseEntity<PacijentDTO> getPostojeciPacijent() {
+	@GetMapping(value = "/postojeciPacijent/{mail}")
+	public ResponseEntity<PacijentDTO> getPostojeciPacijent(@PathVariable String mail) {
 		
-		Pacijent pacijent = pacijentService.findOne((long) 1);
+		Pacijent pacijent = pacijentService.findOne(mail);
 		
 		PacijentDTO pacijentDTO = new PacijentDTO(pacijent);
 		
