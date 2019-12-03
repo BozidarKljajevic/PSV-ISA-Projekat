@@ -1,25 +1,25 @@
 package com.example.demo.dto;
 
 import com.example.demo.model.Bolesti;
+import com.example.demo.model.Lek;
 
-
-public class BolestiDTO {
+public class LekDTO {
 
 	private String naziv;
 	private Long sifra;
 	
 	
-	public BolestiDTO() {
+	public LekDTO() {
 		
 	}
 
-	public BolestiDTO(Bolesti bolesti) {
-		this.naziv = bolesti.getNaziv();
-		this.sifra = bolesti.getSifra();
+	public LekDTO(Lek lek) {
+		this.naziv = lek.getNaziv();
+		this.sifra = lek.getSifra();
 		
 	}
 	
-	public BolestiDTO(String naziv, Long sifra) {
+	public LekDTO(String naziv, Long sifra) {
 		super();
 		this.naziv = naziv;
 		this.sifra = sifra;

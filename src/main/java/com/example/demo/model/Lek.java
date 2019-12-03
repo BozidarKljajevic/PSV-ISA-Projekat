@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class Bolesti {
+public class Lek {
 
 	@Id
 	@Column(name = "sifra", nullable = false, unique = true)

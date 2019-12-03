@@ -27,6 +27,16 @@ INSERT INTO public.medicinsko_osoblje(
 	id, adresa, broj_telefona, drzava, grad, ime, lekar, lozinka, mail, prezime, radno_do, radno_od)
 	VALUES (nextval('medicinsko_osoblje_id_seq'), 'Koste Racina 15', '+381/64-7554699', 'Srbija', 'Beograd', 'John', true, 'johnisner', 'damjanbanjac@gmail.com', 'Isner', '20:00', '10:00');
 
+INSERT INTO public.bolesti(
+	naziv, sifra)
+	VALUES ('kijavica', '552');
+INSERT INTO public.bolesti(
+	naziv, sifra)
+	VALUES ('sida', '59');
 
-
-
+INSERT INTO public.lek(
+	naziv, sifra)
+	VALUES ('pantenol', '12');
+INSERT INTO public.lek(
+	naziv, sifra)
+	VALUES ('strepsils', '52');
