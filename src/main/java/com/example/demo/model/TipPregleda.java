@@ -1,10 +1,13 @@
 package com.example.demo.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class TipPregleda {
@@ -19,6 +22,10 @@ public class TipPregleda {
 	@Column(name = "oznaka", nullable = false)
 	private String oznaka;
 
+	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+	private Klinika klinika;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -41,6 +48,14 @@ public class TipPregleda {
 
 	public void setOznaka(String oznaka) {
 		this.oznaka = oznaka;
+	}
+
+	public Klinika getKlinika() {
+		return klinika;
+	}
+
+	public void setKlinika(Klinika klinika) {
+		this.klinika = klinika;
 	}
 	
 	

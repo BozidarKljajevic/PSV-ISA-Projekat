@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.MedicinskoOsobljeDTO;
 import com.example.demo.model.MedicinskoOsoblje;
+import com.example.demo.repository.AdminKlinikeRepository;
 import com.example.demo.service.MedicinskoOsobljeService;
 
 @RestController
@@ -32,6 +33,8 @@ public class MedicinskoOsobljeController {
 	@Autowired
 	 private MedicinskoOsobljeService medicinskoOsobljeService;
 	
+	
+	
 	@GetMapping(value = "/postojeceMedicinskoOsoblje")
 	public ResponseEntity<MedicinskoOsobljeDTO> getPostojeceMedOsoblje() {
 		
@@ -41,6 +44,8 @@ public class MedicinskoOsobljeController {
 		
 		return new ResponseEntity<>(medicinskoOsobljeDTO, HttpStatus.OK);
 	}
+	
+	
 	
 	
 	@GetMapping(value = "/postojeciSviLekari")
@@ -58,7 +63,7 @@ public class MedicinskoOsobljeController {
 	
 	@PostMapping(value = "/dodajMedicinskoOsoblje", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<MedicinskoOsobljeDTO> dodajMedicinskoOsoblje(@RequestBody MedicinskoOsobljeDTO medicinskoOsobljeDTO) {
-		
+		System.out.println("Usao");
 		MedicinskoOsobljeDTO medicinskoOsobljeDTO2 = new MedicinskoOsobljeDTO();
 		try {
 			medicinskoOsobljeDTO2 = medicinskoOsobljeService.dodajMedicinskoOsoblje(medicinskoOsobljeDTO);

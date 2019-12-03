@@ -10,16 +10,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.example.demo.dto.SalaKlinikeDTO;
 import com.example.demo.dto.TipPregledaDTO;
-
+import com.example.demo.model.SalaKlinike;
 import com.example.demo.model.TipPregleda;
 import com.example.demo.service.TipPregledaService;
 
@@ -54,6 +56,27 @@ public class TipPregledaController {
 		
 		return new ResponseEntity<>(tipPregledaDTO, HttpStatus.OK);
 	}
+	
+	
+	@DeleteMapping(value = "/izbrisiTipPregleda/{id}")
+	public ResponseEntity<Void> deleteSalu(@PathVariable Long id) {
+
+		TipPregleda tipPregleda = tipPregledaService.findOne(id);
+		List<TipPregledaDTO> tipDTO = new ArrayList<>();
+		if (tipPregleda != null) {
+			tipPregledaService.remove(id);
+			List<TipPregleda> tipPre = tipPregledaService.findAll();
+
+			
+			for (TipPregleda tip : tipPre) {
+				tipDTO.add(new TipPregledaDTO(tip));
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
 	
 	@GetMapping(value = "/sviTipoviPregleda")
 	public ResponseEntity<List<TipPregledaDTO>> getSveTipovePregleda() {

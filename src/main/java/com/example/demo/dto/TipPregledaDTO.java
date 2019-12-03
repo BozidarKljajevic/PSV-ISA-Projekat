@@ -7,6 +7,7 @@ public class TipPregledaDTO {
 	private Long id;
 	private String naziv;
 	private String oznaka;
+	private KlinikaDTO klinika;
 	
 	public TipPregledaDTO() {
 		
@@ -16,6 +17,7 @@ public class TipPregledaDTO {
 		this.id = tipPregleda.getId();
 		this.naziv = tipPregleda.getNaziv();
 		this.oznaka = tipPregleda.getOznaka();
+		klinika = new KlinikaDTO(tipPregleda.getKlinika());
 	}
 	
 	public TipPregledaDTO(Long id, String naziv, String oznaka) {
@@ -23,6 +25,7 @@ public class TipPregledaDTO {
 		this.id = id;
 		this.naziv = naziv;
 		this.oznaka = oznaka;
+		
 	}
 	public Long getId() {
 		return id;
@@ -41,6 +44,14 @@ public class TipPregledaDTO {
 	}
 	public void setOznaka(String oznaka) {
 		this.oznaka = oznaka;
+	}
+
+	public KlinikaDTO getKlinika() {
+		return klinika;
+	}
+
+	public void setKlinika(KlinikaDTO klinika) {
+		this.klinika = klinika;
 	}
 	
 	

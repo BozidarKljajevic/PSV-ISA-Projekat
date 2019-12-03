@@ -27,6 +27,10 @@ public class AdminKlinikeService {
 		return adminKlinikeRepository.findById(id).orElseGet(null);
 	}
 	
+	public AdminKlinike findOneMejl(String mejl) {
+		return adminKlinikeRepository.findByMail(mejl);
+	}
+	
 	public AdminKlinikeDTO dodajAdminaKlinike(AdminKlinikeDTO adminklinikeDTO) {
 		AdminKlinike admin = new AdminKlinike();
 		

@@ -7,6 +7,7 @@ public class SalaKlinikeDTO {
 	private Long id;
 	private String naziv;
 	private String broj;
+	private KlinikaDTO klinika;
 	
 	public SalaKlinikeDTO() {
 		
@@ -16,6 +17,7 @@ public class SalaKlinikeDTO {
 		this.id = salaKlinike.getId();
 		this.naziv = salaKlinike.getNaziv();
 		this.broj = salaKlinike.getBroj();
+		klinika = new KlinikaDTO(salaKlinike.getKlinika());
 	}
 	
 	public SalaKlinikeDTO(Long id, String naziv, String broj) {
@@ -24,6 +26,8 @@ public class SalaKlinikeDTO {
 		this.naziv = naziv;
 		this.broj = broj;
 	}
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -41,6 +45,14 @@ public class SalaKlinikeDTO {
 	}
 	public void setBroj(String broj) {
 		this.broj = broj;
+	}
+
+	public KlinikaDTO getKlinika() {
+		return klinika;
+	}
+
+	public void setKlinika(KlinikaDTO klinika) {
+		this.klinika = klinika;
 	}
 	
 	

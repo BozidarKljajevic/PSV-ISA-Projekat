@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.TipPregledaDTO;
 
 import com.example.demo.model.TipPregleda;
+import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.TipPregledaRepository;
 
 @Service
@@ -18,6 +19,9 @@ public class TipPregledaService {
 
 	@Autowired
 	private TipPregledaRepository tipPregledaRepository;
+	
+	@Autowired
+	private KlinikaRepository klinikaRepository;
 	
 	public TipPregleda findOne(Long id) {
 		return tipPregledaRepository.findById(id).orElseGet(null);
@@ -28,10 +32,15 @@ public class TipPregledaService {
 		
 		tipPregleda.setNaziv(tipPregledaDTO.getNaziv());
 		tipPregleda.setOznaka(tipPregledaDTO.getOznaka());
+		tipPregleda.setKlinika(klinikaRepository.getOne(tipPregledaDTO.getKlinika().getId()));
 		tipPregledaRepository.save(tipPregleda);
 		
 		TipPregledaDTO tipDTO=new TipPregledaDTO(tipPregleda);
 		return tipDTO;
+	}
+	
+	public void remove(Long id) {
+		tipPregledaRepository.deleteById(id);
 	}
 	
 	public void izmeniTipPregleda(TipPregledaDTO tipPregledaDTO) {
@@ -50,6 +59,7 @@ public class TipPregledaService {
 		}
 	}
 	
+
 	public List<TipPregleda> findAll() {
 		return tipPregledaRepository.findAll();
 	}
