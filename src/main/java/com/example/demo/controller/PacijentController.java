@@ -70,6 +70,20 @@ public class PacijentController {
 		return new ResponseEntity<>(pacijentDTO, HttpStatus.OK);
 	}
 	
+	@PutMapping(value = "/aktivirajPacijenta/{mail}")
+	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String mail) {
+		
+		NeaktivanPacijent neaktivanPacijent = pacijentService.findOneN(mail);
+		
+		if (neaktivanPacijent == null) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+		
+		pacijentService.aktivirajPacijenta(neaktivanPacijent);
+		
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
 	@DeleteMapping(value = "/ibrisiNeaktivnogPacijenta/{id}")
 	public ResponseEntity<List<PacijentDTO>> izbrisiPacijenta(@PathVariable Long id) {
 

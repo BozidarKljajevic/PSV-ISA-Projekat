@@ -33,6 +33,10 @@ public class PacijentService {
 		return neaktivanPacijentRepository.findById(id).orElseGet(null);
 	}
 	
+	public NeaktivanPacijent findOneN(String mail) {
+		return neaktivanPacijentRepository.findByMail(mail);
+	}
+	
 	public List<NeaktivanPacijent> findAll() {
 		return neaktivanPacijentRepository.findAll();
 	}
@@ -61,5 +65,22 @@ public class PacijentService {
 	
 	public void remove(Long id) {
 		neaktivanPacijentRepository.deleteById(id);
+	}
+	
+	public void aktivirajPacijenta(NeaktivanPacijent neaktivanPacijent) {
+		
+		Pacijent pacijent = new Pacijent();
+		
+		pacijent.setMail(neaktivanPacijent.getMail());
+		pacijent.setSifra(neaktivanPacijent.getSifra());
+		pacijent.setIme(neaktivanPacijent.getIme());
+		pacijent.setPrezime(neaktivanPacijent.getPrezime());
+		pacijent.setAdresa(neaktivanPacijent.getAdresa());
+		pacijent.setGrad(neaktivanPacijent.getGrad());
+		pacijent.setDrzava(neaktivanPacijent.getDrzava());
+		pacijent.setBrojTelefona(neaktivanPacijent.getBrojTelefona());
+		
+		neaktivanPacijentRepository.deleteById(neaktivanPacijent.getId());
+		pacijentRepository.save(pacijent);
 	}
 }
