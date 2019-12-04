@@ -40,9 +40,21 @@ public class MedicinskoOsoblje {
 	@Column(name = "brojTelefona", nullable = false)
 	private String brojTelefona;
 	
+	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+	private Klinika klinika;
+	
+	
 	//@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	//private Klinika klinika;
 	
+	public Klinika getKlinika() {
+		return klinika;
+	}
+
+	public void setKlinika(Klinika klinika) {
+		this.klinika = klinika;
+	}
+
 	@Column(name = "lekar",nullable = false)
 	private Boolean lekar;
 	

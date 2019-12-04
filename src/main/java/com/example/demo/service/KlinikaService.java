@@ -39,6 +39,7 @@ public class KlinikaService {
 		return klinikadto;
 	}
 
+	
 	public void izmeniKliniku(KlinikaDTO klinikaDTO) {
 		Klinika klinika = klinikaRepository.findById(klinikaDTO.getId()).orElse(null);
 		

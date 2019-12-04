@@ -12,6 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 public class Klinika {
 
@@ -40,11 +43,23 @@ public class Klinika {
 	@Column(name = "ocena", nullable = false)
 	private Double ocena;
 	
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<AdminKlinike> adminiKlinike = new HashSet<AdminKlinike>();
 	
-	//@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	//private Set<MedicinskoOsoblje> medicinskaOsoblja = new HashSet<MedicinskoOsoblje>();
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	private Set<SalaKlinike> saleKlinike = new HashSet<SalaKlinike>();
+	
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	private Set<TipPregleda> tipPregleda = new HashSet<TipPregleda>();
+	
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	private Set<MedicinskoOsoblje> medicinskaOsoblja = new HashSet<MedicinskoOsoblje>();
+	
+	
 	
 	public Long getId() {
 		return id;
@@ -115,6 +130,38 @@ public class Klinika {
 	
 	public void setAdminKlinike(Set<AdminKlinike> adminKlinike) {
 		this.adminiKlinike=adminKlinike;
+	}
+
+	public Set<AdminKlinike> getAdminiKlinike() {
+		return adminiKlinike;
+	}
+
+	public void setAdminiKlinike(Set<AdminKlinike> adminiKlinike) {
+		this.adminiKlinike = adminiKlinike;
+	}
+
+	public Set<SalaKlinike> getSaleKlinike() {
+		return saleKlinike;
+	}
+
+	public void setSaleKlinike(Set<SalaKlinike> saleKlinike) {
+		this.saleKlinike = saleKlinike;
+	}
+
+	public Set<MedicinskoOsoblje> getMedicinskaOsoblja() {
+		return medicinskaOsoblja;
+	}
+
+	public void setMedicinskaOsoblja(Set<MedicinskoOsoblje> medicinskaOsoblja) {
+		this.medicinskaOsoblja = medicinskaOsoblja;
+	}
+
+	public Set<TipPregleda> getTipPregleda() {
+		return tipPregleda;
+	}
+
+	public void setTipPregleda(Set<TipPregleda> tipPregleda) {
+		this.tipPregleda = tipPregleda;
 	}
 	
 	//public Set<MedicinskoOsoblje> getMedicinskoOsoblje(){

@@ -12,6 +12,7 @@ import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.MedicinskoOsobljeDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.MedicinskoOsoblje;
+import com.example.demo.repository.AdminKlinikeRepository;
 import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.MedicinskoOsobljeRepository;
 
@@ -20,6 +21,8 @@ public class MedicinskoOsobljeService {
 
 	@Autowired
 	private MedicinskoOsobljeRepository medicinskoOsobljeRepository;
+	
+
 	
 	@Autowired
 	private KlinikaRepository klinikaRepository;
@@ -47,7 +50,8 @@ public class MedicinskoOsobljeService {
 		medOsoblje.setRadnoOd(medicinskoOsobljeDTO.getRadnoOd());
 		medOsoblje.setSifra(medicinskoOsobljeDTO.getIme());
 		medOsoblje.setLekar(medicinskoOsobljeDTO.getLekar());
-		//medOsoblje.setKlinika(klinikaRepository.getOne(medicinskoOsobljeDTO.getIdKlinike().getId()));
+		System.out.println(klinikaRepository.getOne(medicinskoOsobljeDTO.getIdKlinike().getId()));
+		medOsoblje.setKlinika(klinikaRepository.getOne(medicinskoOsobljeDTO.getIdKlinike().getId()));
 		medicinskoOsobljeRepository.save(medOsoblje);
 		
 		MedicinskoOsobljeDTO medicinskoOsobljeDTO2 = new MedicinskoOsobljeDTO(medOsoblje);
@@ -68,8 +72,8 @@ public class MedicinskoOsobljeService {
 			medicinskoOsoblje.setBrojTelefona(medicinskoOsobljeDTO.getBrojTelefona());
 			medicinskoOsoblje.setGrad(medicinskoOsobljeDTO.getGrad());
 			medicinskoOsoblje.setDrzava(medicinskoOsobljeDTO.getDrzava());
-			//medicinskoOsoblje.setRadnoOd(medicinskoOsobljeDTO.getRadnoOd());
-			//medicinskoOsoblje.setRadnoDo(medi);
+			medicinskoOsoblje.setRadnoOd(medicinskoOsobljeDTO.getRadnoOd());
+			medicinskoOsoblje.setRadnoDo(medicinskoOsobljeDTO.getRadnoDo());
 			medicinskoOsobljeRepository.save(medicinskoOsoblje);
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Medicinsko osoblje sa tim idijem nepostoji");
