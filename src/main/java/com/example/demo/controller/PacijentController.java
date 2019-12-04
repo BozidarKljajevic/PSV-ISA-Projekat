@@ -34,10 +34,10 @@ public class PacijentController {
 	@Autowired
 	private PacijentService pacijentService;
 	
-	@GetMapping(value = "/postojeciPacijent")
-	public ResponseEntity<PacijentDTO> getPostojeciPacijent() {
+	@GetMapping(value = "/postojeciPacijent/{mail}")
+	public ResponseEntity<PacijentDTO> getPostojeciPacijent(@PathVariable String mail) {
 		
-		Pacijent pacijent = pacijentService.findOne((long) 1);
+		Pacijent pacijent = pacijentService.findOne(mail);
 		
 		PacijentDTO pacijentDTO = new PacijentDTO(pacijent);
 		
@@ -68,6 +68,20 @@ public class PacijentController {
 		}
 		
 		return new ResponseEntity<>(pacijentDTO, HttpStatus.OK);
+	}
+	
+	@PutMapping(value = "/aktivirajPacijenta/{mail}")
+	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String mail) {
+		
+		NeaktivanPacijent neaktivanPacijent = pacijentService.findOneN(mail);
+		
+		if (neaktivanPacijent == null) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+		
+		pacijentService.aktivirajPacijenta(neaktivanPacijent);
+		
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 	
 	@DeleteMapping(value = "/ibrisiNeaktivnogPacijenta/{id}")

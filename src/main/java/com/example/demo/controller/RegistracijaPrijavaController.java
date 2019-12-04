@@ -50,24 +50,36 @@ public class RegistracijaPrijavaController {
 				responseUser.setIme(pacijent.getIme());
 				responseUser.setPrezime(pacijent.getPrezime());
 				responseUser.setUloga("Pacijent");
+			} else {
+				System.out.println("Sifra nije ispravna");
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 			}
 		} else if (medicinskoOsoblje != null) {
 			if (user.getSifra().equals(medicinskoOsoblje.getLozinka())) {
 				responseUser.setIme(medicinskoOsoblje.getIme());
 				responseUser.setPrezime(medicinskoOsoblje.getPrezime());
 				responseUser.setUloga("MedicinskoOsoblje");
+			} else {
+				System.out.println("Sifra nije ispravna");
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 			}
 		} else if (adminKlinike != null) {
 			if (user.getSifra().equals(adminKlinike.getLozinka())) {
 				responseUser.setIme(adminKlinike.getIme());
 				responseUser.setPrezime(adminKlinike.getPrezime());
 				responseUser.setUloga("AdminKlinike");
-			} 
+			} else {
+				System.out.println("Sifra nije ispravna");
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+			}
 		} else if (adminCentra != null) {
 			if (user.getSifra().equals(adminCentra.getLozinka())) {
 				responseUser.setIme("Admin");
 				responseUser.setPrezime("Admirovic");
 				responseUser.setUloga("AdminCentra");
+			} else {
+				System.out.println("Sifra nije ispravna");
+				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			System.out.println("Sifra nije ispravna");
@@ -80,7 +92,7 @@ public class RegistracijaPrijavaController {
 
 	@PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public void Register(@RequestBody RegisterDTO user) {
-		
+
 		registracijaPrijavaService.register(user);
 	}
 }
