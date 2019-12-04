@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.BolestiDTO;
 import com.example.demo.model.Bolesti;
+import com.example.demo.model.Lek;
 import com.example.demo.service.BolestiService;
 
 
@@ -34,18 +35,21 @@ public class BolestiController {
 	
 	@PostMapping(value = "/dodajBolest", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<BolestiDTO> dodajBolest(@RequestBody BolestiDTO bolestDTO) {
-		Bolesti bol = bolestiService.findOne(bolestDTO.getSifra());
-		if(bol!=null) {
-			throw new ValidationException("Bolest sa tom sifrom vec psotoji");
-		}else {
-			BolestiDTO bolestdto = new BolestiDTO();
-			try {
-				bolestdto = bolestiService.dodajBolest(bolestDTO);
-			}catch (ValidationException e) {
+		List<Bolesti> bolesti = bolestiService.findAll();
+		for (Bolesti bolest : bolesti) {
+			if (bolest.getSifra() == bolestDTO.getSifra()) {
+				
 				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			return new ResponseEntity<>(bolestdto, HttpStatus.OK);
-			}
+		}
+		BolestiDTO bolestdto = new BolestiDTO();
+		try {
+			bolestdto = bolestiService.dodajBolest(bolestDTO);
+		}catch (ValidationException e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>(bolestdto, HttpStatus.OK);
+			
 	}
 	
 	@GetMapping(value = "/postojeceBolesti")
