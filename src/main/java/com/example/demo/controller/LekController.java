@@ -25,61 +25,10 @@ import com.example.demo.service.LekService;
 
 @RestController
 @RequestMapping(value = "lek")
-@CrossOrigin(origins = "http://localhost:8081")
 public class LekController {
 
 	@Autowired
 	private LekService lekService;
 
-	@PostMapping(value = "/dodajLek", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<LekDTO> dodajLek(@RequestBody LekDTO lekDTO) {
-		List<Lek> lekovi = lekService.findAll();
-		for (Lek lek : lekovi) {
-			if (lek.getSifra() == lekDTO.getSifra()) {
-				
-				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
-		LekDTO lekdto = new LekDTO();
-		try {
-			lekdto = lekService.dodajLek(lekDTO);
-		} catch (ValidationException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return new ResponseEntity<>(lekdto, HttpStatus.OK);
-	}
-
-	@GetMapping(value = "/postojeciLek")
-	public ResponseEntity<List<LekDTO>> getPostojeciLek() {
-
-		List<Lek> lekovi = lekService.findAll();
-
-		List<LekDTO> lekDTO = new ArrayList<>();
-		for (Lek lek : lekovi) {
-			lekDTO.add(new LekDTO(lek));
-		}
-
-		return new ResponseEntity<>(lekDTO, HttpStatus.OK);
-	}
-
-	@DeleteMapping(value = "/izbrisiLek/{id}")
-	public ResponseEntity<List<LekDTO>> izbrisiLek(@PathVariable Long id) {
-
-		Lek lek = lekService.findOne(id);
-
-		List<LekDTO> lekDTO = new ArrayList<>();
-		if (lek != null) {
-			lekService.remove(id);
-			List<Lek> lekovi = lekService.findAll();
-
-			for (Lek lek1 : lekovi) {
-				lekDTO.add(new LekDTO(lek1));
-			}
-
-			return new ResponseEntity<>(lekDTO, HttpStatus.OK);
-		} else {
-
-			return new ResponseEntity<>(lekDTO, HttpStatus.NOT_FOUND);
-		}
-	}
+	
 }

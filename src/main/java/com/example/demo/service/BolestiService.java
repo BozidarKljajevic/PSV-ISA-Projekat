@@ -17,27 +17,6 @@ public class BolestiService {
 	@Autowired
 	private BolestiRepository bolestiRepository;
 	
-	public BolestiDTO dodajBolest(BolestiDTO bolestDTO) {
-		Bolesti bolest = new Bolesti();
-		
-		bolest.setNaziv(bolestDTO.getNaziv());
-		bolest.setSifra(bolestDTO.getSifra());
-		
-		bolestiRepository.save(bolest);
-		
-		BolestiDTO bolestdto=new BolestiDTO(bolest);
-		return bolestdto;
-	}
 	
-	public List<Bolesti> findAll() {
-		return bolestiRepository.findAll();
-	}
-	
-	public Bolesti findOne(Long id) {
-		return bolestiRepository.findById(id).orElseGet(null);
-	}
-	public void remove(Long id) {
-		bolestiRepository.deleteById(id);
-	}
 	
 }

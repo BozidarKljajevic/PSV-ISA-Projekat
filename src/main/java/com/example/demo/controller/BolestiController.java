@@ -20,70 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.BolestiDTO;
 import com.example.demo.model.Bolesti;
-import com.example.demo.model.Lek;
 import com.example.demo.service.BolestiService;
 
 
 
 @RestController
 @RequestMapping(value = "bolesti")
-@CrossOrigin(origins = "http://localhost:8081")
 public class BolestiController {
 
 	@Autowired
 	private BolestiService bolestiService;
 	
-	@PostMapping(value = "/dodajBolest", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<BolestiDTO> dodajBolest(@RequestBody BolestiDTO bolestDTO) {
-		List<Bolesti> bolesti = bolestiService.findAll();
-		for (Bolesti bolest : bolesti) {
-			if (bolest.getSifra() == bolestDTO.getSifra()) {
-				
-				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
-		BolestiDTO bolestdto = new BolestiDTO();
-		try {
-			bolestdto = bolestiService.dodajBolest(bolestDTO);
-		}catch (ValidationException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return new ResponseEntity<>(bolestdto, HttpStatus.OK);
-			
-	}
 	
-	@GetMapping(value = "/postojeceBolesti")
-	public ResponseEntity<List<BolestiDTO>> getPostojeceBolesti() {
-		
-		List<Bolesti> bolesti = bolestiService.findAll();
-
-		List<BolestiDTO> bolestDTO = new ArrayList<>();
-		for (Bolesti bolest : bolesti) {
-			bolestDTO.add(new BolestiDTO(bolest));
-		}
-
-		return new ResponseEntity<>(bolestDTO, HttpStatus.OK);
-	}
-	
-	@DeleteMapping(value = "/izbrisiBolest/{id}")
-	public ResponseEntity<List<BolestiDTO>> izbrisiBolest(@PathVariable Long id) {
-
-		Bolesti bolest = bolestiService.findOne(id);
-
-		List<BolestiDTO> bolestDTO = new ArrayList<>();
-		if (bolest != null) {
-			bolestiService.remove(id);
-			List<Bolesti> bolesti = bolestiService.findAll();
-
-			
-			for (Bolesti bolest1 : bolesti) {
-				bolestDTO.add(new BolestiDTO(bolest1));
-			}
-			
-			return new ResponseEntity<>(bolestDTO,HttpStatus.OK);
-		} else {
-			
-			return new ResponseEntity<>(bolestDTO,HttpStatus.NOT_FOUND);
-		}
-	}
 }
