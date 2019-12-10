@@ -24,13 +24,12 @@ public class PacijentController {
 	private PacijentService pacijentService;
 
 	@GetMapping(value = "/preuzmi/{id}")
-	@PreAuthorize("hasAuthority('LEKAR')")
+	@PreAuthorize("hasAuthority('PACIJENT')")
 	public ResponseEntity<?> getPostojeciPacijent(@PathVariable Long id) {
 		
 		Pacijent pacijent = (Pacijent) pacijentService.findOne(id);
 		
 		if (pacijent == null) {
-			System.out.println("Nisam nasao");
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
 
