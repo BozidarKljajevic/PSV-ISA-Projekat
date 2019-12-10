@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.LekDTO;
-import com.example.demo.model.Bolesti;
-import com.example.demo.model.Lek;
 import com.example.demo.service.LekService;
 
 @RestController
