@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -86,5 +87,19 @@ public class AuthenticationController {
 		PacijentDTO pacijentDTO = new PacijentDTO(neaktivanPacijent);
 		HttpHeaders headers = new HttpHeaders();
 		return new ResponseEntity<PacijentDTO>(pacijentDTO, HttpStatus.CREATED);
+	}
+	
+	@RequestMapping(value = "/activate/{code}", method = RequestMethod.PUT)
+	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String code) throws Exception {
+		System.out.println("Usao");
+		Long id = Long.parseLong(code);
+		Pacijent exisPacijent = this.pacijentService.findOne(id);
+		if (exisPacijent != null) {
+			throw new Exception("Alredy exist");
+		}
+		
+		this.pacijentService.aktivirajPacijenta(exisPacijent);
+		
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 }

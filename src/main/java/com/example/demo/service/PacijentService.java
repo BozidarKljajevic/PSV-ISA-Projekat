@@ -54,4 +54,11 @@ public class PacijentService {
 		
 		return neaktivanPacijent;
 	}
+
+	public void aktivirajPacijenta(Pacijent exisPacijent) {
+		
+		exisPacijent.setEnabled(true);
+		this.pacijentRepository.save(exisPacijent);
+		
+	}
 }
