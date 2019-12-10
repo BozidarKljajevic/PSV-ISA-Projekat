@@ -89,12 +89,12 @@ public class AuthenticationController {
 		return new ResponseEntity<PacijentDTO>(pacijentDTO, HttpStatus.CREATED);
 	}
 	
-	@RequestMapping(value = "/activate/{code}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/activate/{code}", method = RequestMethod.POST)
 	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String code) throws Exception {
-		System.out.println("Usao");
+		
 		Long id = Long.parseLong(code);
 		Pacijent exisPacijent = this.pacijentService.findOne(id);
-		if (exisPacijent != null) {
+		if (exisPacijent == null) {
 			throw new Exception("Alredy exist");
 		}
 		
