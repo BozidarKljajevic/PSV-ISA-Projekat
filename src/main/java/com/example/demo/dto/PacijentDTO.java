@@ -1,6 +1,5 @@
 package com.example.demo.dto;
 
-import com.example.demo.model.NeaktivanPacijent;
 import com.example.demo.model.Pacijent;
 
 public class PacijentDTO {
@@ -19,28 +18,6 @@ public class PacijentDTO {
 	}
 	
 	public PacijentDTO(Pacijent pacijent) {
-		this.id = pacijent.getId();
-		this.mail = pacijent.getMail();
-		this.ime = pacijent.getIme();
-		this.prezime = pacijent.getPrezime();
-		this.adresa = pacijent.getAdresa();
-		this.grad = pacijent.getGrad();
-		this.drzava = pacijent.getDrzava();
-		this.brojTelefona = pacijent.getBrojTelefona();
-	}
-	
-	public PacijentDTO(NeaktivanPacijent pacijent) {
-		this.id = pacijent.getId();
-		this.mail = pacijent.getMail();
-		this.ime = pacijent.getIme();
-		this.prezime = pacijent.getPrezime();
-		this.adresa = pacijent.getAdresa();
-		this.grad = pacijent.getGrad();
-		this.drzava = pacijent.getDrzava();
-		this.brojTelefona = pacijent.getBrojTelefona();
-	}
-	
-	public PacijentDTO(RegisterDTO pacijent) {
 		this.id = pacijent.getId();
 		this.mail = pacijent.getMail();
 		this.ime = pacijent.getIme();

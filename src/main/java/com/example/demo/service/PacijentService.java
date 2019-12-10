@@ -1,90 +1,59 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ValidationException;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PacijentDTO;
-import com.example.demo.dto.RegisterDTO;
-import com.example.demo.model.Klinika;
-import com.example.demo.model.NeaktivanPacijent;
+import com.example.demo.model.Authority;
 import com.example.demo.model.Pacijent;
-import com.example.demo.repository.NeaktivanPacijentRepository;
+import com.example.demo.model.User;
+import com.example.demo.repository.AuthorityRepository;
 import com.example.demo.repository.PacijentRepository;
+import com.example.demo.repository.UserRepository;
 
 @Service
 public class PacijentService {
 
 	@Autowired
 	private PacijentRepository pacijentRepository;
+
+	@Autowired
+	private AuthorityRepository authorityRepository;
 	
 	@Autowired
-	private NeaktivanPacijentRepository neaktivanPacijentRepository;
-	
-	public Pacijent findOne(Long id) {
-		return pacijentRepository.findById(id).orElseGet(null);
+	private PasswordEncoder passwordEncoder;
+
+	public User findOne(Long id) {
+		return pacijentRepository.findById(id).orElse(null);
 	}
-	
-	public Pacijent findOne(String mail) {
+
+	public User findOne(String mail) {
 		return pacijentRepository.findByMail(mail);
 	}
-	
-	public NeaktivanPacijent findOneN(Long id) {
-		return neaktivanPacijentRepository.findById(id).orElseGet(null);
-	}
-	
-	public NeaktivanPacijent findOneN(String mail) {
-		return neaktivanPacijentRepository.findByMail(mail);
-	}
-	
-	public List<NeaktivanPacijent> findAll() {
-		return neaktivanPacijentRepository.findAll();
-	}
-	
-	public void izmeniPacijenta(PacijentDTO pacijentDTO) {
-		Pacijent pacijent = pacijentRepository.findById(pacijentDTO.getId()).orElseGet(null);
+
+	public Pacijent save(PacijentDTO pacijent) {
+		Pacijent neaktivanPacijent = new Pacijent();
 		
-		if (pacijent == null) {
-			throw new ValidationException("Pacijent sa zadatim ID-jem Zdravsvenog Osiguranika ne postoji");
-		}
+		neaktivanPacijent.setAdresa(pacijent.getAdresa());
+		Authority auth = this.authorityRepository.findByName("PACIJENT");
+		List<Authority> auths = new ArrayList<>();
+	    auths.add(auth);
+	    neaktivanPacijent.setAuthorities(auths);
+		neaktivanPacijent.setBrojTelefona(pacijent.getBrojTelefona());
+		neaktivanPacijent.setDrzava(pacijent.getDrzava());
+		neaktivanPacijent.setEnabled(false);
+		neaktivanPacijent.setGrad(pacijent.getGrad());
+		neaktivanPacijent.setIme(pacijent.getIme());
+		neaktivanPacijent.setMail("trebalobidaradi@kkk.com");
+		neaktivanPacijent.setPrezime(pacijent.getPrezime());
+		neaktivanPacijent.setSifra(passwordEncoder.encode("123"));
 		
-		try {
-			pacijent = pacijentRepository.getOne(pacijentDTO.getId());
-			pacijent.setIme(pacijentDTO.getIme());
-			pacijent.setPrezime(pacijentDTO.getPrezime());
-			pacijent.setAdresa(pacijentDTO.getAdresa());
-			pacijent.setGrad(pacijentDTO.getGrad());
-			pacijent.setDrzava(pacijentDTO.getDrzava());
-			pacijent.setBrojTelefona(pacijentDTO.getBrojTelefona());
-			
-			pacijentRepository.save(pacijent);
-		} catch (EntityNotFoundException e) {
-			throw new ValidationException("Pacijent sa zadatim ID-jem Zdravsvenog Osiguranika ne postoji");
-		}
-	}
-	
-	public void remove(Long id) {
-		neaktivanPacijentRepository.deleteById(id);
-	}
-	
-	public void aktivirajPacijenta(NeaktivanPacijent neaktivanPacijent) {
+		this.pacijentRepository.save(neaktivanPacijent);
 		
-		Pacijent pacijent = new Pacijent();
-		
-		pacijent.setMail(neaktivanPacijent.getMail());
-		pacijent.setSifra(neaktivanPacijent.getSifra());
-		pacijent.setIme(neaktivanPacijent.getIme());
-		pacijent.setPrezime(neaktivanPacijent.getPrezime());
-		pacijent.setAdresa(neaktivanPacijent.getAdresa());
-		pacijent.setGrad(neaktivanPacijent.getGrad());
-		pacijent.setDrzava(neaktivanPacijent.getDrzava());
-		pacijent.setBrojTelefona(neaktivanPacijent.getBrojTelefona());
-		
-		neaktivanPacijentRepository.deleteById(neaktivanPacijent.getId());
-		pacijentRepository.save(pacijent);
+		return neaktivanPacijent;
 	}
 }
