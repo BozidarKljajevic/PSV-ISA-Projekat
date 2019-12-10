@@ -7,13 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.PacijentDTO;
+import com.example.demo.dto.RegisterDTO;
 import com.example.demo.model.Authority;
 import com.example.demo.model.Pacijent;
-import com.example.demo.model.User;
 import com.example.demo.repository.AuthorityRepository;
 import com.example.demo.repository.PacijentRepository;
-import com.example.demo.repository.UserRepository;
 
 @Service
 public class PacijentService {
@@ -27,15 +25,15 @@ public class PacijentService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	public User findOne(Long id) {
+	public Pacijent findOne(Long id) {
 		return pacijentRepository.findById(id).orElse(null);
 	}
 
-	public User findOne(String mail) {
+	public Pacijent findOne(String mail) {
 		return pacijentRepository.findByMail(mail);
 	}
 
-	public Pacijent save(PacijentDTO pacijent) {
+	public Pacijent save(RegisterDTO pacijent) {
 		Pacijent neaktivanPacijent = new Pacijent();
 		
 		neaktivanPacijent.setAdresa(pacijent.getAdresa());
@@ -48,12 +46,19 @@ public class PacijentService {
 		neaktivanPacijent.setEnabled(false);
 		neaktivanPacijent.setGrad(pacijent.getGrad());
 		neaktivanPacijent.setIme(pacijent.getIme());
-		neaktivanPacijent.setMail("trebalobidaradi@kkk.com");
+		neaktivanPacijent.setMail(pacijent.getMail());
 		neaktivanPacijent.setPrezime(pacijent.getPrezime());
-		neaktivanPacijent.setSifra(passwordEncoder.encode("123"));
+		neaktivanPacijent.setSifra(passwordEncoder.encode(pacijent.getSifra()));
 		
 		this.pacijentRepository.save(neaktivanPacijent);
 		
 		return neaktivanPacijent;
+	}
+
+	public void aktivirajPacijenta(Pacijent exisPacijent) {
+		
+		exisPacijent.setEnabled(true);
+		this.pacijentRepository.save(exisPacijent);
+		
 	}
 }

@@ -57,7 +57,11 @@ public class Klinika {
 	
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-	private Set<MedicinskoOsoblje> medicinskaOsoblja = new HashSet<MedicinskoOsoblje>();
+	private Set<Lekar> lekar = new HashSet<Lekar>();
+	
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	private Set<MedicinskaSestra> medicinskaSestra = new HashSet<MedicinskaSestra>();
 	
 	
 	
@@ -148,13 +152,6 @@ public class Klinika {
 		this.saleKlinike = saleKlinike;
 	}
 
-	public Set<MedicinskoOsoblje> getMedicinskaOsoblja() {
-		return medicinskaOsoblja;
-	}
-
-	public void setMedicinskaOsoblja(Set<MedicinskoOsoblje> medicinskaOsoblja) {
-		this.medicinskaOsoblja = medicinskaOsoblja;
-	}
 
 	public Set<TipPregleda> getTipPregleda() {
 		return tipPregleda;
@@ -163,12 +160,22 @@ public class Klinika {
 	public void setTipPregleda(Set<TipPregleda> tipPregleda) {
 		this.tipPregleda = tipPregleda;
 	}
+
+	public Set<Lekar> getLekar() {
+		return lekar;
+	}
+
+	public void setLekar(Set<Lekar> lekar) {
+		this.lekar = lekar;
+	}
+
+	public Set<MedicinskaSestra> getMedicinskaSestra() {
+		return medicinskaSestra;
+	}
+
+	public void setMedicinskaSestra(Set<MedicinskaSestra> medicinskaSestra) {
+		this.medicinskaSestra = medicinskaSestra;
+	}
 	
-	//public Set<MedicinskoOsoblje> getMedicinskoOsoblje(){
-		//return medicinskaOsoblja;
-	//}
 	
-	//public void setMedicinskoOsoblje(Set<MedicinskoOsoblje> medicinskaOsoblja) {
-		//this.medicinskaOsoblja=medicinskaOsoblja;
-	//}
 }

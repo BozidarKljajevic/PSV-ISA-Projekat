@@ -1,10 +1,10 @@
 package com.example.demo.dto;
 
-import com.example.demo.model.AdminKlinike;
+
+import com.example.demo.model.MedicinskaSestra;
 
 
-
-public class AdminKlinikeDTO {
+public class MedicinskaSestraDTO {
 
 	private Long id;
 	private String mail;
@@ -15,25 +15,31 @@ public class AdminKlinikeDTO {
 	private String drzava;
 	private String brojTelefona;
 	private KlinikaDTO klinika;
+	private String radnoOd;
+	private String radnoDo;
+
 	
-	public AdminKlinikeDTO() {
+	public MedicinskaSestraDTO() {
 		
 	}
 	
-	public AdminKlinikeDTO(AdminKlinike adminK) {
-		this.id = adminK.getId();
-		this.mail = adminK.getMail();
-		this.ime = adminK.getIme();
-		this.prezime = adminK.getPrezime();
-		this.adresa = adminK.getAdresa();
-		this.grad = adminK.getGrad();
-		this.drzava = adminK.getDrzava();
-		this.brojTelefona = adminK.getBrojTelefona();
-		klinika = new KlinikaDTO(adminK.getKlinika());
+	public MedicinskaSestraDTO(MedicinskaSestra medicinskaSestra) {
+		this.id = medicinskaSestra.getId();
+		this.mail = medicinskaSestra.getMail();
+		this.ime = medicinskaSestra.getIme();
+		this.prezime = medicinskaSestra.getPrezime();
+		this.adresa = medicinskaSestra.getAdresa();
+		this.grad = medicinskaSestra.getGrad();
+		this.drzava = medicinskaSestra.getDrzava();
+		this.brojTelefona = medicinskaSestra.getBrojTelefona();
+		this.radnoOd = medicinskaSestra.getRadnoOd();
+		this.radnoDo = medicinskaSestra.getRadnoDo();
+		klinika = new KlinikaDTO(medicinskaSestra.getKlinika());
+		
 	}
 
-	public AdminKlinikeDTO(Long id, String mail, String ime, String prezime, String adresa, String grad, String drzava,
-			String brojTelefona) {
+	public MedicinskaSestraDTO(Long id, String mail, String ime, String prezime, String adresa, String grad, String drzava,
+			String brojTelefona,String radnoOd, String radnoDo) {
 		super();
 		this.id = id;
 		this.mail = mail;
@@ -43,6 +49,8 @@ public class AdminKlinikeDTO {
 		this.grad = grad;
 		this.drzava = drzava;
 		this.brojTelefona = brojTelefona;
+		this.radnoOd = radnoOd;
+		this.radnoDo = radnoDo;
 	}
 
 	public Long getId() {
@@ -108,6 +116,24 @@ public class AdminKlinikeDTO {
 	public void setBrojTelefona(String brojTelefona) {
 		this.brojTelefona = brojTelefona;
 	}
+	
+
+	
+	public String getRadnoOd() {
+		return radnoOd;
+	}
+
+	public void setRadnoOd(String radnoOd) {
+		this.radnoOd = radnoOd;
+	}
+	
+	public String getRadnoDo() {
+		return radnoDo;
+	}
+
+	public void setRadnoDo(String radnoDo) {
+		this.radnoDo = radnoDo;
+	}
 
 	public KlinikaDTO getKlinika() {
 		return klinika;
@@ -116,6 +142,6 @@ public class AdminKlinikeDTO {
 	public void setKlinika(KlinikaDTO klinika) {
 		this.klinika = klinika;
 	}
-	
-	
+
+
 }

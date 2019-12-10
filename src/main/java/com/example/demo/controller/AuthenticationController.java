@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -8,6 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.demo.dto.JwtAuthenticationRequest;
 import com.example.demo.dto.PacijentDTO;
+import com.example.demo.dto.RegisterDTO;
 import com.example.demo.dto.UserTokenState;
 import com.example.demo.model.Authority;
 import com.example.demo.model.Pacijent;
@@ -15,6 +17,7 @@ import com.example.demo.model.User;
 import com.example.demo.security.TokenUtils;
 import com.example.demo.service.CustomUserDetailsService;
 import com.example.demo.service.PacijentService;
+import com.example.demo.service.UserService;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -48,6 +51,9 @@ public class AuthenticationController {
 	@Autowired
 	private PacijentService pacijentService;
 	
+	@Autowired
+	private UserService userService;
+	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest,
 			HttpServletResponse response) throws AuthenticationException, IOException {
@@ -70,15 +76,30 @@ public class AuthenticationController {
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public ResponseEntity<?> addUser(@RequestBody PacijentDTO pacijent) throws Exception {
+	public ResponseEntity<?> addUser(@RequestBody RegisterDTO pacijent) throws Exception {
 
-		/*User existUser = this.pacijentService.findOne(pacijent.getMail());
+		User existUser = this.userService.findOne(pacijent.getMail());
 		if (existUser != null) {
 			throw new Exception("Alredy exist");
-		}*/
-
+		}
+		
 		Pacijent neaktivanPacijent = this.pacijentService.save(pacijent);
+		PacijentDTO pacijentDTO = new PacijentDTO(neaktivanPacijent);
 		HttpHeaders headers = new HttpHeaders();
-		return new ResponseEntity<User>(neaktivanPacijent, HttpStatus.CREATED);
+		return new ResponseEntity<PacijentDTO>(pacijentDTO, HttpStatus.CREATED);
+	}
+	
+	@RequestMapping(value = "/activate/{code}", method = RequestMethod.PUT)
+	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String code) throws Exception {
+		System.out.println("Usao");
+		Long id = Long.parseLong(code);
+		Pacijent exisPacijent = this.pacijentService.findOne(id);
+		if (exisPacijent != null) {
+			throw new Exception("Alredy exist");
+		}
+		
+		this.pacijentService.aktivirajPacijenta(exisPacijent);
+		
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 }

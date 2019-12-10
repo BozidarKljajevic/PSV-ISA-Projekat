@@ -20,85 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.KlinikaDTO;
-import com.example.demo.dto.MedicinskoOsobljeDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
-import com.example.demo.model.MedicinskoOsoblje;
+
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 
 @RestController
 @RequestMapping(value = "klinika")
-@CrossOrigin(origins = "http://localhost:8081")
 public class KlinikaController {
 
 	@Autowired
 	private KlinikaService klinikaService;
-	
-	@Autowired
-	private AdminKlinikeService adminKlinikeService;
-	
-	@GetMapping(value = "/klinikaId/{mail}")
-	public ResponseEntity<KlinikaDTO> getKlinika(@PathVariable String mail) {
-	
-		AdminKlinike admin = adminKlinikeService.findOneMejl(mail);
-		
-		Klinika klinika =klinikaService.findOne(admin.getKlinika().getId());
-		
-		KlinikaDTO klinikaDTO = new KlinikaDTO(klinika);
-		
-		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
-	}
-	
-	
-	
-	
-	@GetMapping(value = "/postojecaKlinika")
-	public ResponseEntity<KlinikaDTO> getPostojecaKlinika() {
-		
-		Klinika klinika = klinikaService.findOne((long) 1);
-		
-		KlinikaDTO klinikaDTO = new KlinikaDTO(klinika);
-		
-		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
-	}
-	
-	@PostMapping(value = "/dodajKliniku", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<KlinikaDTO> dodajKliniku(@RequestBody KlinikaDTO klinikaDTO) {
-		
-		KlinikaDTO klinikadto = new KlinikaDTO();
-		try {
-			klinikadto = klinikaService.dodajKliniku(klinikaDTO);
-		} catch (ValidationException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-		return new ResponseEntity<>(klinikadto, HttpStatus.OK);
-	}
-	
-	@PutMapping(value = "/izmeniPodatkeKlinike", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<KlinikaDTO> izmeniPodatkeKlinike(@RequestBody KlinikaDTO klinikaDTO){
-		
-		try { 
-			klinikaService.izmeniKliniku(klinikaDTO);
-		} catch (ValidationException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
-	}
-	
-	@GetMapping(value = "/sveKlinike")
-	public ResponseEntity<List<KlinikaDTO>> getSveKlinike() {
-		
-		List<Klinika> klinike = klinikaService.findAll();
 
-		// convert courses to DTOs
-		List<KlinikaDTO> klinikeDTO = new ArrayList<>();
-		for (Klinika klinika : klinike) {
-			klinikeDTO.add(new KlinikaDTO(klinika));
-		}
-
-		return new ResponseEntity<>(klinikeDTO, HttpStatus.OK);
-	}
 }

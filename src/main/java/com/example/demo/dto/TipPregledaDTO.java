@@ -7,6 +7,7 @@ public class TipPregledaDTO {
 	private Long id;
 	private String naziv;
 	private String oznaka;
+	private String cena;
 	private KlinikaDTO klinika;
 	
 	public TipPregledaDTO() {
@@ -17,14 +18,16 @@ public class TipPregledaDTO {
 		this.id = tipPregleda.getId();
 		this.naziv = tipPregleda.getNaziv();
 		this.oznaka = tipPregleda.getOznaka();
+		this.cena = tipPregleda.getCena();
 		klinika = new KlinikaDTO(tipPregleda.getKlinika());
 	}
 	
-	public TipPregledaDTO(Long id, String naziv, String oznaka) {
+	public TipPregledaDTO(Long id, String naziv, String oznaka,String cena) {
 		super();
 		this.id = id;
 		this.naziv = naziv;
 		this.oznaka = oznaka;
+		this.cena = cena;
 		
 	}
 	public Long getId() {
@@ -52,6 +55,14 @@ public class TipPregledaDTO {
 
 	public void setKlinika(KlinikaDTO klinika) {
 		this.klinika = klinika;
+	}
+
+	public String getCena() {
+		return cena;
+	}
+
+	public void setCena(String cena) {
+		this.cena = cena;
 	}
 	
 	
