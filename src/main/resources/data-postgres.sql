@@ -6,9 +6,6 @@ INSERT INTO public.pacijent(
 INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
 	VALUES (nextval('klinika_id_seq'), 'Jovana Obrenovica 83A', '+381/61-5534209', 'Crna Gora', 'Pljevlja', 'Sveti vid', 3.5, 'Vrlo lepo');
-INSERT INTO public.klinika(
-	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
-	VALUES (nextval('klinika_id_seq'), 'Danila Kisa 5', '+381/61-1111', 'Srbbija', 'Beograd', 'MC', 4.0, 'Sve naj');	
 
 
 INSERT INTO public.admin_klinike(
