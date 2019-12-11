@@ -33,12 +33,21 @@ public class PacijentService {
 	public Pacijent findOne(String mail) {
 		return pacijentRepository.findByMail(mail);
 	}
+	
+	public List<Pacijent> findAll() {
+		return pacijentRepository.findAll();
+	}
+
+	public void remove(Pacijent pac) {
+		pacijentRepository.delete(pac);
+	}
+
 
 	public Pacijent save(RegisterDTO pacijent) {
 		Pacijent neaktivanPacijent = new Pacijent();
 		
 		neaktivanPacijent.setAdresa(pacijent.getAdresa());
-		Authority auth = this.authorityRepository.findByName("PACIJENT");
+		Authority auth = this.authorityRepository.findByName("ADMINCENTRA");
 		List<Authority> auths = new ArrayList<>();
 	    auths.add(auth);
 	    neaktivanPacijent.setAuthorities(auths);
