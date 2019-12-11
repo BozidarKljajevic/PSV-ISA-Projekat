@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
+import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.SalaKlinikeDTO;
 import com.example.demo.dto.TipPregledaDTO;
 import com.example.demo.model.AdminKlinike;
@@ -155,5 +156,26 @@ public class TipPregledaController {
 		return new ResponseEntity<>(tipoviDTO, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/TipoviLekara/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<List<LekarDTO>> getTipoviLekara(@PathVariable String id) {
+		
+		List<Lekar> lekari = lekarService.findAll();
 
+		Long idLong = Long.parseLong(id);
+		TipPregleda tipPregleda = tipPregledaService.findOne(idLong);
+		List<LekarDTO> lekarDTO = new ArrayList<>();
+		
+		
+		for (Lekar le : lekari) {
+		    if(le.getTipPregleda().getId() == tipPregleda.getId()) {
+			lekarDTO.add(new LekarDTO(le));
+		    }
+		}
+
+		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
+	}
+	
+	
+	
 }
