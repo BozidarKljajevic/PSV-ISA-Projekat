@@ -63,7 +63,6 @@ public class PacijentService {
 		
 		return neaktivanPacijent;
 	}
-	
 
 	public void aktivirajPacijenta(Pacijent exisPacijent) {
 		

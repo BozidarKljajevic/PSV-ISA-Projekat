@@ -10,7 +10,6 @@ INSERT INTO public.pacijent(
 	 id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra)
 	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', false, 'Novi Sad', 'Damjan', 'zutimali@gmail.com', 'Pantic', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra');
 
-
 INSERT INTO public.admin_centra(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra)
 	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'admin@admin.com', 'Pantic', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra');
@@ -22,11 +21,22 @@ INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
 	VALUES (nextval('klinika_id_seq'), 'Danila Kisa 5', '+381/61-1111', 'Srbbija', 'Beograd', 'MC', 4.0, 'Sve naj');
 	
+INSERT INTO public.admin_klinike(
+	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, klinika_id)
+	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'damjanbanjac@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1);
+
 INSERT INTO public.authority(name)VALUES ('PACIJENT');
 INSERT INTO public.authority(name)VALUES ('LEKAR');
+INSERT INTO public.authority(name)VALUES ('ADMIN');
 INSERT INTO public.authority(name)VALUES ('ADMINCENTRA');
+
+
+INSERT INTO public.tip_pregleda(
+	id, cena, naziv, oznaka, klinika_id)
+	VALUES (nextval('tippregleda_id_seq'), '200', 'tip1', ' ozn1', 1);
 
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (3, 1);
-INSERT INTO public.user_authority(user_id, authority_id)VALUES (4, 3);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (4, 4);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (5, 3);
