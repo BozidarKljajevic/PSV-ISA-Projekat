@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class MedicinskaSestra extends User {
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
 	private Klinika klinika;
 	
 
