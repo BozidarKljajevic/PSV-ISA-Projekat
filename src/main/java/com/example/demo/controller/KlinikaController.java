@@ -37,17 +37,6 @@ public class KlinikaController {
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
 	
-	@GetMapping(value = "/postojecaKlinika")
-	@PreAuthorize("hasAuthority('ADMINCENTRA')")
-	public ResponseEntity<KlinikaDTO> getPostojecaKlinika() {
-		
-		Klinika klinika = klinikaService.findOne((long) 1);
-		
-		KlinikaDTO klinikaDTO = new KlinikaDTO(klinika);
-		
-		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
-	}
-	
 	@GetMapping(value = "/sveKlinike")
 	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<KlinikaDTO>> getSveKlinike() {
