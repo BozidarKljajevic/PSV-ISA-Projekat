@@ -72,6 +72,7 @@ public class LekarService {
 		lekar.setBrojTelefona(lekarDTO.getBrojTelefona());
 		lekar.setDrzava(lekarDTO.getDrzava());
 		lekar.setEnabled(true);
+		lekar.setPromenjenaSifra(false);
 		lekar.setGrad(lekarDTO.getGrad());
 		lekar.setIme(lekarDTO.getIme());
 		lekar.setMail(lekarDTO.getMail());

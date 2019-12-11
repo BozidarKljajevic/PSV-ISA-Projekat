@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.KlinikaDTO;
+import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.User;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.UserService;
 
 @RestController
 @RequestMapping(value = "adminKlinike")
@@ -29,6 +31,26 @@ public class AdminKlinikeController {
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
 	
+	@Autowired
+	private UserService userService;
+	
+	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<?> izmeniGenerickuSifru(@RequestBody SifraDTO sifra, @PathVariable Long id) {
+		
+		User user = userService.findOne(id);
+		
+		System.out.println(sifra.getSifra());
+		System.out.println(id);
+		
+		if (user == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		userService.izmeniSifru(user, sifra.getSifra());
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 	
 	@GetMapping(value = "/postojeciAdminKlinike/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")

@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.User;
@@ -12,11 +13,22 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	public User findOne(Long id) {
 		return userRepository.findById(id).orElse(null);
 	}
 	
 	public User findOne(String mail) {
 		return userRepository.findByMail(mail);
+	}
+
+	public void izmeniSifru(User user, String sifra) {
+		
+		user.setSifra(passwordEncoder.encode(sifra));
+		user.setPromenjenaSifra(true);
+		
+		this.userRepository.save(user);
 	}
 }

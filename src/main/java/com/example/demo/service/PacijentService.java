@@ -54,6 +54,7 @@ public class PacijentService {
 		neaktivanPacijent.setBrojTelefona(pacijent.getBrojTelefona());
 		neaktivanPacijent.setDrzava(pacijent.getDrzava());
 		neaktivanPacijent.setEnabled(false);
+		neaktivanPacijent.setPromenjenaSifra(true);
 		neaktivanPacijent.setGrad(pacijent.getGrad());
 		neaktivanPacijent.setIme(pacijent.getIme());
 		neaktivanPacijent.setMail(pacijent.getMail());

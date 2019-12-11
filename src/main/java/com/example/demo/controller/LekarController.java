@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
+import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
@@ -44,6 +45,25 @@ public class LekarController {
 	
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
+	
+	
+	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> izmeniGenerickuSifru(@RequestBody SifraDTO sifra, @PathVariable Long id) {
+		
+		User user = userService.findOne(id);
+		
+		System.out.println(sifra.getSifra());
+		System.out.println(id);
+		
+		if (user == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		userService.izmeniSifru(user, sifra.getSifra());
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 	
 	@PostMapping(value = "/dodajLekara/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")

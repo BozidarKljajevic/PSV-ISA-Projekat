@@ -66,6 +66,7 @@ public class MedicinskaSestraService {
 		medicinskaSestra.setBrojTelefona(medicinskaSestraDTO.getBrojTelefona());
 		medicinskaSestra.setDrzava(medicinskaSestraDTO.getDrzava());
 		medicinskaSestra.setEnabled(true);
+		medicinskaSestra.setPromenjenaSifra(false);
 		medicinskaSestra.setGrad(medicinskaSestraDTO.getGrad());
 		medicinskaSestra.setIme(medicinskaSestraDTO.getIme());
 		medicinskaSestra.setMail(medicinskaSestraDTO.getMail());

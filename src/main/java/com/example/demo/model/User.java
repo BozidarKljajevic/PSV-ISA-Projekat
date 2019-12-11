@@ -60,6 +60,9 @@ public class User implements UserDetails {
 
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
+	
+	@Column(name = "promenjena_sifra", nullable = false)
+	private boolean promenjenaSifra;
 
 	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	@JoinTable(name = "user_authority", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
@@ -135,6 +138,14 @@ public class User implements UserDetails {
 
 	public void setBrojTelefona(String brojTelefona) {
 		this.brojTelefona = brojTelefona;
+	}
+
+	public boolean isPromenjenaSifra() {
+		return promenjenaSifra;
+	}
+
+	public void setPromenjenaSifra(boolean promenjenaSifra) {
+		this.promenjenaSifra = promenjenaSifra;
 	}
 
 	@Override

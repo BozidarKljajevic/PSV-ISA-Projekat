@@ -49,7 +49,7 @@ public class TokenUtils {
 				.setExpiration(generateExpirationDate())
 				.claim("role", role)
 				.claim("id", user.getId())
-				.claim("enabled", user.isEnabled())
+				.claim("enabled", user.isPromenjenaSifra())
 				.signWith(SIGNATURE_ALGORITHM, SECRET).compact();
 	}
 

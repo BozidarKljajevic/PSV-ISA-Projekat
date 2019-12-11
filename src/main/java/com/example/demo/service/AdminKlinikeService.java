@@ -59,7 +59,7 @@ public class AdminKlinikeService {
 	public AdminKlinikeDTO dodajAdminaKlinike(AdminKlinikeDTO adminklinikeDTO) {
 		AdminKlinike admin = new AdminKlinike();
 		
-		Authority auth = this.authorityRepository.findByName("PACIJENT");
+		Authority auth = this.authorityRepository.findByName("ADMIN");
 		List<Authority> auths = new ArrayList<>();
 	    auths.add(auth);
 		admin.setAuthorities(auths);
@@ -71,7 +71,7 @@ public class AdminKlinikeService {
 		admin.setDrzava(adminklinikeDTO.getDrzava());
 		admin.setBrojTelefona(adminklinikeDTO.getBrojTelefona());
 		admin.setSifra(adminklinikeDTO.getIme());
-		System.out.println(adminklinikeDTO.getKlinika().getId());
+		admin.setPromenjenaSifra(false);
 		admin.setKlinika(klinikaRepository.findById(adminklinikeDTO.getKlinika().getId()).orElse(null));
 		admin.setSifra(passwordEncoder.encode("123"));
 		adminKlinikeRepository.save(admin);
