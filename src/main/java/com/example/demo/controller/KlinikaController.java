@@ -38,12 +38,11 @@ public class KlinikaController {
 	private AdminKlinikeService adminKlinikeService;
 	
 	@GetMapping(value = "/sveKlinike")
-	@PreAuthorize("hasAuthority('ADMINCENTRA')")
+	//@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<KlinikaDTO>> getSveKlinike() {
 		
 		List<Klinika> klinike = klinikaService.findAll();
 
-		// convert courses to DTOs
 		List<KlinikaDTO> klinikeDTO = new ArrayList<>();
 		for (Klinika klinika : klinike) {
 			klinikeDTO.add(new KlinikaDTO(klinika));
