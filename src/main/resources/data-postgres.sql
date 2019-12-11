@@ -50,7 +50,7 @@ INSERT INTO public.lekar(
 	
 INSERT INTO public.pregledi(
 	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
-	VALUES (nextval('pregled_id_seq'), 2000, '11/12/2019', 1, 1.5, '12:00', false, 7, 1, 1);
+	VALUES (nextval('pregled_id_seq'), 2000, '11/12/2019', null, 1.5, '12:00', false, 7, 1, 1);
 	
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);
