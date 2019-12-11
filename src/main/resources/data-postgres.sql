@@ -2,6 +2,10 @@
 -- Lozinka za oba user-a je 123
 INSERT INTO public.pacijent(
 	 id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra)
+	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Vilotije', 'vilimali@gmail.com', 'Pantic', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra');
+
+INSERT INTO public.pacijent(
+	 id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra)
 	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'panticdamjan@gmail.com', 'Pantic', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra');
 INSERT INTO public.pacijent(
 	 id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra)
@@ -9,6 +13,7 @@ INSERT INTO public.pacijent(
 INSERT INTO public.pacijent(
 	 id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra)
 	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', false, 'Novi Sad', 'Damjan', 'zutimali@gmail.com', 'Pantic', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra');
+
 
 INSERT INTO public.admin_centra(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra)
@@ -34,9 +39,23 @@ INSERT INTO public.authority(name)VALUES ('ADMINCENTRA');
 INSERT INTO public.tip_pregleda(
 	id, cena, naziv, oznaka, klinika_id)
 	VALUES (nextval('tippregleda_id_seq'), '200', 'tip1', ' ozn1', 1);
-
+	
+INSERT INTO public.sala_klinike(
+	id, broj, naziv, klinika_id)
+	VALUES (nextval('salaklinike_id_seq'), 201, 'Sok Soba', 1);
+	
+INSERT INTO public.lekar(
+	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, ocena, radno_do, radno_od, klinika_id, tip_pregleda_id)
+	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'lekar@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '20:00', '08:00', 1, 1);
+	
+INSERT INTO public.pregledi(
+	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
+	VALUES (nextval('pregled_id_seq'), 2000, '11/12/2019', 1, 1.5, '12:00', false, 7, 1, 1);
+	
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (3, 1);
-INSERT INTO public.user_authority(user_id, authority_id)VALUES (4, 4);
-INSERT INTO public.user_authority(user_id, authority_id)VALUES (5, 3);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (4, 1);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (5, 4);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (6, 3);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (7, 2);

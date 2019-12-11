@@ -14,7 +14,6 @@ public class Lekar extends User {
 	
 	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
 	private TipPregleda tipPregleda;
-
 	
 	@Column(name = "ocena",nullable = false)
 	private String ocena;
