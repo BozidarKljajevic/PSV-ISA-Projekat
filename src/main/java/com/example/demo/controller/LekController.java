@@ -85,7 +85,4 @@ public class LekController {
 			return new ResponseEntity<>(lekDTO, HttpStatus.NOT_FOUND);
 		}
 	}
-
-
-	
 }

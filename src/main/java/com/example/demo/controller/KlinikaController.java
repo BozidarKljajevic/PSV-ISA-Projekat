@@ -34,24 +34,15 @@ public class KlinikaController {
 	@Autowired
 	private KlinikaService klinikaService;
 	
-	@GetMapping(value = "/postojecaKlinika")
-	@PreAuthorize("hasAuthority('ADMINCENTRA')")
-	public ResponseEntity<KlinikaDTO> getPostojecaKlinika() {
-		
-		Klinika klinika = klinikaService.findOne((long) 1);
-		
-		KlinikaDTO klinikaDTO = new KlinikaDTO(klinika);
-		
-		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
-	}
+	@Autowired
+	private AdminKlinikeService adminKlinikeService;
 	
 	@GetMapping(value = "/sveKlinike")
-	@PreAuthorize("hasAuthority('ADMINCENTRA')")
+	//@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<KlinikaDTO>> getSveKlinike() {
 		
 		List<Klinika> klinike = klinikaService.findAll();
 
-		// convert courses to DTOs
 		List<KlinikaDTO> klinikeDTO = new ArrayList<>();
 		for (Klinika klinika : klinike) {
 			klinikeDTO.add(new KlinikaDTO(klinika));
@@ -74,6 +65,30 @@ public class KlinikaController {
 		return new ResponseEntity<>(klinikadto, HttpStatus.OK);
 	}
 
-
-
+	
+	@GetMapping(value = "/postojecaKlinika/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<KlinikaDTO> getPostojecaKlinika(@PathVariable String id) {
+		
+		Long idLong = Long.parseLong(id);
+		Klinika klinika = klinikaService.findOne(adminKlinikeService.findOne(idLong).getKlinika().getId());
+		
+		KlinikaDTO klinikaDTO = new KlinikaDTO(klinika);
+		
+		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/izmeniPodatkeKlinike", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<KlinikaDTO> izmeniPodatkeKlinike(@RequestBody KlinikaDTO klinikaDTO){
+		
+		try { 
+			klinikaService.izmeniKliniku(klinikaDTO);
+		} catch (ValidationException e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
+	}
+	
 }

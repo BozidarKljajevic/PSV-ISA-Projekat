@@ -89,7 +89,6 @@ public class AuthenticationController {
 		return new ResponseEntity<PacijentDTO>(pacijentDTO, HttpStatus.CREATED);
 	}
 	
-
 	@RequestMapping(value = "/activate/{code}", method = RequestMethod.POST)
 	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String code) throws Exception {
 		

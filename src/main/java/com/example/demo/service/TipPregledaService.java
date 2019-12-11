@@ -21,4 +21,8 @@ public class TipPregledaService {
 	private TipPregledaRepository tipPregledaRepository;
 	
 	
+	public List<TipPregleda> findAll() {
+		return tipPregledaRepository.findAll();
+	}
+	
 }
