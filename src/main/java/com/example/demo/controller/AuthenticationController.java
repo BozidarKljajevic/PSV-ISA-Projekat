@@ -38,22 +38,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @RestController
 @RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthenticationController {
-	
+
 	@Autowired
 	TokenUtils tokenUtils;
-	
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	private CustomUserDetailsService userDetailsService;
-	
+
 	@Autowired
 	private PacijentService pacijentService;
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest,
 			HttpServletResponse response) throws AuthenticationException, IOException {
@@ -65,16 +65,24 @@ public class AuthenticationController {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		User user = (User) authentication.getPrincipal();
-		if (user.isEnabled()) {
+		Pacijent pacijent = pacijentService.findOne(user.getId());
+
+		if (pacijent == null) {
 			Collection<?> roles = user.getAuthorities();
-			String jwt = tokenUtils.generateToken(user, (Authority)roles.iterator().next());
+			String jwt = tokenUtils.generateToken(user, (Authority) roles.iterator().next());
+			int expiresIn = tokenUtils.getExpiredIn();
+
+			return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
+		} else if (user.isEnabled()) {
+			Collection<?> roles = user.getAuthorities();
+			String jwt = tokenUtils.generateToken(user, (Authority) roles.iterator().next());
 			int expiresIn = tokenUtils.getExpiredIn();
 
 			return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
 		}
 		return (ResponseEntity<?>) ResponseEntity.notFound();
 	}
-	
+
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public ResponseEntity<?> addUser(@RequestBody RegisterDTO pacijent) throws Exception {
 
@@ -82,24 +90,25 @@ public class AuthenticationController {
 		if (existUser != null) {
 			throw new Exception("Alredy exist");
 		}
-		
+
 		Pacijent neaktivanPacijent = this.pacijentService.save(pacijent);
 		PacijentDTO pacijentDTO = new PacijentDTO(neaktivanPacijent);
 		HttpHeaders headers = new HttpHeaders();
 		return new ResponseEntity<PacijentDTO>(pacijentDTO, HttpStatus.CREATED);
 	}
-	
+
+
 	@RequestMapping(value = "/activate/{code}", method = RequestMethod.POST)
 	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String code) throws Exception {
-		
+
 		Long id = Long.parseLong(code);
 		Pacijent exisPacijent = this.pacijentService.findOne(id);
 		if (exisPacijent == null) {
 			throw new Exception("Alredy exist");
 		}
-		
+
 		this.pacijentService.aktivirajPacijenta(exisPacijent);
-		
+
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 }
