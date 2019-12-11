@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.model.AdminKlinike;
+import com.example.demo.model.Lekar;
 import com.example.demo.repository.AdminKlinikeRepository;
 import com.example.demo.repository.KlinikaRepository;
 
@@ -22,6 +25,11 @@ public class AdminKlinikeService {
 	
 	public AdminKlinike findOne(Long id) {
 		return adminKlinikeRepository.findById(id).orElseGet(null);
+	}
+	
+	
+	public List<AdminKlinike> findAll() {
+		return adminKlinikeRepository.findAll();
 	}
 	
 	public AdminKlinike findOneMejl(String mejl) {
