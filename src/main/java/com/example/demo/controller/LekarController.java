@@ -42,11 +42,13 @@ public class LekarController {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private AdminKlinikeService adminKlinikeService;
 	
 	@PostMapping(value = "/dodajLekara/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Lekar> dodajLekara(@RequestBody LekarDTO lekarDTO1,@PathVariable String id) throws Exception {
-		Lekar lekarDTO2 = new Lekar();
+	public ResponseEntity<LekarDTO> dodajLekara(@RequestBody LekarDTO lekarDTO1,@PathVariable String id) throws Exception {
+		LekarDTO lekarDTO2 = new LekarDTO();
 		
 		User existUser = this.userService.findOne(lekarDTO1.getMail());
 		if (existUser != null) {
@@ -54,7 +56,7 @@ public class LekarController {
 		}
 		
 		Long idLong = Long.parseLong(id);
-		lekarDTO2 = lekarService.dodaj(lekarDTO1,idLong);
+		lekarDTO2 = new LekarDTO(lekarService.dodaj(lekarDTO1,idLong));
 		return new ResponseEntity<>(lekarDTO2, HttpStatus.OK);
 	}
 
@@ -140,6 +142,23 @@ public class LekarController {
 		List<LekarDTO> lekarDTO = new ArrayList<>();
 		for (Lekar le : lekar) {
 			lekarDTO.add(new LekarDTO(le));
+		}
+
+		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/postojeciLekariKlinike/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<List<LekarDTO>> getPostojeciLekariKlinike(@PathVariable String id) {
+		
+		List<Lekar> lekar = lekarService.findAll();
+		Long idLong = Long.parseLong(id);
+		AdminKlinike adm = adminKlinikeService.findOne(idLong);
+		List<LekarDTO> lekarDTO = new ArrayList<>();
+		for (Lekar le : lekar) {
+			 if(le.getKlinika().getId() == adm.getKlinika().getId()) {
+			lekarDTO.add(new LekarDTO(le));
+			 }
 		}
 
 		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);

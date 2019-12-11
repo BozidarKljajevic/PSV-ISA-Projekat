@@ -19,6 +19,7 @@ import com.example.demo.model.AdminKlinike;
 
 import com.example.demo.model.Authority;
 import com.example.demo.model.Pacijent;
+import com.example.demo.model.Lekar;
 import com.example.demo.repository.AdminKlinikeRepository;
 import com.example.demo.repository.AuthorityRepository;
 import com.example.demo.repository.AdminKlinikeRepository;
@@ -47,7 +48,10 @@ public class AdminKlinikeService {
 	public AdminKlinike findOneM(String mail) {
 		return adminKlinikeRepository.findByMail(mail);
 	}
-
+	
+	public List<AdminKlinike> findAll() {
+		return adminKlinikeRepository.findAll();
+	}
 	public AdminKlinike findOneMejl(String mejl) {
 		return adminKlinikeRepository.findByMail(mejl);
 	}
