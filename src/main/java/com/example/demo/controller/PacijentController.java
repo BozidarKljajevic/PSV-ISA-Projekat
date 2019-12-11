@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,5 +37,22 @@ public class PacijentController {
 		PacijentDTO pacijentDTO = new PacijentDTO(pacijent);
 
 		return new ResponseEntity<>(pacijentDTO, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/izmeni")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> izmeniPacijenta(@RequestBody PacijentDTO pacijentDTO) {
+		
+		Pacijent pacijent = (Pacijent) pacijentService.findOne(pacijentDTO.getId());
+		
+		if (pacijent == null) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+		
+		Pacijent izmenjenPacijent = pacijentService.izmeni(pacijent, pacijentDTO);
+
+		PacijentDTO newPacijentDTO = new PacijentDTO(izmenjenPacijent);
+
+		return new ResponseEntity<>(newPacijentDTO, HttpStatus.OK);
 	}
 }

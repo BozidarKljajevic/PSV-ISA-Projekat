@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.RegisterDTO;
 import com.example.demo.model.Authority;
 import com.example.demo.model.Pacijent;
@@ -60,5 +61,19 @@ public class PacijentService {
 		exisPacijent.setEnabled(true);
 		this.pacijentRepository.save(exisPacijent);
 		
+	}
+
+	public Pacijent izmeni(Pacijent pacijent, PacijentDTO pacijentDTO) {
+		
+		pacijent.setIme(pacijentDTO.getIme());
+		pacijent.setPrezime(pacijentDTO.getPrezime());
+		pacijent.setAdresa(pacijentDTO.getAdresa());
+		pacijent.setGrad(pacijentDTO.getGrad());
+		pacijent.setDrzava(pacijentDTO.getDrzava());
+		pacijent.setBrojTelefona(pacijentDTO.getBrojTelefona());
+		
+		this.pacijentRepository.save(pacijent);
+		
+		return pacijent;
 	}
 }
