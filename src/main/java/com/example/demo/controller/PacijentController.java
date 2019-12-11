@@ -1,10 +1,14 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,4 +41,47 @@ public class PacijentController {
 
 		return new ResponseEntity<>(pacijentDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/postojeciNeaktivanPacijent")
+	public ResponseEntity<List<PacijentDTO>> getPostojeciNeaktivanPacijent() {
+		
+		List<Pacijent> pacijenti = pacijentService.findAll();
+
+		List<PacijentDTO> pacijentiDTO = new ArrayList<>();
+		for (Pacijent pacijent : pacijenti) {
+			if(pacijent.isEnabled()==false) {
+				pacijentiDTO.add(new PacijentDTO(pacijent));
+			}
+		}
+
+		return new ResponseEntity<>(pacijentiDTO, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/ibrisiNeaktivnogPacijenta/{id}")
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
+	public ResponseEntity<List<PacijentDTO>> izbrisiPacijenta(@PathVariable String id) {
+
+		Long idLong = Long.parseLong(id);
+		Pacijent pac = pacijentService.findOne(idLong);
+
+		List<PacijentDTO> pacijentiDTO = new ArrayList<>();
+		if (pac != null) {
+			
+			pacijentService.remove(pac);
+			List<Pacijent> pacijenti = pacijentService.findAll();
+
+			for (Pacijent pacijent : pacijenti) {
+				if(pacijent.isEnabled()==false) {
+					pacijentiDTO.add(new PacijentDTO(pacijent));
+				}
+			}
+			
+			return new ResponseEntity<>(pacijentiDTO,HttpStatus.OK);
+		} else {
+			
+			return new ResponseEntity<>(pacijentiDTO,HttpStatus.NOT_FOUND);
+		}
+	}
+
+	
 }
