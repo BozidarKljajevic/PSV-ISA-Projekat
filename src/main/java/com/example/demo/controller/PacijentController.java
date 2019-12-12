@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.PacijentDTO;
+import com.example.demo.dto.PorukaDTO;
+import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.Pacijent;
+import com.example.demo.model.User;
+import com.example.demo.service.EmailService;
 import com.example.demo.service.PacijentService;
 
 @RestController
@@ -27,6 +32,9 @@ public class PacijentController {
 
 	@Autowired
 	private PacijentService pacijentService;
+	
+	@Autowired
+	private EmailService emailService;
 
 	@GetMapping(value = "/preuzmi/{id}")
 	@PreAuthorize("hasAuthority('PACIJENT')")
@@ -90,9 +98,9 @@ public class PacijentController {
 		return new ResponseEntity<>(pacijentiDTO, HttpStatus.OK);
 	}
 	
-	@PostMapping(value = "/ibrisiNeaktivnogPacijenta/{id}")
+	@PostMapping(value = "/ibrisiNeaktivnogPacijenta/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMINCENTRA')")
-	public ResponseEntity<List<PacijentDTO>> izbrisiPacijenta(@PathVariable String id) {
+	public ResponseEntity<List<PacijentDTO>> izbrisiPacijenta(@RequestBody PorukaDTO poruka, @PathVariable String id) throws MailException, InterruptedException {
 
 		Long idLong = Long.parseLong(id);
 		Pacijent pac = pacijentService.findOne(idLong);
@@ -108,7 +116,7 @@ public class PacijentController {
 					pacijentiDTO.add(new PacijentDTO(pacijent));
 				}
 			}
-			
+			emailService.sendNotificaitionAsync((User)pac, poruka.getPoruka());
 			return new ResponseEntity<>(pacijentiDTO,HttpStatus.OK);
 		} else {
 			

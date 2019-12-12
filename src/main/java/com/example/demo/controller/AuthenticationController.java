@@ -16,6 +16,7 @@ import com.example.demo.model.Pacijent;
 import com.example.demo.model.User;
 import com.example.demo.security.TokenUtils;
 import com.example.demo.service.CustomUserDetailsService;
+import com.example.demo.service.EmailService;
 import com.example.demo.service.PacijentService;
 import com.example.demo.service.UserService;
 
@@ -53,6 +54,8 @@ public class AuthenticationController {
 
 	@Autowired
 	private UserService userService;
+
+	
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest,
@@ -96,7 +99,6 @@ public class AuthenticationController {
 		HttpHeaders headers = new HttpHeaders();
 		return new ResponseEntity<PacijentDTO>(pacijentDTO, HttpStatus.CREATED);
 	}
-
 
 	@RequestMapping(value = "/activate/{code}", method = RequestMethod.POST)
 	public ResponseEntity<?> aktivirajPacijenta(@PathVariable String code) throws Exception {

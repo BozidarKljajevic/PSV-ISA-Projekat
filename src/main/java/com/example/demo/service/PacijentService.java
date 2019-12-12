@@ -47,7 +47,7 @@ public class PacijentService {
 		Pacijent neaktivanPacijent = new Pacijent();
 		
 		neaktivanPacijent.setAdresa(pacijent.getAdresa());
-		Authority auth = this.authorityRepository.findByName("ADMINCENTRA");
+		Authority auth = this.authorityRepository.findByName("PACIJENT");
 		List<Authority> auths = new ArrayList<>();
 	    auths.add(auth);
 	    neaktivanPacijent.setAuthorities(auths);
