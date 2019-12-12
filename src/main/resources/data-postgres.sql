@@ -33,7 +33,7 @@ INSERT INTO public.admin_klinike(
 	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'damjanbanjac@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, false);
 INSERT INTO public.admin_klinike(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, klinika_id, promenjena_sifra)
-	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjanko', 'damjanbanjac1@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 2, true);
+	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjanko', 'damjanbanjac14@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 2, true);
 	
 INSERT INTO public.authority(name)VALUES ('PACIJENT');
 INSERT INTO public.authority(name)VALUES ('LEKAR');
