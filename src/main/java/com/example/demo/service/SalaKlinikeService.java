@@ -10,8 +10,9 @@ import org.springframework.stereotype.Service;
 
 
 import com.example.demo.dto.SalaKlinikeDTO;
-import com.example.demo.model.MedicinskoOsoblje;
+import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.SalaKlinike;
+import com.example.demo.repository.AdminKlinikeRepository;
 import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.SalaKlinikeRepository;
 
@@ -24,18 +25,23 @@ public class SalaKlinikeService {
 	@Autowired
 	private KlinikaRepository klinikaRepository;
 	
+	@Autowired
+	private AdminKlinikeRepository adminKlinikeRepository;
+	
+	
 	public SalaKlinike findOne(Long id) {
 		return salaKlinikeRepository.findById(id).orElseGet(null);
 	}
 	
 
 	
-	public SalaKlinikeDTO dodajSaluKlinike(SalaKlinikeDTO salaKlinikeDTO) {
+	public SalaKlinikeDTO dodajSaluKlinike(SalaKlinikeDTO salaKlinikeDTO,Long id) {
 		SalaKlinike sala = new SalaKlinike();
 		
 		sala.setNaziv(salaKlinikeDTO.getNaziv());
 		sala.setBroj(salaKlinikeDTO.getBroj());
-		sala.setKlinika(klinikaRepository.getOne(salaKlinikeDTO.getKlinika().getId()));
+		AdminKlinike admin = adminKlinikeRepository.findById(id).orElse(null);
+		sala.setKlinika(admin.getKlinika());
 		salaKlinikeRepository.save(sala);
 		
 		SalaKlinikeDTO salaDTO=new SalaKlinikeDTO(sala);
@@ -65,4 +71,5 @@ public class SalaKlinikeService {
 	public List<SalaKlinike> findAll() {
 		return salaKlinikeRepository.findAll();
 	}
+
 }

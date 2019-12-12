@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.LekDTO;
 import com.example.demo.model.Lek;
-import com.example.demo.model.NeaktivanPacijent;
 import com.example.demo.repository.LekRepository;
 
 
@@ -40,4 +39,5 @@ public class LekService {
 	public void remove(Long id) {
 		lekRepository.deleteById(id);
 	}
+
 }

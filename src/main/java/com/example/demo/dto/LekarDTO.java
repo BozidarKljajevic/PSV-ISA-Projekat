@@ -1,9 +1,10 @@
 package com.example.demo.dto;
 
-import com.example.demo.model.AdminKlinike;
-import com.example.demo.model.MedicinskoOsoblje;
 
-public class MedicinskoOsobljeDTO {
+import com.example.demo.model.Lekar;
+
+
+public class LekarDTO {
 
 	private Long id;
 	private String mail;
@@ -13,33 +14,35 @@ public class MedicinskoOsobljeDTO {
 	private String grad;
 	private String drzava;
 	private String brojTelefona;
-	private KlinikaDTO idKlinike;
-	private Boolean lekar;
+	private KlinikaDTO klinika;
+	private TipPregledaDTO tipPregleda;
+	//private String ocena;
 	private String radnoOd;
 	private String radnoDo;
 
 	
-	public MedicinskoOsobljeDTO() {
+	public LekarDTO() {
 		
 	}
 	
-	public MedicinskoOsobljeDTO(MedicinskoOsoblje medOsoblje) {
-		this.id = medOsoblje.getId();
-		this.mail = medOsoblje.getMail();
-		this.ime = medOsoblje.getIme();
-		this.prezime = medOsoblje.getPrezime();
-		this.adresa = medOsoblje.getAdresa();
-		this.grad = medOsoblje.getGrad();
-		this.drzava = medOsoblje.getDrzava();
-		this.brojTelefona = medOsoblje.getBrojTelefona();
-		this.lekar = medOsoblje.getLekar();
-		this.radnoOd = medOsoblje.getRadnoOd();
-		this.radnoDo = medOsoblje.getRadnoDo();
-		//idKlinike = new KlinikaDTO(medOsoblje.getKlinika());
+	public LekarDTO(Lekar lekar) {
+		this.id = lekar.getId();
+		this.mail = lekar.getMail();
+		this.ime = lekar.getIme();
+		this.prezime = lekar.getPrezime();
+		this.adresa = lekar.getAdresa();
+		this.grad = lekar.getGrad();
+		this.drzava = lekar.getDrzava();
+		this.brojTelefona = lekar.getBrojTelefona();
+		this.radnoOd = lekar.getRadnoOd();
+		this.radnoDo = lekar.getRadnoDo();
+	//	this.ocena = lekar.getOcena();
+		klinika = new KlinikaDTO(lekar.getKlinika());
+		tipPregleda = new TipPregledaDTO(lekar.getTipPregleda());
 	}
 
-	public MedicinskoOsobljeDTO(Long id, String mail, String ime, String prezime, String adresa, String grad, String drzava,
-			String brojTelefona,Boolean lekar,String radnoOd, String radnoDo) {
+	public LekarDTO(Long id, String mail, String ime, String prezime, String adresa, String grad, String drzava,
+			String brojTelefona,String radnoOd, String radnoDo, String ocena) {
 		super();
 		this.id = id;
 		this.mail = mail;
@@ -49,9 +52,9 @@ public class MedicinskoOsobljeDTO {
 		this.grad = grad;
 		this.drzava = drzava;
 		this.brojTelefona = brojTelefona;
-		this.lekar = lekar;
 		this.radnoOd = radnoOd;
 		this.radnoDo = radnoDo;
+		//this.ocena = ocena;
 	}
 
 	public Long getId() {
@@ -118,21 +121,7 @@ public class MedicinskoOsobljeDTO {
 		this.brojTelefona = brojTelefona;
 	}
 	
-	public KlinikaDTO getIdKlinike() {
-		return idKlinike;
-	}
 
-	public void setKlinikaId(KlinikaDTO idKlinike) {
-		this.idKlinike = idKlinike ;
-	}
-	
-	public Boolean getLekar() {
-		return lekar;
-	}
-
-	public void setLekar(Boolean lekar) {
-		this.lekar = lekar;
-	}
 	
 	public String getRadnoOd() {
 		return radnoOd;
@@ -150,7 +139,28 @@ public class MedicinskoOsobljeDTO {
 		this.radnoDo = radnoDo;
 	}
 
-	public void setIdKlinike(KlinikaDTO idKlinike) {
-		this.idKlinike = idKlinike;
+	public KlinikaDTO getKlinika() {
+		return klinika;
 	}
+
+	public void setKlinika(KlinikaDTO klinika) {
+		this.klinika = klinika;
+	}
+
+	public TipPregledaDTO getTipPregleda() {
+		return tipPregleda;
+	}
+
+	public void setTipPregleda(TipPregledaDTO tipPregleda) {
+		this.tipPregleda = tipPregleda;
+	}
+
+/*	public String getOcena() {
+		return ocena;
+	}
+
+	public void setOcena(String ocena) {
+		this.ocena = ocena;
+	}
+ */
 }

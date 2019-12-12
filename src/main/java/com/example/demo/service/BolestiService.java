@@ -17,6 +17,7 @@ public class BolestiService {
 	@Autowired
 	private BolestiRepository bolestiRepository;
 	
+	
 	public BolestiDTO dodajBolest(BolestiDTO bolestDTO) {
 		Bolesti bolest = new Bolesti();
 		
@@ -32,12 +33,12 @@ public class BolestiService {
 	public List<Bolesti> findAll() {
 		return bolestiRepository.findAll();
 	}
-	
+
 	public Bolesti findOne(Long id) {
 		return bolestiRepository.findById(id).orElseGet(null);
 	}
 	public void remove(Long id) {
 		bolestiRepository.deleteById(id);
 	}
-	
+
 }

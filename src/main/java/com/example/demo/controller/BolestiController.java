@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,20 +21,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.BolestiDTO;
 import com.example.demo.model.Bolesti;
-import com.example.demo.model.Lek;
 import com.example.demo.service.BolestiService;
 
 
 
 @RestController
 @RequestMapping(value = "bolesti")
-@CrossOrigin(origins = "http://localhost:8081")
 public class BolestiController {
 
 	@Autowired
 	private BolestiService bolestiService;
 	
 	@PostMapping(value = "/dodajBolest", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<BolestiDTO> dodajBolest(@RequestBody BolestiDTO bolestDTO) {
 		List<Bolesti> bolesti = bolestiService.findAll();
 		for (Bolesti bolest : bolesti) {
@@ -53,6 +53,7 @@ public class BolestiController {
 	}
 	
 	@GetMapping(value = "/postojeceBolesti")
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<BolestiDTO>> getPostojeceBolesti() {
 		
 		List<Bolesti> bolesti = bolestiService.findAll();
@@ -64,8 +65,9 @@ public class BolestiController {
 
 		return new ResponseEntity<>(bolestDTO, HttpStatus.OK);
 	}
-	
-	@DeleteMapping(value = "/izbrisiBolest/{id}")
+
+	@PostMapping(value = "/izbrisiBolest/{id}")
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<BolestiDTO>> izbrisiBolest(@PathVariable Long id) {
 
 		Bolesti bolest = bolestiService.findOne(id);
@@ -86,4 +88,6 @@ public class BolestiController {
 			return new ResponseEntity<>(bolestDTO,HttpStatus.NOT_FOUND);
 		}
 	}
+
+	
 }

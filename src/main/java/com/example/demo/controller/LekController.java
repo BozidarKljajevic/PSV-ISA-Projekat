@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,19 +20,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.LekDTO;
-import com.example.demo.model.Bolesti;
 import com.example.demo.model.Lek;
 import com.example.demo.service.LekService;
 
 @RestController
 @RequestMapping(value = "lek")
-@CrossOrigin(origins = "http://localhost:8081")
 public class LekController {
 
 	@Autowired
 	private LekService lekService;
 
 	@PostMapping(value = "/dodajLek", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<LekDTO> dodajLek(@RequestBody LekDTO lekDTO) {
 		List<Lek> lekovi = lekService.findAll();
 		for (Lek lek : lekovi) {
@@ -48,8 +48,9 @@ public class LekController {
 		}
 		return new ResponseEntity<>(lekdto, HttpStatus.OK);
 	}
-
+	
 	@GetMapping(value = "/postojeciLek")
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<LekDTO>> getPostojeciLek() {
 
 		List<Lek> lekovi = lekService.findAll();
@@ -62,7 +63,9 @@ public class LekController {
 		return new ResponseEntity<>(lekDTO, HttpStatus.OK);
 	}
 
-	@DeleteMapping(value = "/izbrisiLek/{id}")
+
+	@PostMapping(value = "/izbrisiLek/{id}")
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<LekDTO>> izbrisiLek(@PathVariable Long id) {
 
 		Lek lek = lekService.findOne(id);
