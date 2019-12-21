@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.MedicinskaSestraDTO;
 import com.example.demo.dto.PregledDTO;
-
+import com.example.demo.dto.ZahtevDTO;
 import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.PregledRepository;
 import com.example.demo.model.AdminKlinike;
@@ -43,7 +43,7 @@ public class PregledController {
 
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
-	
+
 	@Autowired
 	private EmailService emailService;
 
@@ -185,6 +185,21 @@ public class PregledController {
 		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/predefinisaniPreglediKlinike/{id}")
+	public ResponseEntity<?> getPredefinisaniPreglediKlinike(@PathVariable Long id) {
+
+		List<Pregled> pregledi = pregledService.findAll();
+		List<PregledDTO> preglediDTO = new ArrayList<>();
+
+		for (Pregled pregled : pregledi) {
+			if (pregled.getIdPacijenta() == null && pregled.getLekar().getKlinika().getId() == id) {
+				preglediDTO.add(new PregledDTO(pregled));
+			}
+		}
+
+		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
+
 	@GetMapping(value = "/zakzaniPregledi/{id}")
 	public ResponseEntity<?> getZakazaniPregledi(@PathVariable Long id) {
 
@@ -202,7 +217,8 @@ public class PregledController {
 
 	@PostMapping(value = "/zakaziPregled/{idPregleda}/{idPacijenta}")
 	@PreAuthorize("hasAuthority('PACIJENT')")
-	public ResponseEntity<?> zakaziPregled(@PathVariable Long idPregleda, @PathVariable Long idPacijenta) throws MailException, InterruptedException {
+	public ResponseEntity<?> zakaziPregled(@PathVariable Long idPregleda, @PathVariable Long idPacijenta)
+			throws MailException, InterruptedException {
 
 		Pregled zakaziPregled = pregledService.findOne(idPregleda);
 		pregledService.zakaziPregled(zakaziPregled, idPacijenta);
@@ -229,5 +245,25 @@ public class PregledController {
 		}
 
 		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/podnesiZahtev")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> podnesiZahtev(@RequestBody ZahtevDTO zahtevDTO)
+			throws MailException, InterruptedException {
+
+		pregledService.dodajZahtev(zahtevDTO);
+
+		List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();
+
+		for (AdminKlinike adminKlinike : adminiKlinika) {
+			if (adminKlinike.getKlinika().getId() == zahtevDTO.getLekar().getKlinika().getId()) {
+				String message = "Podnesen je zahtev za pregle na Vasoj klinici za lekara "
+						+ zahtevDTO.getLekar().getIme() + " " + zahtevDTO.getLekar().getPrezime();
+				emailService.sendNotificaitionAsync((User) adminKlinike, message);
+			}
+		}
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 }
