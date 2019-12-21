@@ -21,11 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.KlinikaDTO;
+import com.example.demo.dto.LekarDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
-
+import com.example.demo.model.Lekar;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
+import com.example.demo.service.LekarService;
 
 @RestController
 @RequestMapping(value = "klinika")
@@ -33,6 +35,9 @@ public class KlinikaController {
 
 	@Autowired
 	private KlinikaService klinikaService;
+	
+	@Autowired
+	private LekarService lekarService;
 	
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
@@ -91,4 +96,18 @@ public class KlinikaController {
 		return new ResponseEntity<>(klinikaDTO, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/postojeciLekariKlinike/{id}")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<List<LekarDTO>> getPostojeciLekariKlinikePacijent(@PathVariable Long id) {
+
+		List<Lekar> lekari = lekarService.findAll();
+		List<LekarDTO> lekarDTO = new ArrayList<>();
+		for (Lekar lekar : lekari) {
+			if (lekar.getKlinika().getId() == id) {
+				lekarDTO.add(new LekarDTO(lekar));
+			}
+		}
+
+		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
+	}
 }
