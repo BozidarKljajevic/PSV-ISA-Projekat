@@ -162,7 +162,9 @@ public class LekarController {
 
 			
 			for (Lekar le : lekari) {
+				if(le.getKlinika().getId() == lekar.getKlinika().getId()) {
 				lekarDTO.add(new LekarDTO(le));
+				}
 			}
 			return new ResponseEntity<>(lekarDTO,HttpStatus.OK);
 		} else {

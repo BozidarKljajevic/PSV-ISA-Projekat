@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.KlinikaDTO;
+import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.MedicinskaSestraDTO;
 import com.example.demo.dto.PregledDTO;
+import com.example.demo.dto.TipPregledaDTO;
 import com.example.demo.dto.ZahtevDTO;
 import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.PregledRepository;
@@ -274,6 +276,33 @@ public class PregledController {
 		for (AdminKlinike adminKlinike : adminiKlinika) {
 			if (adminKlinike.getKlinika().getId() == zahtevDTO.getLekar().getKlinika().getId()) {
 				String message = "Podnesen je zahtev za pregle na Vasoj klinici za lekara "
+						+ zahtevDTO.getLekar().getIme() + " " + zahtevDTO.getLekar().getPrezime();
+				emailService.sendNotificaitionAsync((User) adminKlinike, message);
+			}
+		}
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/podnesiZahtevLekar/{id}")
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> podnesiZahtevLekar(@RequestBody ZahtevDTO zahtevDTO,@PathVariable Long id)
+			throws MailException, InterruptedException {
+
+		
+		Pregled pregled = pregledService.findOne(id);
+		zahtevDTO.setLekar(new LekarDTO(pregled.getLekar()));
+		zahtevDTO.setTipPregleda(new TipPregledaDTO(pregled.getTipPregleda()));
+		zahtevDTO.setIdPacijenta(pregled.getIdPacijenta());
+		zahtevDTO.setCena(Double.parseDouble(pregled.getTipPregleda().getCena()));
+		
+		pregledService.dodajZahtev(zahtevDTO);
+
+		List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();
+
+		for (AdminKlinike adminKlinike : adminiKlinika) {
+			if (adminKlinike.getKlinika().getId() == zahtevDTO.getLekar().getKlinika().getId()) {
+				String message = "Podnesen je zahtev za pregled na Vasoj klinici za lekara "
 						+ zahtevDTO.getLekar().getIme() + " " + zahtevDTO.getLekar().getPrezime();
 				emailService.sendNotificaitionAsync((User) adminKlinike, message);
 			}
