@@ -27,10 +27,12 @@ import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.PregledService;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -42,6 +44,9 @@ public class LekarController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private PregledService pregledService;
 	
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
@@ -63,6 +68,25 @@ public class LekarController {
 		userService.izmeniSifru(user, sifra.getSifra());
 
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/obavezeLekara/{id}")
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public List<String> obavezeLekara(@PathVariable String id) {
+		
+		Long idLong = Long.parseLong(id);
+		Lekar lekar = lekarService.findOne(idLong);
+		
+		List<Pregled> pregledi = pregledService.findAll();
+		List<String> datumi = new ArrayList<>();
+		
+		for(Pregled preg : pregledi)
+		{
+			if((preg.getLekar().getId()).equals(idLong)) {
+				datumi.add(preg.getDatum());
+			}
+		};
+		return datumi;
 	}
 	
 	@PostMapping(value = "/dodajLekara/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
