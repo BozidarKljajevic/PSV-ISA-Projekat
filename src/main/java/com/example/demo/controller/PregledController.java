@@ -184,6 +184,21 @@ public class PregledController {
 
 		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/PreglediLekar/{id}")
+	public ResponseEntity<?> getPreglediLekar(@PathVariable Long id) {
+
+		List<Pregled> pregledi = pregledService.findAll();
+		List<PregledDTO> preglediDTO = new ArrayList<>();
+
+		for (Pregled pregled : pregledi) {
+			if (pregled.getIdPacijenta() != null && pregled.getLekar().getId() == id ) {
+				preglediDTO.add(new PregledDTO(pregled));
+			}
+		}
+
+		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
 
 	@GetMapping(value = "/zakzaniPregledi/{id}")
 	public ResponseEntity<?> getZakazaniPregledi(@PathVariable Long id) {

@@ -27,10 +27,12 @@ import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.PregledService;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -39,6 +41,10 @@ public class LekarController {
 
 	@Autowired
 	private LekarService lekarService;
+	
+	@Autowired
+	private PregledService pregledService;
+	
 	
 	@Autowired
 	private UserService userService;
@@ -138,8 +144,20 @@ public class LekarController {
 
 		Lekar lekar = lekarService.findOne(id);
 		List<LekarDTO> lekarDTO = new ArrayList<>();
+		boolean flag = false;
 		if (lekar != null) {
-			lekarService.remove(id);
+			List<Pregled> pregledi = pregledService.findAll();
+			for(Pregled pr : pregledi) {
+				if(pr.getLekar().getId() == id) {
+					flag = true;
+					break;
+				}
+			}
+			
+			if(flag == false) {
+				lekarService.remove(id);
+			}
+				
 			List<Lekar> lekari = lekarService.findAll();
 
 			
