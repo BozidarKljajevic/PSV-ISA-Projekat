@@ -83,7 +83,7 @@ public class LekarController {
 		for(Pregled preg : pregledi)
 		{
 			if((preg.getLekar().getId()).equals(idLong)) {
-				datumi.add(preg.getDatum());
+				datumi.add(preg.getDatum()+ ' ' +preg.getVreme());
 			}
 		};
 		return datumi;
