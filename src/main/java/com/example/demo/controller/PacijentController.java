@@ -22,9 +22,11 @@ import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.PorukaDTO;
 import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.Pacijent;
+import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.PacijentService;
+import com.example.demo.service.PregledService;
 
 @RestController
 @RequestMapping(value = "/pacijent")
@@ -34,10 +36,13 @@ public class PacijentController {
 	private PacijentService pacijentService;
 	
 	@Autowired
+	private PregledService pregledService;
+	
+	@Autowired
 	private EmailService emailService;
 
 	@GetMapping(value = "/preuzmi/{id}")
-	@PreAuthorize("hasAuthority('PACIJENT')")
+	//@PreAuthorize("hasAuthority('PACIJENT')")
 	public ResponseEntity<?> getPostojeciPacijent(@PathVariable Long id) {
 		
 		Pacijent pacijent = (Pacijent) pacijentService.findOne(id);
@@ -49,6 +54,25 @@ public class PacijentController {
 		PacijentDTO pacijentDTO = new PacijentDTO(pacijent);
 
 		return new ResponseEntity<>(pacijentDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/preuzmiPac/{id}")
+	//@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> getPostojeciPacijentLekar(@PathVariable Long id) {
+		
+		Pregled pregled = (Pregled) pregledService.findOne(id);
+		
+		List<Pacijent> pacijenti = pacijentService.findAll();
+		for (Pacijent pacijent : pacijenti) {
+			if(pacijent.getId() == pregled.getIdPacijenta()) {
+				PacijentDTO pacijentDTO = new PacijentDTO(pacijent);
+				return new ResponseEntity<>(pacijentDTO, HttpStatus.OK);
+			}
+		}
+		
+		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		
+	
 	}
 	
 	@PostMapping(value = "/izmeni")

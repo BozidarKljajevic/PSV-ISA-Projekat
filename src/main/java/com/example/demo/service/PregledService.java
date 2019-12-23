@@ -74,6 +74,9 @@ public class PregledService {
 		zahtev.setLekar(lekarRepository.findById(zahtevDTO.getLekar().getId()).orElse(null));
 		zahtev.setIdPacijenta(zahtevDTO.getIdPacijenta());
 		zahtev.setCena(zahtevDTO.getCena());
+		zahtev.setDatum(zahtevDTO.getDatum());
+		zahtev.setVreme(zahtevDTO.getVreme());
+		zahtev.setTrajanjePregleda(zahtevDTO.getTrajanjePregleda());
 
 		zahteviRepository.save(zahtev);
 
