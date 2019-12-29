@@ -53,7 +53,7 @@ public class BolestiController {
 	}
 	
 	@GetMapping(value = "/postojeceBolesti")
-	@PreAuthorize("hasAuthority('ADMINCENTRA')")
+	
 	public ResponseEntity<List<BolestiDTO>> getPostojeceBolesti() {
 		
 		List<Bolesti> bolesti = bolestiService.findAll();

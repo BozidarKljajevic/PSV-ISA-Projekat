@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.KlinikaDTO;
+import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.MedicinskaSestraDTO;
 import com.example.demo.dto.PregledDTO;
-
+import com.example.demo.dto.TipPregledaDTO;
+import com.example.demo.dto.ZahtevDTO;
 import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.PregledRepository;
 import com.example.demo.model.AdminKlinike;
@@ -43,7 +45,7 @@ public class PregledController {
 
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
-	
+
 	@Autowired
 	private EmailService emailService;
 
@@ -184,6 +186,36 @@ public class PregledController {
 
 		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/PreglediLekar/{id}")
+	public ResponseEntity<?> getPreglediLekar(@PathVariable Long id) {
+
+		List<Pregled> pregledi = pregledService.findAll();
+		List<PregledDTO> preglediDTO = new ArrayList<>();
+
+		for (Pregled pregled : pregledi) {
+			if (pregled.getIdPacijenta() != null && pregled.getLekar().getId() == id ) {
+				preglediDTO.add(new PregledDTO(pregled));
+			}
+		}
+
+		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/predefinisaniPreglediKlinike/{id}")
+	public ResponseEntity<?> getPredefinisaniPreglediKlinike(@PathVariable Long id) {
+
+		List<Pregled> pregledi = pregledService.findAll();
+		List<PregledDTO> preglediDTO = new ArrayList<>();
+
+		for (Pregled pregled : pregledi) {
+			if (pregled.getIdPacijenta() == null && pregled.getLekar().getKlinika().getId() == id) {
+				preglediDTO.add(new PregledDTO(pregled));
+			}
+		}
+
+		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
 
 	@GetMapping(value = "/zakzaniPregledi/{id}")
 	public ResponseEntity<?> getZakazaniPregledi(@PathVariable Long id) {
@@ -202,7 +234,8 @@ public class PregledController {
 
 	@PostMapping(value = "/zakaziPregled/{idPregleda}/{idPacijenta}")
 	@PreAuthorize("hasAuthority('PACIJENT')")
-	public ResponseEntity<?> zakaziPregled(@PathVariable Long idPregleda, @PathVariable Long idPacijenta) throws MailException, InterruptedException {
+	public ResponseEntity<?> zakaziPregled(@PathVariable Long idPregleda, @PathVariable Long idPacijenta)
+			throws MailException, InterruptedException {
 
 		Pregled zakaziPregled = pregledService.findOne(idPregleda);
 		pregledService.zakaziPregled(zakaziPregled, idPacijenta);
@@ -229,5 +262,132 @@ public class PregledController {
 		}
 
 		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/podnesiZahtev")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> podnesiZahtev(@RequestBody ZahtevDTO zahtevDTO)
+			throws MailException, InterruptedException {
+
+		zahtevDTO.setIzbor(true);
+		pregledService.dodajZahtev(zahtevDTO);
+
+		List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();
+
+		for (AdminKlinike adminKlinike : adminiKlinika) {
+			if (adminKlinike.getKlinika().getId() == zahtevDTO.getLekar().getKlinika().getId()) {
+				String message = "Podnesen je zahtev za pregle na Vasoj klinici za lekara "
+						+ zahtevDTO.getLekar().getIme() + " " + zahtevDTO.getLekar().getPrezime();
+				emailService.sendNotificaitionAsync((User) adminKlinike, message);
+			}
+		}
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/podnesiZahtevLekar/{id}")
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> podnesiZahtevLekar(@RequestBody ZahtevDTO zahtevDTO,@PathVariable Long id)
+			throws MailException, InterruptedException {
+
+		
+		Pregled pregled = pregledService.findOne(id);
+		boolean flag = false;
+		zahtevDTO.setLekar(new LekarDTO(pregled.getLekar()));
+		zahtevDTO.setTipPregleda(new TipPregledaDTO(pregled.getTipPregleda()));
+		zahtevDTO.setIdPacijenta(pregled.getIdPacijenta());
+		zahtevDTO.setCena(Double.parseDouble(pregled.getTipPregleda().getCena()));
+		
+		
+		String[] RadnoOd = pregled.getLekar().getRadnoOd().split(":");
+		double radnoP = Double.parseDouble(RadnoOd[0]);
+		String[] RadnoDo = pregled.getLekar().getRadnoDo().split(":");
+		double radnoK = Double.parseDouble(RadnoDo[0]);
+		
+		
+		String[] vrP = zahtevDTO.getVreme().split(":");
+		double satP = Double.parseDouble(vrP[0]);
+		double minP = Double.parseDouble(vrP[1]);
+		double pocetakPregledaP = 0;
+		if (minP % 60 != 0) {
+			pocetakPregledaP = satP + 0.5;
+		} else {
+			pocetakPregledaP = satP;
+		}
+		double trajanjeMinP = zahtevDTO.getTrajanjePregleda() * 60;
+		double trajanjeMinOstatakP = trajanjeMinP % 60;
+		double trajanjeSatP = trajanjeMinP / 60;
+		double krajPregledaSatP = satP + trajanjeSatP;
+		double krajPregledaMinP = minP + trajanjeMinOstatakP;
+
+		if (krajPregledaMinP % 60 != 0) {
+			krajPregledaSatP++;
+			krajPregledaMinP = 0;
+		} else {
+			krajPregledaSatP += 0.5;
+		}
+		
+		List<Pregled> pregledi = pregledService.findAll();
+		for (Pregled pre : pregledi) {
+			 if (zahtevDTO.getDatum().equals(pre.getDatum())
+					&& pre.getLekar().getId() == zahtevDTO.getLekar().getId()) {
+
+				String[] vr = pre.getVreme().split(":");
+				double sat = Double.parseDouble(vr[0]);
+				double min = Double.parseDouble(vr[1]);
+				double pocetakPregleda = 0;
+				if (min % 60 != 0) {
+					pocetakPregleda = sat + 0.5;
+				} else {
+					pocetakPregleda = sat;
+				}
+				double trajanjeMin = zahtevDTO.getTrajanjePregleda() * 60;
+				double trajanjeMinOstatak = trajanjeMin % 60;
+				double trajanjeSat = trajanjeMin / 60;
+				double krajPregledaSat = sat + trajanjeSat;
+				double krajPregledaMin = min + trajanjeMinOstatak;
+				if (krajPregledaMin % 60 != 0) {
+					krajPregledaSat++;
+					krajPregledaMin = 0;
+				} else {
+					krajPregledaSat += 0.5;
+				}
+
+				if (pocetakPregledaP >= pocetakPregleda && pocetakPregledaP <= krajPregledaSat) {
+					flag = true;
+				} else if (pocetakPregledaP <= pocetakPregleda && krajPregledaSatP >= pocetakPregleda) {
+					flag = true;
+				}
+
+			} else if (pocetakPregledaP < radnoP || pocetakPregledaP > radnoK) {
+				flag = true;
+			} else if (pocetakPregledaP > radnoP && krajPregledaSatP > radnoK) {
+				flag = true;
+			}
+		}
+		
+		
+		if (flag == true) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		if(flag == false) {
+			pregledService.dodajZahtev(zahtevDTO);
+
+			List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();
+
+			for (AdminKlinike adminKlinike : adminiKlinika) {
+				if (adminKlinike.getKlinika().getId() == zahtevDTO.getLekar().getKlinika().getId()) {
+					String message = "Podnesen je zahtev za pregled na Vasoj klinici za lekara "
+							+ zahtevDTO.getLekar().getIme() + " " + zahtevDTO.getLekar().getPrezime();
+					emailService.sendNotificaitionAsync((User) adminKlinike, message);
+				}
+			}
+
+			
+			
+		}
+		
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 }

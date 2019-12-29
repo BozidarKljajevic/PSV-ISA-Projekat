@@ -50,7 +50,7 @@ public class LekController {
 	}
 	
 	@GetMapping(value = "/postojeciLek")
-	@PreAuthorize("hasAuthority('ADMINCENTRA')")
+	
 	public ResponseEntity<List<LekDTO>> getPostojeciLek() {
 
 		List<Lek> lekovi = lekService.findAll();

@@ -43,6 +43,10 @@ public class LekarController {
 	private LekarService lekarService;
 	
 	@Autowired
+	private PregledService pregledService;
+	
+	
+	@Autowired
 	private UserService userService;
 	
 	@Autowired
@@ -162,13 +166,27 @@ public class LekarController {
 
 		Lekar lekar = lekarService.findOne(id);
 		List<LekarDTO> lekarDTO = new ArrayList<>();
+		boolean flag = false;
 		if (lekar != null) {
-			lekarService.remove(id);
+			List<Pregled> pregledi = pregledService.findAll();
+			for(Pregled pr : pregledi) {
+				if(pr.getLekar().getId() == id) {
+					flag = true;
+					break;
+				}
+			}
+			
+			if(flag == false) {
+				lekarService.remove(id);
+			}
+				
 			List<Lekar> lekari = lekarService.findAll();
 
 			
 			for (Lekar le : lekari) {
+				if(le.getKlinika().getId() == lekar.getKlinika().getId()) {
 				lekarDTO.add(new LekarDTO(le));
+				}
 			}
 			return new ResponseEntity<>(lekarDTO,HttpStatus.OK);
 		} else {

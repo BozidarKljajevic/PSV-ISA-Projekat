@@ -16,7 +16,7 @@ public class LekarDTO {
 	private String brojTelefona;
 	private KlinikaDTO klinika;
 	private TipPregledaDTO tipPregleda;
-	//private String ocena;
+	private String ocena;
 	private String radnoOd;
 	private String radnoDo;
 
@@ -36,7 +36,7 @@ public class LekarDTO {
 		this.brojTelefona = lekar.getBrojTelefona();
 		this.radnoOd = lekar.getRadnoOd();
 		this.radnoDo = lekar.getRadnoDo();
-	//	this.ocena = lekar.getOcena();
+		this.ocena = lekar.getOcena();
 		klinika = new KlinikaDTO(lekar.getKlinika());
 		tipPregleda = new TipPregledaDTO(lekar.getTipPregleda());
 	}
@@ -54,7 +54,7 @@ public class LekarDTO {
 		this.brojTelefona = brojTelefona;
 		this.radnoOd = radnoOd;
 		this.radnoDo = radnoDo;
-		//this.ocena = ocena;
+		this.ocena = ocena;
 	}
 
 	public Long getId() {
@@ -155,12 +155,12 @@ public class LekarDTO {
 		this.tipPregleda = tipPregleda;
 	}
 
-/*	public String getOcena() {
+	public String getOcena() {
 		return ocena;
 	}
 
 	public void setOcena(String ocena) {
 		this.ocena = ocena;
 	}
- */
+	
 }
