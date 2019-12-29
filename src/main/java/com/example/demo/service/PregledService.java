@@ -77,6 +77,7 @@ public class PregledService {
 		zahtev.setDatum(zahtevDTO.getDatum());
 		zahtev.setVreme(zahtevDTO.getVreme());
 		zahtev.setTrajanjePregleda(zahtevDTO.getTrajanjePregleda());
+		zahtev.setIzbor(zahtevDTO.isIzbor());
 
 		zahteviRepository.save(zahtev);
 
