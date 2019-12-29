@@ -49,8 +49,6 @@ public class LekarController {
 	@Autowired
 	private UserService userService;
 	
-	@Autowired
-	private PregledService pregledService;
 	
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
