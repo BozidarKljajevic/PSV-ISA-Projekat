@@ -23,7 +23,12 @@ public class ZahtevDTO {
 		this.id = zahtev.getId();
 		this.datum = zahtev.getDatum();
 		this.vreme = zahtev.getVreme();
-		this.sala = new SalaKlinikeDTO(zahtev.getSala());
+		if (zahtev.getSala() != null) {
+			this.sala = new SalaKlinikeDTO(zahtev.getSala());
+		}else {
+			this.sala = null;
+		}
+		
 		this.tipPregleda = new TipPregledaDTO(zahtev.getTipPregleda());
 		this.lekar = new LekarDTO(zahtev.getLekar());
 		this.cena = zahtev.getCena();

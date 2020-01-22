@@ -294,7 +294,7 @@ public class PregledController {
 		Pregled pregled = pregledService.findOne(id);
 		boolean flag = false;
 		zahtevDTO.setLekar(new LekarDTO(pregled.getLekar()));
-		zahtevDTO.setTipPregleda(new TipPregledaDTO(pregled.getTipPregleda()));
+		zahtevDTO.setTipPregleda(new TipPregledaDTO(pregled.getLekar().getTipPregleda()));
 		zahtevDTO.setIdPacijenta(pregled.getIdPacijenta());
 		zahtevDTO.setCena(Double.parseDouble(pregled.getTipPregleda().getCena()));
 		

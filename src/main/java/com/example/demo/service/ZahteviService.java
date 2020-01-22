@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.model.Pregled;
 import com.example.demo.model.Zahtev;
 import com.example.demo.repository.ZahteviRepository;
 
@@ -19,5 +20,13 @@ public class ZahteviService {
 	
 	public List<Zahtev> findAll() {
 		return zahteviRepository.findAll();
+	}
+	
+	public Zahtev findOne(Long id) {
+		return zahteviRepository.findById(id).orElseGet(null);
+	}
+	
+	public void dodajRezervisanuSalu(Zahtev zahtev) {
+		zahteviRepository.save(zahtev);
 	}
 }
