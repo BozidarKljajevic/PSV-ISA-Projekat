@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
+import com.example.demo.dto.DogadjajDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.SifraDTO;
@@ -74,18 +75,44 @@ public class LekarController {
 	
 	@GetMapping(value = "/obavezeLekara/{id}")
 	@PreAuthorize("hasAuthority('LEKAR')")
-	public List<String> obavezeLekara(@PathVariable String id) {
+	public List<DogadjajDTO> obavezeLekara(@PathVariable String id) {
 		
 		Long idLong = Long.parseLong(id);
 		Lekar lekar = lekarService.findOne(idLong);
 		
 		List<Pregled> pregledi = pregledService.findAll();
-		List<String> datumi = new ArrayList<>();
+		List<DogadjajDTO> datumi = new ArrayList<>();
 		
 		for(Pregled preg : pregledi)
 		{
 			if((preg.getLekar().getId()).equals(idLong)) {
-				datumi.add(preg.getDatum()+ ' ' +preg.getVreme());
+				String[] datum = preg.getDatum().split("/");
+				String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
+				
+				String[] vr = preg.getVreme().split(":");
+				double sat = Double.parseDouble(vr[0]);
+				double min = Double.parseDouble(vr[1]);
+				
+				double trajanjeMin = preg.getTrajanjePregleda() * 60;
+				double trajanjeMinOstatak = trajanjeMin % 60;
+				double trajanjeSat = trajanjeMin / 60;
+				int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak)/60);
+				double krajPregledaMin = min + trajanjeMinOstatak;
+				
+				System.out.println(sat+" "+krajPregledaSat+" "+min+" "+trajanjeMinOstatak);
+				
+				String minStr = "";
+				if (trajanjeMinOstatak == 0) {
+					minStr = "00";
+				}else {
+					minStr = "30";
+				}
+				
+				
+				
+				String start = datumStr+ ' ' +preg.getVreme();
+				String end = datumStr +' '+ krajPregledaSat+":"+minStr;
+				datumi.add(new DogadjajDTO(start, end));
 			}
 		};
 		return datumi;
