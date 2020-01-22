@@ -13,6 +13,7 @@ public class ZahtevDTO {
 	private Double cena;
 	private Long idPacijenta;
 	private Double trajanjePregleda;
+	private boolean izbor;
 	
 	public ZahtevDTO() {
 
@@ -28,10 +29,11 @@ public class ZahtevDTO {
 		this.cena = zahtev.getCena();
 		this.idPacijenta = zahtev.getIdPacijenta();
 		this.trajanjePregleda = zahtev.getTrajanjePregleda();
+		this.izbor = zahtev.isIzbor();
 	}
 	
 	public ZahtevDTO(Long id, String datum, String vreme, SalaKlinikeDTO sala, TipPregledaDTO tipPregleda,
-			LekarDTO lekar, Double cena, Long idPacijenta, Double trajanjePregleda) {
+			LekarDTO lekar, Double cena, Long idPacijenta, Double trajanjePregleda,boolean izbor) {
 		super();
 		this.id = id;
 		this.datum = datum;
@@ -42,6 +44,7 @@ public class ZahtevDTO {
 		this.cena = cena;
 		this.idPacijenta = idPacijenta;
 		this.trajanjePregleda = trajanjePregleda;
+		this.izbor = izbor;
 	}
 
 	public Long getId() {
@@ -54,6 +57,14 @@ public class ZahtevDTO {
 
 	public String getDatum() {
 		return datum;
+	}
+
+	public boolean isIzbor() {
+		return izbor;
+	}
+
+	public void setIzbor(boolean izbor) {
+		this.izbor = izbor;
 	}
 
 	public void setDatum(String datum) {

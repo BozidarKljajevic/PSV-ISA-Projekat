@@ -269,6 +269,7 @@ public class PregledController {
 	public ResponseEntity<?> podnesiZahtev(@RequestBody ZahtevDTO zahtevDTO)
 			throws MailException, InterruptedException {
 
+		zahtevDTO.setIzbor(true);
 		pregledService.dodajZahtev(zahtevDTO);
 
 		List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();
@@ -296,6 +297,7 @@ public class PregledController {
 		zahtevDTO.setTipPregleda(new TipPregledaDTO(pregled.getTipPregleda()));
 		zahtevDTO.setIdPacijenta(pregled.getIdPacijenta());
 		zahtevDTO.setCena(Double.parseDouble(pregled.getTipPregleda().getCena()));
+		
 		
 		String[] RadnoOd = pregled.getLekar().getRadnoOd().split(":");
 		double radnoP = Double.parseDouble(RadnoOd[0]);

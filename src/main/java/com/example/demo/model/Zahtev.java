@@ -26,6 +26,17 @@ public class Zahtev{
 	@Column(name = "vreme")
 	private String vreme;
 	
+	@Column(name = "izbor")
+	private boolean izbor;
+	
+	public boolean isIzbor() {
+		return izbor;
+	}
+
+	public void setIzbor(boolean izbor) {
+		this.izbor = izbor;
+	}
+
 	@OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
 	@JoinColumn(name = "sala_klinike_id")
 	private SalaKlinike sala;
