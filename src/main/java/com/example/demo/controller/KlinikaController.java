@@ -110,4 +110,26 @@ public class KlinikaController {
 
 		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/drzaveKlinika")
+	public ResponseEntity<List<String>> getDrzaveKlinika() {
+		
+		List<String> drzave = klinikaService.getDrzave();
+		
+		return new ResponseEntity<>(drzave, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/gradoviKlinika/{drzava}")
+	public ResponseEntity<List<String>> getDrzaveKlinika(@PathVariable String drzava) {
+		
+		List<String> gradovi = new ArrayList<String>();
+		
+		if(drzava.equals("none")) {
+			gradovi = klinikaService.getGradovi();
+		}else {
+			gradovi = klinikaService.getGradovi(drzava);
+		}
+		
+		return new ResponseEntity<>(gradovi, HttpStatus.OK);
+	}
 }

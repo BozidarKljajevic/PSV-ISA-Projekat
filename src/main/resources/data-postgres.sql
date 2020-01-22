@@ -23,10 +23,10 @@ INSERT INTO public.klinika(
 	VALUES (nextval('klinika_id_seq'), 'Jovana Obrenovica 83A', '+381/61-5534209', 'Crna Gora', 'Pljevlja', 'Sveti vid', 3.5, 'Vrlo lepo');
 INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
-	VALUES (nextval('klinika_id_seq'), 'Danila Kisa 5', '+381/61-31234123', 'Srbbija', 'Beograd', 'MC', 4.0, 'Sve naj');
+	VALUES (nextval('klinika_id_seq'), 'Danila Kisa 5', '+381/61-31234123', 'Srbija', 'Beograd', 'MC', 4.0, 'Sve naj');
 INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
-	VALUES (nextval('klinika_id_seq'), 'Bulevar Oslobodjenja', '+381/65-1241231','srbija' ,'Novi Sad', 'Klinika Centar', 5.0, 'Savrsena');
+	VALUES (nextval('klinika_id_seq'), 'Bulevar Oslobodjenja', '+381/65-1241231','Srbija' ,'Novi Sad', 'Klinika Centar', 5.0, 'Savrsena');
 	
 INSERT INTO public.admin_klinike(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, klinika_id, promenjena_sifra)
