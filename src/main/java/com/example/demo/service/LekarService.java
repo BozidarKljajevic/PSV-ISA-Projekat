@@ -111,5 +111,9 @@ public class LekarService {
 			throw new ValidationException("Medicinsko osoblje sa tim idijem nepostoji");
 		}
 	}
+
+	public List<Lekar> sviLekariKlinike(Long id) {
+		return lekarRepository.findByTipPregledaId(id);
+	}
 	
 }

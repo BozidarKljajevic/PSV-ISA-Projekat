@@ -121,7 +121,6 @@ public class TipPregledaController {
 	
 	
 	@GetMapping(value = "/sviTipovi")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<TipPregledaDTO>> getSveKlinike() {
 		
 		List<TipPregleda> tipoviPregleda = tipPregledaService.findAll();

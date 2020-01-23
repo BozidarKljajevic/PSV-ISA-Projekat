@@ -84,4 +84,8 @@ public class PregledService {
 
 	}
 
+	public List<Pregled> getPregledeOdLekara(Long id) {
+		return pregledRepository.findByLekarId(id);
+	}
+
 }
