@@ -12,6 +12,6 @@ public interface LekarRepository extends JpaRepository< Lekar, Long>{
 
 	Lekar findByMail( String mail );
 
-	List<Lekar> findByTipPregledaId(Long id);
+	List<Lekar> findByKlinikaId(Long id);
 	
 }

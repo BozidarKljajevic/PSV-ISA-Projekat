@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ValidationException;
 
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
+import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.SalaKlinikeDTO;
 import com.example.demo.dto.TipPregledaDTO;
@@ -133,6 +137,22 @@ public class TipPregledaController {
 		}
 
 		return new ResponseEntity<>(tipoviDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/sviTipoviDistinct")
+	public ResponseEntity<Collection<TipPregledaDTO>> getSveKlinikeDistinct() {
+		
+		List<TipPregleda> tipoviPregleda = tipPregledaService.findAll();
+
+		Map<String, TipPregledaDTO> tipoviDTO = new HashMap();
+		
+		for (TipPregleda tip : tipoviPregleda) {
+			if (!tipoviDTO.containsKey(tip.getNaziv().toLowerCase())) {
+				tipoviDTO.put(tip.getNaziv().toLowerCase() ,new TipPregledaDTO(tip));
+			}
+		}
+
+		return new ResponseEntity<>(tipoviDTO.values(), HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/TipoviKlinike/{id}")

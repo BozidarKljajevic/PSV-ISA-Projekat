@@ -29,10 +29,12 @@ import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.Pregled;
+import com.example.demo.model.TipPregleda;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.PregledService;
+import com.example.demo.service.TipPregledaService;
 
 @RestController
 @RequestMapping(value = "klinika")
@@ -49,6 +51,9 @@ public class KlinikaController {
 	
 	@Autowired
 	private PregledService pregledService;
+	
+	@Autowired
+	private TipPregledaService tipPregledaService;
 	
 	@GetMapping(value = "/sveKlinike")
 	//@PreAuthorize("hasAuthority('ADMINCENTRA')")
@@ -148,6 +153,8 @@ public class KlinikaController {
 		List<Klinika> klinike = klinikaService.findAll();
 		String[] yyyymmdd = datumPregleda.split("-");
 		String datum = yyyymmdd[2]+"/"+yyyymmdd[1]+"/"+yyyymmdd[0];
+		
+		TipPregleda tipPregledaPretraga = tipPregledaService.findOne(tipPregleda);
 
 		Map<Long, KlinikaDTO> klinikeDTO = new HashMap();
 		for (Klinika klinika : klinike) {
@@ -155,7 +162,7 @@ public class KlinikaController {
 			for (Lekar lekar : lekari) {
 				boolean imaPregledZaZadatiDatum = false;
 				int trajanjePregledaMin = 0;
-				if (lekar.getTipPregleda().getId() == tipPregleda) {
+				if (lekar.getTipPregleda().getNaziv().toLowerCase().equals(tipPregledaPretraga.getNaziv().toLowerCase())) {
 					List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
 					for (Pregled pregled : pregledi) {
 						if (datum.equals(pregled.getDatum())) {

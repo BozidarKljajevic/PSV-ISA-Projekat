@@ -113,7 +113,7 @@ public class LekarService {
 	}
 
 	public List<Lekar> sviLekariKlinike(Long id) {
-		return lekarRepository.findByTipPregledaId(id);
+		return lekarRepository.findByKlinikaId(id);
 	}
 	
 }
