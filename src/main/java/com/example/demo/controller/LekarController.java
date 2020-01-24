@@ -102,8 +102,9 @@ public class LekarController {
 				System.out.println(sat+" "+krajPregledaSat+" "+min+" "+trajanjeMinOstatak);
 				
 				String minStr = "";
-				if (trajanjeMinOstatak == 0) {
+				if (krajPregledaMin == 0) {
 					minStr = "00";
+					krajPregledaSat++;
 				}else {
 					minStr = "30";
 				}
