@@ -22,6 +22,7 @@ import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.MedicinskaSestraDTO;
 import com.example.demo.dto.PregledDTO;
+import com.example.demo.dto.SalaKlinikeDTO;
 import com.example.demo.dto.TipPregledaDTO;
 import com.example.demo.dto.ZahtevDTO;
 import com.example.demo.repository.KlinikaRepository;
@@ -49,6 +50,9 @@ public class PregledController {
 	@Autowired
 	private EmailService emailService;
 
+	
+	
+	
 	@PostMapping(value = "/dodajPregled", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PregledDTO> dodajPregled(@RequestBody PregledDTO pregledDTO) {
