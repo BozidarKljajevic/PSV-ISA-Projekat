@@ -111,8 +111,8 @@ public class ZahteviController {
 		
 		for (Zahtev zahtev : zahtevi) {
 			if (zahtev.isIzbor() == false) {
-				zahtev.setSala(sale.get(0));
-				zahtev.setTipPregleda(tipovi.get(0));
+				//zahtev.setSala(sale.get(0));
+				//zahtev.setTipPregleda(tipovi.get(0));
 				zahtevDTO.add(new ZahtevDTO(zahtev));
 			}
 		}
