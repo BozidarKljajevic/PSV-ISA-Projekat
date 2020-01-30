@@ -108,6 +108,7 @@ public class LekarController {
 				}else if (krajPregledaMin == 0)
 				{
 					minStr = "00";
+					krajPregledaSat++;
 				}else {
 					minStr = "30";
 				}
