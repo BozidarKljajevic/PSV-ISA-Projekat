@@ -195,7 +195,7 @@ public class SalaKlinikeController {
 		
 		
 		
-		
+		List<Zahtev> zahtevi = zahteviService.findAll();
 		
 	
 		Long idLongPregled = Long.parseLong(idPregleda);
@@ -246,7 +246,7 @@ public class SalaKlinikeController {
 								double minutiKrajP = krajPregledaSatP*60 + krajPregledaMinP;
 								System.out.println(minutiPocetakP);
 								System.out.println(minutiKrajP);
-								if(!((minutiPocetak < minutiPocetakP && minutiKraj < minutiPocetakP) || (minutiPocetak > minutiKrajP && minutiKraj > minutiKrajP)))
+								if(!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP) || (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP)))
 								{
 									flag = true;
 								}
@@ -257,6 +257,39 @@ public class SalaKlinikeController {
 						
 						
 					}
+					
+					
+					for(Zahtev z : zahtevi) {
+						if(z.getSala() != null) {
+						if(z.getDatum().equals(datumStr) && z.getSala().getId() == s.getId()  && z.getId() != zahtev.getId()) {
+							String[] vremeZ = z.getVreme().split(":");
+							double satZ = Double.parseDouble(vremeZ[0]);
+							double minZ = Double.parseDouble(vremeZ[1]);
+							double trajanjeMinZ = z.getTrajanjePregleda() * 60;
+							double trajanjeMinOstatakZ = trajanjeMinZ % 60;
+							double trajanjeSatZ = trajanjeMinZ / 60;
+							int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ)/60);
+							double krajPregledaMinZ = minZ + trajanjeMinOstatakZ;
+							if (krajPregledaMinZ == 60) {
+								krajPregledaMinZ = 0;
+								krajPregledaSatZ++;
+							}
+								double minutiPocetakZ = satZ*60 + minZ;
+								double minutiKrajZ = krajPregledaSatZ*60 + krajPregledaMinZ;
+								System.out.println(minutiPocetakZ);
+								System.out.println(minutiKrajZ);
+								if(!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ) || (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ)))
+								{
+									flag = true;
+								}
+							
+							
+							
+						} 
+						
+					}
+					}
+					
 					
 					if (flag == true) {
 						flag = false;
@@ -311,8 +344,7 @@ public class SalaKlinikeController {
 	
 		Long idLongPregled = Long.parseLong(idPregleda);
 		Zahtev zahtev =  zahteviService.findOne(idLongPregled);
-		
-		
+		List<Zahtev> zahtevi = zahteviService.findAll();		
 		 if(!dat.equals("-") && !vr.equals("-")) {
 			String[] datum = dat.split("-");
 			String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
@@ -367,6 +399,38 @@ public class SalaKlinikeController {
 						
 						
 					}
+					
+					
+					for(Zahtev z : zahtevi) {
+						if(z.getDatum().equals(datumStr) && z.getSala().getId() == s.getId() && z.getId() != zahtev.getId()) {
+							String[] vremeZ = z.getVreme().split(":");
+							double satZ = Double.parseDouble(vremeZ[0]);
+							double minZ = Double.parseDouble(vremeZ[1]);
+							double trajanjeMinZ = z.getTrajanjePregleda() * 60;
+							double trajanjeMinOstatakZ = trajanjeMinZ % 60;
+							double trajanjeSatZ = trajanjeMinZ / 60;
+							int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ)/60);
+							double krajPregledaMinZ = minZ + trajanjeMinOstatakZ;
+							if (krajPregledaMinZ == 60) {
+								krajPregledaMinZ = 0;
+								krajPregledaSatZ++;
+							}
+								double minutiPocetakZ = satZ*60 + minZ;
+								double minutiKrajZ = krajPregledaSatZ*60 + krajPregledaMinZ;
+								System.out.println(minutiPocetakZ);
+								System.out.println(minutiKrajZ);
+								if(!((minutiPocetak < minutiPocetakZ && minutiKraj < minutiPocetakZ) || (minutiPocetak > minutiKrajZ && minutiKraj > minutiKrajZ)))
+								{
+									flag = true;
+								}
+							
+							
+							
+						} 
+						
+						
+					}
+					
 					
 					if (flag == true) {
 						flag = false;

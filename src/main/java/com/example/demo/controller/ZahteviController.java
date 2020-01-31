@@ -115,6 +115,7 @@ public class ZahteviController {
 	public ResponseEntity<?> rezervisiSalu(@RequestBody ZahtevDTO zahtevDTO, @PathVariable Long idSale) throws MailException, InterruptedException {
 
 		Zahtev zahtev = zahteviService.findOne(zahtevDTO.getId());
+		System.out.println(zahtevDTO.getLekar().getIme());
 		zahtev.setLekar(lekarService.findOne(zahtevDTO.getLekar().getId()));
 		zahtev.setDatum(zahtevDTO.getDatum());
 		zahtev.setVreme(zahtevDTO.getVreme());
@@ -140,9 +141,9 @@ public class ZahteviController {
 
 		Pacijent pacijent = pacijentService.findOne(zahtev.getIdPacijenta());
 		
-				String message = "Dobili ste salu, da li vam odgovara ovaj termin i ova lekar, ako da odgovorite ? "
-						+"lekar:"+ zahtevDTO.getLekar().getIme() + "datum: " + zahtevDTO.getDatum() + "vreme: " + zahtevDTO.getVreme()
-						+ "zahtev id: " + zahtevDTO.getId();
+				String message = "Dobili ste salu, da li vam odgovara ovaj termin i ovaj lekar, ako da odgovorite ? "
+						+"lekar: "+ zahtevDTO.getLekar().getIme() + " datum: " + zahtevDTO.getDatum() + " vreme: " + zahtevDTO.getVreme()
+						+ " link: localhost:8081/#/potvrdaZahteva/" + zahtevDTO.getId();
 				emailService.sendNotificaitionAsync((User) pacijent, message);
 				
 				String message2 = "Dobili ste salu, da li vam odgovara ovaj termin, ako da odgovorite ? "
