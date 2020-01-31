@@ -53,6 +53,22 @@ public class PregledService {
 		return pregleddto;
 	}
 
+	public void potvrdiZahtevZaPregled(Zahtev zahtev) {
+		Pregled pregled = new Pregled();
+		
+		pregled.setDatum(zahtev.getDatum());
+		pregled.setVreme(zahtev.getVreme());
+		pregled.setCena(zahtev.getCena());
+		pregled.setLekar(lekarRepository.findById(zahtev.getLekar().getId()).orElse(null));
+		pregled.setSala(salaKlinikeRepository.getOne(zahtev.getSala().getId()));
+		pregled.setTipPregleda(tipPregledaRepository.getOne(zahtev.getTipPregleda().getId()));
+		pregled.setTrajanjePregleda(zahtev.getTrajanjePregleda());
+		pregled.setIdPacijenta(zahtev.getIdPacijenta());
+		pregled.setZavrsen(false);
+		
+		pregledRepository.save(pregled);
+	}
+
 	public Pregled findOne(Long id) {
 		return pregledRepository.findById(id).orElseGet(null);
 	}

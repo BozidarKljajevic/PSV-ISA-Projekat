@@ -33,4 +33,9 @@ public class ZahteviService {
 	public List<Zahtev> getZahteveOdLekara(Long id) {
 		return zahteviRepository.findByLekarId(id);
 	}
+
+	public void remove(Long id) {
+		zahteviRepository.deleteById(id);
+		
+	}
 }
