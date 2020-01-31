@@ -1,6 +1,8 @@
 package com.example.demo.model;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -13,10 +15,16 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(name = "OPERACIJA")
@@ -25,8 +33,8 @@ public class Operacija {
 
 	@Id
 	@Column(name = "id")
-	@SequenceGenerator(name = "pregled_id_seq", sequenceName = "pregled_id_seq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pregled_id_seq")
+	@SequenceGenerator(name = "operacija_id_seq", sequenceName = "operacija_id_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "operacija_id_seq")
 	private Long id;
 	
 	@Column(name = "datum", nullable = false, unique = false)
@@ -38,9 +46,14 @@ public class Operacija {
 	@OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
 	@JoinColumn(name = "sala_klinike_id")
 	private SalaKlinike sala;
+	/*
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@ManyToMany(mappedBy = "operacija", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Lekar> lekarKlinike = new HashSet<Lekar>();*/
 	
-	@OneToMany(mappedBy = "lekar", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Lekar> lekarKlinike = new HashSet<Lekar>();
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@JoinTable(name = "lekari_operacije", joinColumns = @JoinColumn(name = "operacija_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "lekar_id", referencedColumnName = "id"))
+	private List<Lekar> lekariKlinike;
 	
 	@Column(name = "cena", nullable = false, unique = false)
 	private Double cena;
@@ -85,13 +98,32 @@ public class Operacija {
 	public void setSala(SalaKlinike sala) {
 		this.sala = sala;
 	}
+	
+	
+	/*
+	public void setLekariKlinike(List<Lekar> lekariKlinike) {
+		this.lekariKlinike = lekariKlinike;
+	}
 
+	@Override
+	public Collection<? extends GrantedAuthority> getLekariKlinike() {
+		return this.lekariKlinike;
+	}
+	
 	public Set<Lekar> getLekarKlinike() {
 		return lekarKlinike;
 	}
 
 	public void setLekarKlinike(Set<Lekar> lekarKlinike) {
 		this.lekarKlinike = lekarKlinike;
+	}*/
+
+	public List<Lekar> getLekariKlinike() {
+		return lekariKlinike;
+	}
+
+	public void setLekariKlinike(List<Lekar> lekariKlinike) {
+		this.lekariKlinike = lekariKlinike;
 	}
 
 	public Double getCena() {
