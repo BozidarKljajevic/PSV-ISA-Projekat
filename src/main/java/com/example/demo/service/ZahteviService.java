@@ -29,4 +29,8 @@ public class ZahteviService {
 	public void dodajRezervisanuSalu(Zahtev zahtev) {
 		zahteviRepository.save(zahtev);
 	}
+
+	public List<Zahtev> getZahteveOdLekara(Long id) {
+		return zahteviRepository.findByLekarId(id);
+	}
 }

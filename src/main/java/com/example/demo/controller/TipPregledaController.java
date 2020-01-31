@@ -44,65 +44,66 @@ public class TipPregledaController {
 
 	@Autowired
 	private TipPregledaService tipPregledaService;
-	
+
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
-	
+
 	@Autowired
 	private LekarService lekarService;
-	
-	
+
 	@PostMapping(value = "/dodajTipPregleda/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<TipPregledaDTO> dodajTipPregleda(@RequestBody TipPregledaDTO tipPregledaDTO,@PathVariable String id) {
-		
+	public ResponseEntity<TipPregledaDTO> dodajTipPregleda(@RequestBody TipPregledaDTO tipPregledaDTO,
+			@PathVariable String id) {
+
 		TipPregledaDTO tipDTO = new TipPregledaDTO();
 		Long idLong = Long.parseLong(id);
 		AdminKlinike adm = adminKlinikeService.findOne(idLong);
 		List<TipPregleda> tipovi = tipPregledaService.findAll();
-		for(TipPregleda tip : tipovi) {
-			if(tip.getOznaka().equals(tipPregledaDTO.getOznaka()) && tip.getKlinika().getId() == adm.getKlinika().getId()) {
+		for (TipPregleda tip : tipovi) {
+			if (tip.getOznaka().equals(tipPregledaDTO.getOznaka())
+					&& tip.getKlinika().getId() == adm.getKlinika().getId()) {
 				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			if(tip.getNaziv().equals(tipPregledaDTO.getNaziv()) && tip.getKlinika().getId() == adm.getKlinika().getId()) {
+			if (tip.getNaziv().equals(tipPregledaDTO.getNaziv())
+					&& tip.getKlinika().getId() == adm.getKlinika().getId()) {
 				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		
+
 		try {
-			tipDTO = tipPregledaService.dodajTipPregleda(tipPregledaDTO,idLong);
-		}catch (ValidationException e) {
+			tipDTO = tipPregledaService.dodajTipPregleda(tipPregledaDTO, idLong);
+		} catch (ValidationException e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return new ResponseEntity<>(tipDTO, HttpStatus.OK);
 	}
-	
-	@PostMapping(value = "/izmeniPodatkeTipaPregleda", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+
+	@PostMapping(value = "/izmeniPodatkeTipaPregleda", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<TipPregledaDTO> izmeniPodatkeTipaPregleda(@RequestBody TipPregledaDTO tipPregledaDTO){
-		
+	public ResponseEntity<TipPregledaDTO> izmeniPodatkeTipaPregleda(@RequestBody TipPregledaDTO tipPregledaDTO) {
+
 		try {
 			tipPregledaService.izmeniTipPregleda(tipPregledaDTO);
 		} catch (ValidationException e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
+
 		return new ResponseEntity<>(tipPregledaDTO, HttpStatus.OK);
 	}
-	
-	
+
 	@PostMapping(value = "/izbrisiTipPregleda/{id}/{idd}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<?> deleteTip(@PathVariable Long id,@PathVariable String idd) {
+	public ResponseEntity<?> deleteTip(@PathVariable Long id, @PathVariable String idd) {
 
 		TipPregleda tipPregleda = tipPregledaService.findOne(id);
 		Long idLong = Long.parseLong(idd);
 		AdminKlinike adm = adminKlinikeService.findOne(idLong);
 		List<Lekar> lekari = lekarService.findAll();
-		 boolean flag = false;
-		for(Lekar lekar : lekari) {
-			if(adm.getKlinika().getId() == lekar.getKlinika().getId()) {
-				if(lekar.getTipPregleda().getId() == tipPregleda.getId()) {
+		boolean flag = false;
+		for (Lekar lekar : lekari) {
+			if (adm.getKlinika().getId() == lekar.getKlinika().getId()) {
+				if (lekar.getTipPregleda().getId() == tipPregleda.getId()) {
 					flag = true;
 				}
 			}
@@ -111,90 +112,99 @@ public class TipPregledaController {
 			tipPregledaService.remove(id);
 			List<TipPregleda> tipPre = tipPregledaService.findAll();
 			List<TipPregledaDTO> tipoviDTO = new ArrayList<>();
-			
+
 			for (TipPregleda tip : tipPre) {
-			    if(tip.getKlinika().getId() == adm.getKlinika().getId()) {
-			    	tipoviDTO.add(new TipPregledaDTO(tip));
-			    }
+				if (tip.getKlinika().getId() == adm.getKlinika().getId()) {
+					tipoviDTO.add(new TipPregledaDTO(tip));
+				}
 			}
-			return new ResponseEntity<>(tipoviDTO,HttpStatus.OK);
+			return new ResponseEntity<>(tipoviDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
-	
+
 	@GetMapping(value = "/sviTipovi")
 	public ResponseEntity<List<TipPregledaDTO>> getSveKlinike() {
-		
+
 		List<TipPregleda> tipoviPregleda = tipPregledaService.findAll();
 
 		List<TipPregledaDTO> tipoviDTO = new ArrayList<>();
-		
+
 		for (TipPregleda tip : tipoviPregleda) {
-			
+
 			tipoviDTO.add(new TipPregledaDTO(tip));
 		}
 
 		return new ResponseEntity<>(tipoviDTO, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/sviTipoviDistinct")
 	public ResponseEntity<Collection<TipPregledaDTO>> getSveKlinikeDistinct() {
-		
+
 		List<TipPregleda> tipoviPregleda = tipPregledaService.findAll();
 
 		Map<String, TipPregledaDTO> tipoviDTO = new HashMap();
-		
+
 		for (TipPregleda tip : tipoviPregleda) {
 			if (!tipoviDTO.containsKey(tip.getNaziv().toLowerCase())) {
-				tipoviDTO.put(tip.getNaziv().toLowerCase() ,new TipPregledaDTO(tip));
+				tipoviDTO.put(tip.getNaziv().toLowerCase(), new TipPregledaDTO(tip));
 			}
 		}
 
 		return new ResponseEntity<>(tipoviDTO.values(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/TipoviKlinike/{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<TipPregledaDTO>> getTipovi(@PathVariable String id) {
-		
+
 		List<TipPregleda> tipoviPregleda = tipPregledaService.findAll();
 
 		Long idLong = Long.parseLong(id);
 		AdminKlinike adm = adminKlinikeService.findOne(idLong);
 		List<TipPregledaDTO> tipoviDTO = new ArrayList<>();
-		
-		
+
 		for (TipPregleda tip : tipoviPregleda) {
-		    if(tip.getKlinika().getId() == adm.getKlinika().getId()) {
-			tipoviDTO.add(new TipPregledaDTO(tip));
-		    }
+			if (tip.getKlinika().getId() == adm.getKlinika().getId()) {
+				tipoviDTO.add(new TipPregledaDTO(tip));
+			}
 		}
 
 		return new ResponseEntity<>(tipoviDTO, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/TipoviLekara/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<LekarDTO>> getTipoviLekara(@PathVariable String id) {
-		
+
 		List<Lekar> lekari = lekarService.findAll();
 
 		Long idLong = Long.parseLong(id);
 		TipPregleda tipPregleda = tipPregledaService.findOne(idLong);
 		List<LekarDTO> lekarDTO = new ArrayList<>();
-		
-		
+
 		for (Lekar le : lekari) {
-		    if(le.getTipPregleda().getId() == tipPregleda.getId()) {
-			lekarDTO.add(new LekarDTO(le));
-		    }
+			if (le.getTipPregleda().getId() == tipPregleda.getId()) {
+				lekarDTO.add(new LekarDTO(le));
+			}
 		}
 
 		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
 	}
-	
-	
-	
+
+	@GetMapping(value = "/tipoviPregledaKlinike/{id}")
+	public ResponseEntity<List<TipPregledaDTO>> getTipovi(@PathVariable Long id) {
+
+		List<TipPregleda> tipoviPregleda = tipPregledaService.findAll();
+		List<TipPregledaDTO> tipoviDTO = new ArrayList<>();
+
+		for (TipPregleda tip : tipoviPregleda) {
+			if (tip.getKlinika().getId() == id) {
+				tipoviDTO.add(new TipPregledaDTO(tip));
+			}
+		}
+
+		return new ResponseEntity<>(tipoviDTO, HttpStatus.OK);
+	}
+
 }

@@ -30,11 +30,13 @@ import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.TipPregleda;
+import com.example.demo.model.Zahtev;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.PregledService;
 import com.example.demo.service.TipPregledaService;
+import com.example.demo.service.ZahteviService;
 
 @RestController
 @RequestMapping(value = "klinika")
@@ -51,6 +53,9 @@ public class KlinikaController {
 	
 	@Autowired
 	private PregledService pregledService;
+	
+	@Autowired
+	private ZahteviService zahteviService;
 	
 	@Autowired
 	private TipPregledaService tipPregledaService;
@@ -170,6 +175,15 @@ public class KlinikaController {
 							trajanjePregledaMin += pregled.getTrajanjePregleda()*60;
 						}
 					}
+					
+					List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(lekar.getId());
+					for (Zahtev zahtev : zahtevi) {
+						if (datum.equals(zahtev.getDatum())) {
+							imaPregledZaZadatiDatum = true;
+							trajanjePregledaMin += zahtev.getTrajanjePregleda()*60;
+						}
+					}
+					
 					if (imaPregledZaZadatiDatum) {
 						String[] hhmmOd = lekar.getRadnoOd().split(":");
 						int hOd = Integer.parseInt(hhmmOd[0]);
@@ -197,6 +211,63 @@ public class KlinikaController {
 		}
 
 		return new ResponseEntity<>(klinikeDTO.values(), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/slobodniLekari/{datumPregleda}/{tipPregleda}/{idKlinike}")
+	public ResponseEntity<List<LekarDTO>> slobodniLekariKlinike(@PathVariable String datumPregleda, @PathVariable Long tipPregleda, @PathVariable Long idKlinike){
+		List<Lekar> lekari = lekarService.sviLekariKlinike(idKlinike);
+		List<LekarDTO> lekariDTO = new ArrayList<LekarDTO>();
+		
+		String datum = "NONE";
+		
+		if (!datumPregleda.equals("NONE")) {
+			String[] yyyymmdd = datumPregleda.split("-");
+			datum = yyyymmdd[2]+"/"+yyyymmdd[1]+"/"+yyyymmdd[0];
+		}
+		
+		
+		for (Lekar lekar : lekari) {
+			boolean imaPregledZaZadatiDatum = false;
+			int trajanjePregledaMin = 0;
+			if (lekar.getTipPregleda().getId() == tipPregleda || tipPregleda == -1) {
+				List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
+				for (Pregled pregled : pregledi) {
+					if (datum.equals(pregled.getDatum())) {
+						imaPregledZaZadatiDatum = true;
+						trajanjePregledaMin += pregled.getTrajanjePregleda()*60;
+					}
+				}
+				
+				List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(lekar.getId());
+				for (Zahtev zahtev : zahtevi) {
+					if (datum.equals(zahtev.getDatum())) {
+						imaPregledZaZadatiDatum = true;
+						trajanjePregledaMin += zahtev.getTrajanjePregleda()*60;
+					}
+				}
+				
+				if (imaPregledZaZadatiDatum) {
+					String[] hhmmOd = lekar.getRadnoOd().split(":");
+					int hOd = Integer.parseInt(hhmmOd[0]);
+					int mOd = Integer.parseInt(hhmmOd[1]);
+					
+					String[] hhmmDo = lekar.getRadnoDo().split(":");
+					int hDo = Integer.parseInt(hhmmDo[0]);
+					int mDo = Integer.parseInt(hhmmDo[1]);
+					
+					int slobodnoVremeLekaraMin = Math.abs((hDo - hOd))*60 - (mDo - mOd);
+					
+					if (slobodnoVremeLekaraMin - trajanjePregledaMin > 0) {
+						lekariDTO.add(new LekarDTO(lekar));
+					}
+					
+				}else {
+					lekariDTO.add(new LekarDTO(lekar));
+				}
+			}
+		}
+		
+		return new ResponseEntity<>(lekariDTO, HttpStatus.OK);
 	}
 	
 }
