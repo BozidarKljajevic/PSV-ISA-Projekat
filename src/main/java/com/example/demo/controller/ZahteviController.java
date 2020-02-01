@@ -43,6 +43,7 @@ import com.example.demo.model.Zahtev;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.PacijentService;
+import com.example.demo.service.PregledService;
 import com.example.demo.service.SalaKlinikeService;
 import com.example.demo.service.TipPregledaService;
 import com.example.demo.service.ZahteviService;
@@ -72,6 +73,9 @@ public class ZahteviController {
 	@Autowired
 	private TipPregledaService tipPregledaService;
 	
+	@Autowired
+	private PregledService pregledService;
+	
 	
 	@PostMapping(value = "/izmeniZahtev", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
@@ -85,9 +89,6 @@ public class ZahteviController {
 
 		return new ResponseEntity<>(zahtevDTO, HttpStatus.OK);
 	}
-	
-	
-
 	
 	@GetMapping(value = "/zahteviZaPreglede")
 	public ResponseEntity<?> getZahteviZaPregledi() {
@@ -109,6 +110,35 @@ public class ZahteviController {
 		}
 
 		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/zahtev/{id}")
+	public ResponseEntity<?> getZahtev(@PathVariable Long id) {
+
+		Zahtev zahtev = zahteviService.findOne(id);
+
+		return new ResponseEntity<>(new ZahtevDTO(zahtev), HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/potvrdiZahtev")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> potvrdiZahtev(@RequestBody ZahtevDTO zahtevDTO) {
+
+		Zahtev zahtev = zahteviService.findOne(zahtevDTO.getId());
+		zahteviService.remove(zahtevDTO.getId());
+		
+		pregledService.potvrdiZahtevZaPregled(zahtev);
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/odbijZahtev")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> odbijZahtev(@RequestBody ZahtevDTO zahtevDTO) {
+
+		zahteviService.remove(zahtevDTO.getId());
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/rezervisiSalu/{idSale}")

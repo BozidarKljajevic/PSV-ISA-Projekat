@@ -68,4 +68,16 @@ public class KlinikaService {
 		return klinikaRepository.findAll();
 	}
 
+	public List<String> getDrzave() {
+		return klinikaRepository.getDrzave();
+	}
+
+	public List<String> getGradovi() {
+		return klinikaRepository.getGradovi();
+	}
+
+	public List<String> getGradovi(String drzava) {
+		return klinikaRepository.getGradovi(drzava);
+	}
+
 }

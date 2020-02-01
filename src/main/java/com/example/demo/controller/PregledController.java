@@ -407,6 +407,8 @@ public class PregledController {
 			throws MailException, InterruptedException {
 
 		zahtevDTO.setIzbor(true);
+		zahtevDTO.setTipPregleda(zahtevDTO.getLekar().getTipPregleda());
+		
 		pregledService.dodajZahtev(zahtevDTO);
 
 		List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();

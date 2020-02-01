@@ -20,13 +20,13 @@ INSERT INTO public.admin_centra(
 
 INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
-	VALUES (nextval('klinika_id_seq'), 'Jovana Obrenovica 83A', '+381/61-5534209', 'Crna Gora', 'Pljevlja', 'Sveti vid', 3.5, 'Vrlo lepo');
+	VALUES (nextval('klinika_id_seq'), 'Jovana Obrenovica 83A', '+381/61-5534209', 'Crna Gora', 'Pljevlja', 'Sveti vid', 4.0, 'Vrlo lepo');
 INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
-	VALUES (nextval('klinika_id_seq'), 'Danila Kisa 5', '+381/61-31234123', 'Srbbija', 'Beograd', 'MC', 4.0, 'Sve naj');
+	VALUES (nextval('klinika_id_seq'), 'Danila Kisa 5', '+381/61-31234123', 'Srbija', 'Beograd', 'MC', 3.5, 'Sve naj');
 INSERT INTO public.klinika(
 	id, adresa, broj_telefona, drzava, grad, naziv, ocena, opis)
-	VALUES (nextval('klinika_id_seq'), 'Bulevar Oslobodjenja', '+381/65-1241231','srbija' ,'Novi Sad', 'Klinika Centar', 5.0, 'Savrsena');
+	VALUES (nextval('klinika_id_seq'), 'Bulevar Oslobodjenja', '+381/65-1241231','Srbija' ,'Novi Sad', 'Klinika Centar', 3.0, 'Savrsena');
 	
 INSERT INTO public.admin_klinike(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, klinika_id, promenjena_sifra)
@@ -59,17 +59,17 @@ INSERT INTO public.sala_klinike(
 
 INSERT INTO public.lekar(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, ocena, radno_do, radno_od, klinika_id, tip_pregleda_id, promenjena_sifra)
-	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'lekar@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '20:00', '08:00', 1, 1, true);
+	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'lekar@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '20:00', '12:00', 1, 1, true);
 INSERT INTO public.lekar(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, ocena, radno_do, radno_od, klinika_id, tip_pregleda_id, promenjena_sifra)
-	VALUES (nextval('users_id_seq'), 'Janka Veska 12', '+381/65-5504205', 'Srbija', true, 'Beograd', 'Bolo', 'lekar2@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '20:00', '08:00', 2, 2, true);
+	VALUES (nextval('users_id_seq'), 'Janka Veska 12', '+381/65-5504205', 'Srbija', true, 'Beograd', 'Bolo', 'lekar2@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '14:00', '12:00', 2, 2, true);
 	
 INSERT INTO public.pregledi(
 	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
-	VALUES (nextval('pregled_id_seq'), 2000, '11/12/2019', null, 1.5, '12:00', false, 8, 1, 1);
+	VALUES (nextval('pregled_id_seq'), 2000, '30/01/2020', null, 1.5, '13:00', false, 8, 1, 1);
 INSERT INTO public.pregledi(
 	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
-	VALUES (nextval('pregled_id_seq'), 5000, '21/12/2019', null, 0.5, '13:00', false, 9, 2, 2);
+	VALUES (nextval('pregled_id_seq'), 5000, '30/01/2020', null, 1.0, '12:30', false, 9, 2, 2);
 	
 
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
