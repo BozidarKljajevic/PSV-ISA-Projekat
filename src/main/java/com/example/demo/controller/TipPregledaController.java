@@ -206,5 +206,10 @@ public class TipPregledaController {
 
 		return new ResponseEntity<>(tipoviDTO, HttpStatus.OK);
 	}
-
+	
+	@GetMapping(value = "/tipPregleda/{id}")
+	public ResponseEntity<TipPregledaDTO> getTipPregleda(@PathVariable Long id){
+		
+		return new ResponseEntity<>(new TipPregledaDTO(tipPregledaService.findOne(id)), HttpStatus.OK);
+	}
 }
