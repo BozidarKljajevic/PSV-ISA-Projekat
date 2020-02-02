@@ -40,6 +40,7 @@ import com.example.demo.model.SalaKlinike;
 import com.example.demo.model.TipPregleda;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
+import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.PacijentService;
@@ -57,6 +58,9 @@ public class ZahteviController {
 
 	@Autowired
 	private ZahteviService zahteviService;
+	
+	@Autowired
+	private AdminKlinikeService adminKlinikeService;
 	
 	@Autowired
 	private SalaKlinikeService salaKlinikeService;
@@ -90,19 +94,19 @@ public class ZahteviController {
 		return new ResponseEntity<>(zahtevDTO, HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/zahteviZaPreglede")
-	public ResponseEntity<?> getZahteviZaPregledi() {
+	@GetMapping(value = "/zahteviZaPreglede/{id}")
+	public ResponseEntity<?> getZahteviZaPregledi(@PathVariable Long id) {
 
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		List<ZahtevDTO> zahteviDTO = new ArrayList<>();
-
+		AdminKlinike admin = adminKlinikeService.findOne(id);
 		List<SalaKlinike> sale = salaKlinikeService.findAll();
 		List<TipPregleda> tipovi = tipPregledaService.findAll();
 
 		
 		
 		for (Zahtev zahtev : zahtevi) {
-			if (zahtev.isIzbor() == true && zahtev.getSala() == null) {
+			if (zahtev.isIzbor() == true && zahtev.getSala() == null && admin.getKlinika() == zahtev.getLekar().getKlinika()) {
 				//zahtev.setSala(sale.get(0));
 				//zahtev.setTipPregleda(tipovi.get(0));
 				zahteviDTO.add(new ZahtevDTO(zahtev));
