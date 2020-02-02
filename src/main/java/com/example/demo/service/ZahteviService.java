@@ -52,5 +52,13 @@ public class ZahteviService {
 			throw new ValidationException("Sala sa tim idijem nepostoji");
 		}
 	}
-	
+
+	public List<Zahtev> getZahteveOdLekara(Long id) {
+		return zahteviRepository.findByLekarId(id);
+	}
+
+	public void remove(Long id) {
+		zahteviRepository.deleteById(id);
+		
+	}
 }

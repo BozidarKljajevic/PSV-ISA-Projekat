@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ValidationException;
 
@@ -25,9 +28,15 @@ import com.example.demo.dto.LekarDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.Pregled;
+import com.example.demo.model.TipPregleda;
+import com.example.demo.model.Zahtev;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.PregledService;
+import com.example.demo.service.TipPregledaService;
+import com.example.demo.service.ZahteviService;
 
 @RestController
 @RequestMapping(value = "klinika")
@@ -41,6 +50,15 @@ public class KlinikaController {
 	
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
+	
+	@Autowired
+	private PregledService pregledService;
+	
+	@Autowired
+	private ZahteviService zahteviService;
+	
+	@Autowired
+	private TipPregledaService tipPregledaService;
 	
 	@GetMapping(value = "/sveKlinike")
 	//@PreAuthorize("hasAuthority('ADMINCENTRA')")
@@ -110,4 +128,146 @@ public class KlinikaController {
 
 		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/drzaveKlinika")
+	public ResponseEntity<List<String>> getDrzaveKlinika() {
+		
+		List<String> drzave = klinikaService.getDrzave();
+		
+		return new ResponseEntity<>(drzave, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/gradoviKlinika/{drzava}")
+	public ResponseEntity<List<String>> getDrzaveKlinika(@PathVariable String drzava) {
+		
+		List<String> gradovi = new ArrayList<String>();
+		
+		if(drzava.equals("none")) {
+			gradovi = klinikaService.getGradovi();
+		}else {
+			gradovi = klinikaService.getGradovi(drzava);
+		}
+		
+		return new ResponseEntity<>(gradovi, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/pretraziKlinike/{datumPregleda}/{tipPregleda}")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<Collection<KlinikaDTO>> pretraziKlinike(@PathVariable String datumPregleda, @PathVariable Long tipPregleda) {
+		
+		List<Klinika> klinike = klinikaService.findAll();
+		String[] yyyymmdd = datumPregleda.split("-");
+		String datum = yyyymmdd[2]+"/"+yyyymmdd[1]+"/"+yyyymmdd[0];
+		
+		TipPregleda tipPregledaPretraga = tipPregledaService.findOne(tipPregleda);
+
+		Map<Long, KlinikaDTO> klinikeDTO = new HashMap();
+		for (Klinika klinika : klinike) {
+			List<Lekar> lekari = lekarService.sviLekariKlinike(klinika.getId());
+			for (Lekar lekar : lekari) {
+				boolean imaPregledZaZadatiDatum = false;
+				int trajanjePregledaMin = 0;
+				if (lekar.getTipPregleda().getNaziv().toLowerCase().equals(tipPregledaPretraga.getNaziv().toLowerCase())) {
+					List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
+					for (Pregled pregled : pregledi) {
+						if (datum.equals(pregled.getDatum())) {
+							imaPregledZaZadatiDatum = true;
+							trajanjePregledaMin += pregled.getTrajanjePregleda()*60;
+						}
+					}
+					
+					List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(lekar.getId());
+					for (Zahtev zahtev : zahtevi) {
+						if (datum.equals(zahtev.getDatum())) {
+							imaPregledZaZadatiDatum = true;
+							trajanjePregledaMin += zahtev.getTrajanjePregleda()*60;
+						}
+					}
+					
+					if (imaPregledZaZadatiDatum) {
+						String[] hhmmOd = lekar.getRadnoOd().split(":");
+						int hOd = Integer.parseInt(hhmmOd[0]);
+						int mOd = Integer.parseInt(hhmmOd[1]);
+						
+						String[] hhmmDo = lekar.getRadnoDo().split(":");
+						int hDo = Integer.parseInt(hhmmDo[0]);
+						int mDo = Integer.parseInt(hhmmDo[1]);
+						
+						int slobodnoVremeLekaraMin = Math.abs((hDo - hOd))*60 - (mDo - mOd);
+						
+						if (slobodnoVremeLekaraMin - trajanjePregledaMin > 0) {
+							if (!klinikeDTO.containsKey(klinika.getId())) {
+								klinikeDTO.put(klinika.getId() , new KlinikaDTO(klinika));
+							}
+						}
+						
+					} else {
+						if (!klinikeDTO.containsKey(klinika.getId())) {
+							klinikeDTO.put(klinika.getId() , new KlinikaDTO(klinika));
+						}
+					}
+				}
+			}
+		}
+
+		return new ResponseEntity<>(klinikeDTO.values(), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/slobodniLekari/{datumPregleda}/{tipPregleda}/{idKlinike}")
+	public ResponseEntity<List<LekarDTO>> slobodniLekariKlinike(@PathVariable String datumPregleda, @PathVariable Long tipPregleda, @PathVariable Long idKlinike){
+		List<Lekar> lekari = lekarService.sviLekariKlinike(idKlinike);
+		List<LekarDTO> lekariDTO = new ArrayList<LekarDTO>();
+		
+		String datum = "NONE";
+		
+		if (!datumPregleda.equals("NONE")) {
+			String[] yyyymmdd = datumPregleda.split("-");
+			datum = yyyymmdd[2]+"/"+yyyymmdd[1]+"/"+yyyymmdd[0];
+		}
+		
+		
+		for (Lekar lekar : lekari) {
+			boolean imaPregledZaZadatiDatum = false;
+			int trajanjePregledaMin = 0;
+			if (lekar.getTipPregleda().getId() == tipPregleda || tipPregleda == -1) {
+				List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
+				for (Pregled pregled : pregledi) {
+					if (datum.equals(pregled.getDatum())) {
+						imaPregledZaZadatiDatum = true;
+						trajanjePregledaMin += pregled.getTrajanjePregleda()*60;
+					}
+				}
+				
+				List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(lekar.getId());
+				for (Zahtev zahtev : zahtevi) {
+					if (datum.equals(zahtev.getDatum())) {
+						imaPregledZaZadatiDatum = true;
+						trajanjePregledaMin += zahtev.getTrajanjePregleda()*60;
+					}
+				}
+				
+				if (imaPregledZaZadatiDatum) {
+					String[] hhmmOd = lekar.getRadnoOd().split(":");
+					int hOd = Integer.parseInt(hhmmOd[0]);
+					int mOd = Integer.parseInt(hhmmOd[1]);
+					
+					String[] hhmmDo = lekar.getRadnoDo().split(":");
+					int hDo = Integer.parseInt(hhmmDo[0]);
+					int mDo = Integer.parseInt(hhmmDo[1]);
+					
+					int slobodnoVremeLekaraMin = Math.abs((hDo - hOd))*60 - (mDo - mOd);
+					
+					if (slobodnoVremeLekaraMin - trajanjePregledaMin > 0) {
+						lekariDTO.add(new LekarDTO(lekar));
+					}
+					
+				}else {
+					lekariDTO.add(new LekarDTO(lekar));
+				}
+			}
+		}
+		
+		return new ResponseEntity<>(lekariDTO, HttpStatus.OK);
+	}
+	
 }
