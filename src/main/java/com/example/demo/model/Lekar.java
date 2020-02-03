@@ -4,11 +4,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Lekar extends User {
 
+	
 	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
 	private Klinika klinika;
 	
@@ -23,7 +25,7 @@ public class Lekar extends User {
 	
 	@Column(name = "radnoDo",nullable = false)
 	private String radnoDo;
-	
+
 	public Klinika getKlinika() {
 		return klinika;
 	}
