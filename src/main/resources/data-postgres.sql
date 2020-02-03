@@ -95,7 +95,7 @@ INSERT INTO public.pregledi(
 
 INSERT INTO public.godisnji(
 	id, datum_do, datum_od, odobren, lekar_id, sestra_id)
-	VALUES (nextval('pregled_id_seq'), '31/01/2022', '01/01/2022', false, 8, null);
+	VALUES (nextval('godisnji_id_seq'), '31/01/2022', '01/01/2022', false, 8, null);
 	
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);
