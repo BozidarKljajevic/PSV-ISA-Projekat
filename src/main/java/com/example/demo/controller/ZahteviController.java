@@ -40,8 +40,10 @@ import com.example.demo.model.SalaKlinike;
 import com.example.demo.model.TipPregleda;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
+import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PacijentService;
 import com.example.demo.service.PregledService;
 import com.example.demo.service.SalaKlinikeService;
@@ -57,6 +59,9 @@ public class ZahteviController {
 
 	@Autowired
 	private ZahteviService zahteviService;
+	
+	@Autowired
+	private AdminKlinikeService adminKlinikeService;
 	
 	@Autowired
 	private SalaKlinikeService salaKlinikeService;
@@ -76,6 +81,8 @@ public class ZahteviController {
 	@Autowired
 	private PregledService pregledService;
 	
+	@Autowired
+	private OperacijaService operacijaService;
 	
 	@PostMapping(value = "/izmeniZahtev", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
@@ -90,19 +97,19 @@ public class ZahteviController {
 		return new ResponseEntity<>(zahtevDTO, HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/zahteviZaPreglede")
-	public ResponseEntity<?> getZahteviZaPregledi() {
+	@GetMapping(value = "/zahteviZaPreglede/{id}")
+	public ResponseEntity<?> getZahteviZaPregledi(@PathVariable Long id) {
 
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		List<ZahtevDTO> zahteviDTO = new ArrayList<>();
-
+		AdminKlinike admin = adminKlinikeService.findOne(id);
 		List<SalaKlinike> sale = salaKlinikeService.findAll();
 		List<TipPregleda> tipovi = tipPregledaService.findAll();
 
 		
 		
 		for (Zahtev zahtev : zahtevi) {
-			if (zahtev.isIzbor() == true && zahtev.getSala() == null) {
+			if (zahtev.isIzbor() == true && zahtev.getSala() == null && admin.getKlinika() == zahtev.getLekar().getKlinika()) {
 				//zahtev.setSala(sale.get(0));
 				//zahtev.setTipPregleda(tipovi.get(0));
 				zahteviDTO.add(new ZahtevDTO(zahtev));
@@ -131,6 +138,19 @@ public class ZahteviController {
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
+	/*
+	@PostMapping(value = "/potvrdiZahtevOperacije")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<?> potvrdiZahtevOperacije(@RequestBody ZahtevDTO zahtevDTO) {
+
+		Zahtev zahtev = zahteviService.findOne(zahtevDTO.getId());
+		zahteviService.remove(zahtevDTO.getId());
+		System.out.println(zahtev.getDatum());
+		operacijaService.potvrdiZahtevZaOperaciju(zahtev);
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}*/
+	
 	
 	@PostMapping(value = "/odbijZahtev")
 	@PreAuthorize("hasAuthority('PACIJENT')")
@@ -194,6 +214,71 @@ public class ZahteviController {
 		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/rezervisi/{idSale}/{lekar1}/{lekar2}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<?> rezervisi(@RequestBody ZahtevDTO zahtevDTO, @PathVariable Long idSale, @PathVariable Long lekar1, @PathVariable Long lekar2) throws MailException, InterruptedException {
+
+		Zahtev zahtev = zahteviService.findOne(zahtevDTO.getId());
+		System.out.println(zahtevDTO.getLekar().getIme());
+		zahtev.setLekar(lekarService.findOne(zahtevDTO.getLekar().getId()));
+		zahtev.setDatum(zahtevDTO.getDatum());
+		zahtev.setVreme(zahtevDTO.getVreme());
+		
+		zahtev.setLekar1(lekarService.findOne(lekar1));
+		zahtev.setLekar2(lekarService.findOne(lekar2));
+		
+		SalaKlinike sala = salaKlinikeService.findOne(idSale);
+	
+		zahtev.setSala(sala);
+		System.out.println(lekar1);
+		System.out.println(lekar2);
+		zahteviService.dodajRezervisanuSalu(zahtev);
+		
+		List<Zahtev> zahtevi = zahteviService.findAll();
+		List<ZahtevDTO> zahteviDTO = new ArrayList<>();
+		List<Lekar> lekariMail = new ArrayList<>();
+		
+		for (Zahtev z : zahtevi) {
+			if (z.getSala() == null) {
+				
+				zahteviDTO.add(new ZahtevDTO(z));
+			}
+		}
+		List<Pacijent> pacijenti = pacijentService.findAll();
+
+		Pacijent pacijent = pacijentService.findOne(zahtev.getIdPacijenta());
+		Lekar lekar11 = lekarService.findOne(lekar1);
+		Lekar lekar22 = lekarService.findOne(lekar2);
+				String message = "Vasa operacija je zakazana datuma: " + zahtevDTO.getDatum() + "u vreme: " + zahtevDTO.getVreme();
+				emailService.sendNotificaitionAsync((User) pacijent, message);
+				
+				
+				String message2 = "Imate operaciju datuma: " + zahtev.getDatum() + "u vreme: " + zahtev.getVreme();
+				if (lekar1!=-1) {
+					emailService.sendNotificaitionAsync((User) lekar11, message2);
+				}
+				if(lekar2!=-1) {
+					emailService.sendNotificaitionAsync((User) lekar22, message2);
+				}
+				
+				emailService.sendNotificaitionAsync((User) zahtev.getLekar(), message2);
+			
+				
+				zahteviService.remove(zahtevDTO.getId());
+				System.out.println(zahtev.getDatum());
+				operacijaService.potvrdiZahtevZaOperaciju(zahtev);
+				
+		/*for (Pacijent pacijent : pacijenti) {
+			if (adminKlinike.getKlinika().getId() == zahtevDTO.getLekar().getKlinika().getId()) {
+				String message = "Dodata je sala i za pregled na Vasoj klinici za lekara "
+						+ zahtevDTO.getLekar().getIme() + " " + zahtevDTO.getLekar().getPrezime();
+				emailService.sendNotificaitionAsync((User) zahtev.getIdPacijenta(), message);
+			}
+		} */
+		
+		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
+	}
+	
 
 	@GetMapping(value = "/zahteviZaOperacije")
 	public ResponseEntity<List<ZahtevDTO>> getZakazaneOperacije() {
@@ -205,9 +290,9 @@ public class ZahteviController {
 		List<TipPregleda> tipovi= tipPregledaService.findAll();
 		
 		for (Zahtev zahtev : zahtevi) {
-			if (zahtev.isIzbor() == false) {
-				zahtev.setSala(sale.get(0));
-				zahtev.setTipPregleda(tipovi.get(0));
+			if (zahtev.isIzbor() == false && zahtev.getSala() == null) {
+				//zahtev.setSala(sale.get(0));
+				//zahtev.setTipPregleda(tipovi.get(0));
 				zahtevDTO.add(new ZahtevDTO(zahtev));
 			}
 		}

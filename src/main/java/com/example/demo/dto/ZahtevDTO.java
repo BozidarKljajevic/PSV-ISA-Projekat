@@ -10,6 +10,8 @@ public class ZahtevDTO {
 	private SalaKlinikeDTO sala;
 	private TipPregledaDTO tipPregleda;
 	private LekarDTO lekar;
+	private LekarDTO lekar1;
+	private LekarDTO lekar2;
 	private Double cena;
 	private Long idPacijenta;
 	private Double trajanjePregleda;
@@ -28,7 +30,16 @@ public class ZahtevDTO {
 		}else {
 			this.sala = null;
 		}
-		
+		if (zahtev.getLekar1() != null) {
+			this.lekar1 = new LekarDTO(zahtev.getLekar1());
+		}else {
+			this.lekar1 = null;
+		}
+		if (zahtev.getLekar2() != null) {
+			this.lekar2 = new LekarDTO(zahtev.getLekar2());
+		}else {
+			this.lekar2 = null;
+		}
 		this.tipPregleda = new TipPregledaDTO(zahtev.getTipPregleda());
 		this.lekar = new LekarDTO(zahtev.getLekar());
 		this.cena = zahtev.getCena();
@@ -38,7 +49,7 @@ public class ZahtevDTO {
 	}
 	
 	public ZahtevDTO(Long id, String datum, String vreme, SalaKlinikeDTO sala, TipPregledaDTO tipPregleda,
-			LekarDTO lekar, Double cena, Long idPacijenta, Double trajanjePregleda,boolean izbor) {
+			LekarDTO lekar,LekarDTO lekar1, LekarDTO lekar2, Double cena, Long idPacijenta, Double trajanjePregleda,boolean izbor) {
 		super();
 		this.id = id;
 		this.datum = datum;
@@ -46,6 +57,8 @@ public class ZahtevDTO {
 		this.sala = sala;
 		this.tipPregleda = tipPregleda;
 		this.lekar = lekar;
+		this.lekar1=lekar1;
+		this.lekar2=lekar2;
 		this.cena = cena;
 		this.idPacijenta = idPacijenta;
 		this.trajanjePregleda = trajanjePregleda;
@@ -106,6 +119,24 @@ public class ZahtevDTO {
 
 	public void setLekar(LekarDTO lekar) {
 		this.lekar = lekar;
+	}
+
+	
+	
+	public LekarDTO getLekar1() {
+		return lekar1;
+	}
+
+	public void setLekar1(LekarDTO lekar1) {
+		this.lekar1 = lekar1;
+	}
+
+	public LekarDTO getLekar2() {
+		return lekar2;
+	}
+
+	public void setLekar2(LekarDTO lekar2) {
+		this.lekar2 = lekar2;
 	}
 
 	public Double getCena() {
