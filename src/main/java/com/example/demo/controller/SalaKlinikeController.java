@@ -523,7 +523,7 @@ public class SalaKlinikeController {
 								double minutiKrajP = krajPregledaSatP*60 + krajPregledaMinP;
 								System.out.println(minutiPocetakP);
 								System.out.println(minutiKrajP);
-								if(!((minutiPocetak < minutiPocetakP && minutiKraj < minutiPocetakP) || (minutiPocetak > minutiKrajP && minutiKraj > minutiKrajP)))
+								if(!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP) || (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP)))
 								{
 									flag = true;
 								}
@@ -554,7 +554,7 @@ public class SalaKlinikeController {
 								double minutiKrajZ = krajPregledaSatZ*60 + krajPregledaMinZ;
 								System.out.println(minutiPocetakZ);
 								System.out.println(minutiKrajZ);
-								if(!((minutiPocetak < minutiPocetakZ && minutiKraj < minutiPocetakZ) || (minutiPocetak > minutiKrajZ && minutiKraj > minutiKrajZ)))
+								if(!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ) || (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ)))
 								{
 									flag = true;
 								}
