@@ -72,8 +72,8 @@ INSERT INTO public.pregledi(
 	VALUES (nextval('pregled_id_seq'), 5000, '21/12/2019', null, 0.5, '13:00', false, 9, 2, 2);
 
 INSERT INTO public.operacija(
-	id, cena, datum, id_pacijenta, trajanje_operacije, vreme, zavrsen, sala_klinike_id)
-	VALUES (nextval('operacija_id_seq'), 2000, '22/12/2019', 2, 1.5, '12:00', false, 1);
+	id, cena, datum, id_pacijenta, trajanje_operacije, vreme, zavrsen, sala_klinike_id, tip_operacije_id)
+	VALUES (nextval('operacija_id_seq'), 2000, '22/12/2019', 2, 1.5, '12:00', false, 1, 1);
 
 	
 INSERT INTO public.lekari_operacije(

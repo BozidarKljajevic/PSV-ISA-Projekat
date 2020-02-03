@@ -55,6 +55,10 @@ public class Operacija {
 	@JoinTable(name = "lekari_operacije", joinColumns = @JoinColumn(name = "operacija_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "lekar_id", referencedColumnName = "id"))
 	private List<Lekar> lekariKlinike;
 	
+	@OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+	@JoinColumn(name = "tip_operacije_id")
+	private TipPregleda tipOperacije;
+	
 	@Column(name = "cena", nullable = false, unique = false)
 	private Double cena;
 	
@@ -66,6 +70,7 @@ public class Operacija {
 	
 	@Column(name = "trajanje_operacije", nullable = false, unique = false)
 	private Double trajanjeOperacije;
+	
 	
 	public Long getId() {
 		return id;
@@ -89,6 +94,15 @@ public class Operacija {
 
 	public void setVreme(String vreme) {
 		this.vreme = vreme;
+	}
+
+	
+	public TipPregleda getTipOperacije() {
+		return tipOperacije;
+	}
+
+	public void setTipOperacije(TipPregleda tipOperacije) {
+		this.tipOperacije = tipOperacije;
 	}
 
 	public SalaKlinike getSala() {
@@ -150,11 +164,13 @@ public class Operacija {
 		this.zavrsen = zavrsen;
 	}
 
-	public Double getTrajanjePregleda() {
+	public Double getTrajanjeOperacije() {
 		return trajanjeOperacije;
 	}
 
-	public void setTrajanjePregleda(Double trajanjeOperacije) {
+	public void setTrajanjeOperacije(Double trajanjeOperacije) {
 		this.trajanjeOperacije = trajanjeOperacije;
 	}
+
+	
 }

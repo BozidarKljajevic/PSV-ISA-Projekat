@@ -8,6 +8,7 @@ public class OperacijaDTO {
 	private String datum;
 	private String vreme;
 	private SalaKlinikeDTO sala;
+	private TipPregledaDTO tipOperacije;
 	private Double cena;
 	private Long idPacijenta;
 	private Boolean zavrsen;
@@ -23,20 +24,22 @@ public class OperacijaDTO {
 		this.datum = operacija.getDatum();
 		this.vreme = operacija.getVreme();
 		this.sala = new SalaKlinikeDTO(operacija.getSala());
+		this.tipOperacije= new TipPregledaDTO(operacija.getTipOperacije());
 		this.cena = operacija.getCena();
 		this.idPacijenta = operacija.getIdPacijenta();
 		this.zavrsen = operacija.getZavrsen();
-		this.trajanjeOperacije = operacija.getTrajanjePregleda();
+		this.trajanjeOperacije = operacija.getTrajanjeOperacije();
 	}
 	
 
-	public OperacijaDTO(Long id, String datum, String vreme, SalaKlinikeDTO sala, Double cena, Long idPacijenta,
+	public OperacijaDTO(Long id, String datum, String vreme, SalaKlinikeDTO sala,TipPregledaDTO tipOperacije, Double cena, Long idPacijenta,
 			Boolean zavrsen, Double trajanjeOperacije) {
 		super();
 		this.id = id;
 		this.datum = datum;
 		this.vreme = vreme;
 		this.sala = sala;
+		this.tipOperacije=tipOperacije;
 		this.cena = cena;
 		this.idPacijenta = idPacijenta;
 		this.zavrsen = zavrsen;
@@ -73,6 +76,16 @@ public class OperacijaDTO {
 
 	public void setSala(SalaKlinikeDTO sala) {
 		this.sala = sala;
+	}
+	
+	
+
+	public TipPregledaDTO getTipOperacije() {
+		return tipOperacije;
+	}
+
+	public void setTipOperacije(TipPregledaDTO tipOperacije) {
+		this.tipOperacije = tipOperacije;
 	}
 
 	public Double getCena() {

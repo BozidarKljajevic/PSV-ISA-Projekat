@@ -399,7 +399,7 @@ public class SalaKlinikeController {
 								String[] vremeP = o.getVreme().split(":");
 								double satP = Double.parseDouble(vremeP[0]);
 								double minP = Double.parseDouble(vremeP[1]);
-								double trajanjeMinP = o.getTrajanjePregleda() * 60;
+								double trajanjeMinP = o.getTrajanjeOperacije() * 60;
 								double trajanjeMinOstatakP = trajanjeMinP % 60;
 								double trajanjeSatP = trajanjeMinP / 60;
 								int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);
