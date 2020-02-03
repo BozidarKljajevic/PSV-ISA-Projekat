@@ -42,6 +42,7 @@ import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PacijentService;
 import com.example.demo.service.PregledService;
 import com.example.demo.service.SalaKlinikeService;
@@ -76,6 +77,8 @@ public class ZahteviController {
 	@Autowired
 	private PregledService pregledService;
 	
+	@Autowired
+	private OperacijaService operacijaService;
 	
 	@PostMapping(value = "/izmeniZahtev", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
@@ -131,6 +134,19 @@ public class ZahteviController {
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
+	/*
+	@PostMapping(value = "/potvrdiZahtevOperacije")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<?> potvrdiZahtevOperacije(@RequestBody ZahtevDTO zahtevDTO) {
+
+		Zahtev zahtev = zahteviService.findOne(zahtevDTO.getId());
+		zahteviService.remove(zahtevDTO.getId());
+		System.out.println(zahtev.getDatum());
+		operacijaService.potvrdiZahtevZaOperaciju(zahtev);
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}*/
+	
 	
 	@PostMapping(value = "/odbijZahtev")
 	@PreAuthorize("hasAuthority('PACIJENT')")
@@ -238,11 +254,15 @@ public class ZahteviController {
 					emailService.sendNotificaitionAsync((User) lekar11, message2);
 				}
 				if(lekar2!=-1) {
-					emailService.sendNotificaitionAsync((User) lekar11, message2);
+					emailService.sendNotificaitionAsync((User) lekar22, message2);
 				}
 				
 				emailService.sendNotificaitionAsync((User) zahtev.getLekar(), message2);
+			
 				
+				zahteviService.remove(zahtevDTO.getId());
+				System.out.println(zahtev.getDatum());
+				operacijaService.potvrdiZahtevZaOperaciju(zahtev);
 				
 		/*for (Pacijent pacijent : pacijenti) {
 			if (adminKlinike.getKlinika().getId() == zahtevDTO.getLekar().getKlinika().getId()) {

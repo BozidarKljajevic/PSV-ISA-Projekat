@@ -28,12 +28,14 @@ import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PregledService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.ZahteviService;
@@ -56,6 +58,9 @@ public class LekarController {
 	
 	@Autowired
 	private ZahteviService zahteviService;
+	
+	@Autowired
+	private OperacijaService operacijaService;
 
 	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('LEKAR')")
@@ -83,7 +88,9 @@ public class LekarController {
 		Lekar lekar = lekarService.findOne(idLong);
 
 		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
 		List<DogadjajDTO> datumi = new ArrayList<>();
+		List<Lekar> lekari = new ArrayList<>();
 
 		for (Pregled preg : pregledi) {
 			if ((preg.getLekar().getId()).equals(idLong)) {
@@ -118,8 +125,48 @@ public class LekarController {
 				String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
 				datumi.add(new DogadjajDTO(start, end));
 			}
-		}
-		;
+		};
+		for (Operacija o : operacije) {
+			lekari=o.getLekariKlinike();
+			System.out.println(lekari.size());
+			for(int i=0; i<lekari.size(); i++) {
+				if ((lekari.get(i).getId()).equals(idLong)) {
+					String[] datum = o.getDatum().split("/");
+					String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
+
+					String[] vr = o.getVreme().split(":");
+					double sat = Double.parseDouble(vr[0]);
+					double min = Double.parseDouble(vr[1]);
+
+					double trajanjeMin = o.getTrajanjePregleda() * 60;
+					double trajanjeMinOstatak = trajanjeMin % 60;
+					double trajanjeSat = trajanjeMin / 60;
+					int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak) / 60);
+					double krajPregledaMin = min + trajanjeMinOstatak;
+
+					System.out.println(sat + " " + krajPregledaSat + " " + min + " " + trajanjeMinOstatak);
+
+					String minStr = "";
+					if (krajPregledaMin == 60) {
+						minStr = "00";
+						krajPregledaSat++;
+					}else if (krajPregledaMin == 0)
+					{
+						minStr = "00";
+						krajPregledaSat++;
+					} else {
+						minStr = "30";
+					}
+
+					String start = datumStr + ' ' + o.getVreme();
+					String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
+					datumi.add(new DogadjajDTO(start, end));
+				}
+				
+			}
+			
+		};
+		
 		return datumi;
 	}
 
