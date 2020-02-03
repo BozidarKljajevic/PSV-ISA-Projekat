@@ -1,5 +1,9 @@
 package com.example.demo.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.demo.model.Lekar;
 import com.example.demo.model.Operacija;
 
 public class OperacijaDTO {
@@ -13,9 +17,11 @@ public class OperacijaDTO {
 	private Long idPacijenta;
 	private Boolean zavrsen;
 	private Double trajanjeOperacije;
+	private List<LekarDTO> lekari;
 	
 	public OperacijaDTO() {
 		
+		lekari = new ArrayList<LekarDTO>();
 	}
 	
 	public OperacijaDTO(Operacija operacija) {
@@ -29,6 +35,10 @@ public class OperacijaDTO {
 		this.idPacijenta = operacija.getIdPacijenta();
 		this.zavrsen = operacija.getZavrsen();
 		this.trajanjeOperacije = operacija.getTrajanjeOperacije();
+		this.lekari = new ArrayList<LekarDTO>();
+		for (Lekar lekar : operacija.getLekariKlinike()) {
+			lekari.add(new LekarDTO(lekar));
+		}
 	}
 	
 
@@ -119,6 +129,12 @@ public class OperacijaDTO {
 	public void setTrajanjeOperacije(Double trajanjeOperacije) {
 		this.trajanjeOperacije = trajanjeOperacije;
 	}
-	
-	
+
+	public List<LekarDTO> getLekari() {
+		return lekari;
+	}
+
+	public void setLekari(List<LekarDTO> lekari) {
+		this.lekari = lekari;
+	}
 }
