@@ -214,5 +214,19 @@ public class ZahteviController {
 
 		return new ResponseEntity<>(zahtevDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/zahteviPacijenta/{id}")
+	public ResponseEntity<List<ZahtevDTO>> getZahtevePacijenta(@PathVariable Long id) {
+		List<Zahtev> zahtevi = zahteviService.findAll();
+		List<ZahtevDTO> zahteviDTO = new ArrayList<>();
+		
+		for (Zahtev zahtev : zahtevi) {
+			if (zahtev.getIdPacijenta() == id) {
+				zahteviDTO.add(new ZahtevDTO(zahtev));
+			}
+		}
+
+		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
+	}
 
 }
