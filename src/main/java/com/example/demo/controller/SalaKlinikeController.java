@@ -41,6 +41,9 @@ public class SalaKlinikeController {
 
 	@Autowired
 	private SalaKlinikeService salaKlinikeService;
+	
+	@Autowired
+	private ZahteviService zahteviService2;
 
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
@@ -54,7 +57,71 @@ public class SalaKlinikeController {
 	@Autowired
 	private ZahteviService zahteviService;
 
-	
+	@GetMapping(value = "/slobodniTermin/{idPregleda}")
+	public ResponseEntity<String> getSlobodniTermini(@PathVariable Long idPregleda) {
+		Zahtev pregled = zahteviService.findOne(idPregleda);
+
+		int vreme = Integer.parseInt(pregled.getVreme().split(":")[0]) * 60 + Integer.parseInt(pregled.getVreme().split(":")[1]);
+		double trajanje = pregled.getTrajanjePregleda() * 60;
+
+		String[] yyyymmdd = pregled.getDatum().split("-");
+		String datum = pregled.getDatum();
+
+		String slobodniTermin = "";
+
+		List<Pregled> pregledi = pregledService.getPregledeOdLekara(pregled.getLekar().getId());
+		List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(pregled.getLekar().getId());
+
+		for (int i = vreme; i < 1440 ; i += 30) {
+			System.out.println("ovo je vreme" + i);
+			
+			boolean exist = false;
+			for (Pregled p : pregledi) {
+				if (datum.equals(p.getDatum())) {
+					System.out.println(datum);
+					System.out.println(p.getDatum());
+					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(p.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + p.getTrajanjePregleda() * 60);
+					if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+					 {
+						System.out.println(exist);
+						exist = true;
+						break;
+					}
+				}
+			}
+			
+		/*	for (Zahtev zahtev : zahtevi) {
+				if (datum.equals(zahtev.getDatum())) {
+					int pregledOd = Integer.parseInt(zahtev.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(zahtev.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + zahtev.getTrajanjePregleda() * 60);
+					if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+					 {
+						exist = true;
+						break;
+					}
+				}
+			} */
+			
+			if (!exist) {
+				int terminOd = i;
+			
+				System.out.println("usao u exist" + terminOd);
+
+				String terminOdStr = (terminOd / 60) + ":"
+						+ (((terminOd - (terminOd / 60) * 60) == 0) ? "00" : (terminOd - (terminOd / 60) * 60));
+				
+
+				slobodniTermin = terminOdStr;
+				return new ResponseEntity<>(slobodniTermin, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity<>(slobodniTermin, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 	
 	@GetMapping(value = "/kalendar/{idSale}")
 	@PreAuthorize("hasAuthority('ADMIN')")
