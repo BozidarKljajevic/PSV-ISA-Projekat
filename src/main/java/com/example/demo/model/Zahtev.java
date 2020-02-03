@@ -49,6 +49,14 @@ public class Zahtev{
 	@JoinColumn(name = "lekar_id")
 	private Lekar lekar;
 	
+	@OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+	@JoinColumn(name = "lekar1_id")
+	private Lekar lekar1;
+	
+	@OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+	@JoinColumn(name = "lekar2_id")
+	private Lekar lekar2;
+	
 	@Column(name = "cena")
 	private Double cena;
 	
@@ -104,6 +112,24 @@ public class Zahtev{
 
 	public void setLekar(Lekar lekar) {
 		this.lekar = lekar;
+	}
+
+	
+	
+	public Lekar getLekar1() {
+		return lekar1;
+	}
+
+	public void setLekar1(Lekar lekar1) {
+		this.lekar1 = lekar1;
+	}
+
+	public Lekar getLekar2() {
+		return lekar2;
+	}
+
+	public void setLekar2(Lekar lekar2) {
+		this.lekar2 = lekar2;
 	}
 
 	public Double getCena() {
