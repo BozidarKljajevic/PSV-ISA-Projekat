@@ -16,10 +16,14 @@ import com.example.demo.dto.RegisterDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Authority;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.OcenaLekar;
+import com.example.demo.model.Pacijent;
 import com.example.demo.repository.AdminKlinikeRepository;
 import com.example.demo.repository.AuthorityRepository;
 import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.LekarRepository;
+import com.example.demo.repository.OcenaLekarRepository;
+import com.example.demo.repository.PacijentRepository;
 import com.example.demo.repository.TipPregledaRepository;
 
 @Service
@@ -39,6 +43,12 @@ public class LekarService {
 	
 	@Autowired
 	private TipPregledaRepository tipPregledaRepository;
+	
+	@Autowired
+	private PacijentRepository pacijentRepository;
+	
+	@Autowired
+	private OcenaLekarRepository ocenaLekarRepository;
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -114,6 +124,60 @@ public class LekarService {
 
 	public List<Lekar> sviLekariKlinike(Long id) {
 		return lekarRepository.findByKlinikaId(id);
+	}
+
+	public void oceniLekara(Long idPacijent, Long idLekar, Integer ocena) {
+		Pacijent pacijent = pacijentRepository.findById(idPacijent).orElse(null);
+		Lekar lekar = lekarRepository.findById(idLekar).orElse(null);
+		
+		List<OcenaLekar> sveOceneLekara = ocenaLekarRepository.findAll();
+		OcenaLekar ocenaLekara = new OcenaLekar();
+		
+		for (OcenaLekar ocenaLekar : sveOceneLekara) {
+			if (ocenaLekar.getLekar().getId() == idLekar && ocenaLekar.getPacijent().getId() == idPacijent) {
+				ocenaLekara = ocenaLekar;
+				break;
+			}
+		}
+		
+		ocenaLekara.setLekar(lekar);
+		ocenaLekara.setPacijent(pacijent);
+		ocenaLekara.setOcena(ocena);
+		
+		ocenaLekarRepository.save(ocenaLekara);
+		
+		Double prosecna_ocena = 0.0;
+		int br_ocena = 0;
+		
+		sveOceneLekara = ocenaLekarRepository.findAll();
+		
+		for (OcenaLekar ocenaLekar : sveOceneLekara) {
+			if (ocenaLekar.getLekar().getId() == idLekar) {
+				prosecna_ocena += ocenaLekar.getOcena();
+				br_ocena++;
+			}
+		}
+		
+		if (br_ocena != 0) {
+			prosecna_ocena /= br_ocena;
+		}
+		
+		lekar.setOcena(prosecna_ocena+"");
+		lekarRepository.save(lekar);
+		
+	}
+
+	public OcenaLekar getOcena(Long idPacijent, Long idLekar) {
+		
+		List<OcenaLekar> sveOceneLekara = ocenaLekarRepository.findAll();
+		
+		for (OcenaLekar ocenaLekar : sveOceneLekara) {
+			if (ocenaLekar.getLekar().getId() == idLekar && ocenaLekar.getPacijent().getId() == idPacijent) {
+				return ocenaLekar;
+			}
+		}
+		
+		return null;
 	}
 	
 }

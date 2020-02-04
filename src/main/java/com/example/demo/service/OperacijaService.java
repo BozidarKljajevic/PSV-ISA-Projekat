@@ -60,4 +60,9 @@ public class OperacijaService {
 		
 		operacijaRepository.save(operacija);
 	}
+
+	public List<Operacija> getOperacijePacijenta(Long id) {
+		
+		return operacijaRepository.findByIdPacijenta(id);
+	}
 }

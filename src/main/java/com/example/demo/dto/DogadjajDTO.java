@@ -4,13 +4,38 @@ public class DogadjajDTO {
 
 	String start;
 	String end;
+	String title;
+	Long idPregleda;
+	
 	
 	public DogadjajDTO() {
 	}
 
-	public DogadjajDTO(String start, String end) {
+	public DogadjajDTO(String start, String end, String title, Long idPregleda) {
 		this.start = start;
 		this.end = end;
+		this.title=title;
+		this.idPregleda=idPregleda;
+	}
+
+	
+	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	
+
+	public Long getIdPregleda() {
+		return idPregleda;
+	}
+
+	public void setIdPregleda(Long idPregleda) {
+		this.idPregleda = idPregleda;
 	}
 
 	public String getStart() {

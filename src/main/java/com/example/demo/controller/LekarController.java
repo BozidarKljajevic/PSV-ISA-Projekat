@@ -29,6 +29,7 @@ import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.Operacija;
+import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
@@ -96,7 +97,7 @@ public class LekarController {
 			if ((preg.getLekar().getId()).equals(idLong)) {
 				String[] datum = preg.getDatum().split("/");
 				String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
-
+				
 				String[] vr = preg.getVreme().split(":");
 				double sat = Double.parseDouble(vr[0]);
 				double min = Double.parseDouble(vr[1]);
@@ -123,7 +124,7 @@ public class LekarController {
 
 				String start = datumStr + ' ' + preg.getVreme();
 				String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-				datumi.add(new DogadjajDTO(start, end));
+				datumi.add(new DogadjajDTO(start, end, "pregled", preg.getId()));
 			}
 		};
 		for (Operacija o : operacije) {
@@ -160,7 +161,7 @@ public class LekarController {
 
 					String start = datumStr + ' ' + o.getVreme();
 					String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-					datumi.add(new DogadjajDTO(start, end));
+					datumi.add(new DogadjajDTO(start, end, "operacija", o.getId()));
 				}
 				
 			}
@@ -215,7 +216,7 @@ public class LekarController {
 
 				String start = datumStr + ' ' + preg.getVreme();
 				String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-				datumi.add(new DogadjajDTO(start, end));
+				datumi.add(new DogadjajDTO(start, end,"",(long) -1));
 			}
 		};
 		for (Operacija o : operacije) {
@@ -252,7 +253,7 @@ public class LekarController {
 
 					String start = datumStr + ' ' + o.getVreme();
 					String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-					datumi.add(new DogadjajDTO(start, end));
+					datumi.add(new DogadjajDTO(start, end,"",(long) -1));
 				}
 				
 			}
@@ -942,6 +943,4 @@ public class LekarController {
 		return new ResponseEntity<>(slobodniTermini, HttpStatus.OK);
 		
 	}
-	
-	
 }
