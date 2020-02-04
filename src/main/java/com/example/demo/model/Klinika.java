@@ -65,7 +65,9 @@ public class Klinika {
 	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
 	private Set<MedicinskaSestra> medicinskaSestra = new HashSet<MedicinskaSestra>();
 	
-	
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@OneToMany(mappedBy = "klinika", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	private Set<OcenaKlinika> oceneKlinike = new HashSet<OcenaKlinika>();
 	
 	public Long getId() {
 		return id;
@@ -178,6 +180,12 @@ public class Klinika {
 	public void setMedicinskaSestra(Set<MedicinskaSestra> medicinskaSestra) {
 		this.medicinskaSestra = medicinskaSestra;
 	}
-	
-	
+
+	public Set<OcenaKlinika> getOceneKlinike() {
+		return oceneKlinike;
+	}
+
+	public void setOceneKlinike(Set<OcenaKlinika> oceneKlinike) {
+		this.oceneKlinike = oceneKlinike;
+	}
 }
