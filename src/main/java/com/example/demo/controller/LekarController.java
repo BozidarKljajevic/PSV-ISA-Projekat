@@ -705,5 +705,4 @@ public class LekarController {
 
 		return new ResponseEntity<>(slobodniTermini, HttpStatus.OK);
 	}
-
 }
