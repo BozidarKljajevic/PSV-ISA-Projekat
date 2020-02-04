@@ -104,4 +104,9 @@ public class PregledService {
 		return pregledRepository.findByLekarId(id);
 	}
 
+	public void zavrsiPregled(Pregled pregled) {
+		pregled.setZavrsen(true);
+		pregledRepository.save(pregled);
+	}
+
 }

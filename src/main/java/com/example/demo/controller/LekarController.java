@@ -705,5 +705,15 @@ public class LekarController {
 
 		return new ResponseEntity<>(slobodniTermini, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/lekarPregleda/{id}")
+	public ResponseEntity<LekarDTO> lekarPregleda(@PathVariable Long id){
+		
+		Pregled pregled = pregledService.findOne(id);
+		
+		LekarDTO lekarDTO = new LekarDTO(pregled.getLekar());
+		
+		return new ResponseEntity<>(lekarDTO ,HttpStatus.OK);
+	}
 
 }
