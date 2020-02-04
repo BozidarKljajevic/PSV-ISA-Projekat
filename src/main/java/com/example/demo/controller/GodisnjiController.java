@@ -24,6 +24,7 @@ import com.example.demo.dto.PregledDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Godisnji;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
@@ -33,6 +34,7 @@ import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PregledService;
 import com.example.demo.service.ZahteviService;
 
@@ -56,6 +58,10 @@ public class GodisnjiController {
 	
 	@Autowired
 	private ZahteviService zahteviService;
+	
+
+	@Autowired
+	private OperacijaService operacijaService;
 	
 	@Autowired
 	private EmailService emailService;
@@ -85,6 +91,7 @@ public class GodisnjiController {
 		System.out.println(mesecDo);
 		System.out.println(godinaDo);
 		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		String pregledDatum[];
 		String zahtevDatum[];
@@ -94,11 +101,61 @@ public class GodisnjiController {
 			int pregledMesec = Integer.parseInt(pregledDatum[1]);
 			int pregledGodina = Integer.parseInt(pregledDatum[2]);
 			if(lekar.getId() == p.getLekar().getId() && pregledGodina >= godinaOd && pregledGodina <= godinaDo) {
-				if(godinaOd != godinaDo && pregledGodina == godinaDo && pregledMesec <= mesecDo && pregledDan <= danDo) {
-					flag = true;
+				if(godinaOd != godinaDo && pregledGodina == godinaDo && pregledMesec <= mesecDo) {
+					if(pregledMesec == mesecDo && pregledDan <= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec < mesecDo) {
+						flag = true;
+					}
 				}
 				else if(godinaOd != godinaDo && pregledGodina == godinaOd && pregledMesec >= mesecOd && pregledDan >= danOd) {
-					flag = true;
+					if(pregledMesec == mesecOd && pregledDan >= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec > mesecOd) {
+						flag = true;
+					}
+					
+				}
+				else if(godinaOd == godinaDo && pregledMesec >= mesecOd && pregledMesec <= mesecDo) {
+					 if(mesecDo != mesecOd && pregledMesec == mesecDo && pregledDan <= danDo) {
+						 flag = true;
+					 }
+					 else if(mesecDo != mesecOd && pregledMesec == mesecOd && pregledDan >= danOd) {
+						 flag = true;
+						 
+					 }
+					 else if(mesecDo == mesecOd && pregledDan >= danOd && pregledDan <= danDo) {
+						 flag = true;
+						 
+					 }
+				}
+			}
+		}
+		
+		for (Operacija o : operacije) {
+			pregledDatum = o.getDatum().split("/");
+			int pregledDan = Integer.parseInt(pregledDatum[0]);
+			int pregledMesec = Integer.parseInt(pregledDatum[1]);
+			int pregledGodina = Integer.parseInt(pregledDatum[2]);
+			if(o.getLekariKlinike().contains(lekar) && pregledGodina >= godinaOd && pregledGodina <= godinaDo) {
+				if(godinaOd != godinaDo && pregledGodina == godinaDo && pregledMesec <= mesecDo) {
+					if(pregledMesec == mesecDo && pregledDan <= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec < mesecDo) {
+						flag = true;
+					}
+				}
+				else if(godinaOd != godinaDo && pregledGodina == godinaOd && pregledMesec >= mesecOd && pregledDan >= danOd) {
+					if(pregledMesec == mesecOd && pregledDan >= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec > mesecOd) {
+						flag = true;
+					}
+					
 				}
 				else if(godinaOd == godinaDo && pregledMesec >= mesecOd && pregledMesec <= mesecDo) {
 					 if(mesecDo != mesecOd && pregledMesec == mesecDo && pregledDan <= danDo) {

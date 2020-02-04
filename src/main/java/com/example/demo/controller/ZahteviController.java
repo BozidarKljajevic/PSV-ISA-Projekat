@@ -184,7 +184,7 @@ public class ZahteviController {
 		
 		
 		for (Zahtev z : zahtevi) {
-			if (z.getSala() == null && admin.getKlinika() == z.getLekar().getKlinika()) {
+			if (z.getSala() == null && admin.getKlinika() == z.getLekar().getKlinika() && z.isIzbor() == true) {
 				
 				zahteviDTO.add(new ZahtevDTO(z));
 			}

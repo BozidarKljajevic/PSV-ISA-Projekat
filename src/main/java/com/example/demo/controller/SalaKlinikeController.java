@@ -69,9 +69,11 @@ public class SalaKlinikeController {
 
 		String slobodniTermin = "";
 
+		
 		List<Pregled> pregledi = pregledService.getPregledeOdLekara(pregled.getLekar().getId());
 		List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(pregled.getLekar().getId());
-
+		List<Operacija> operacije = operacijaService.findAll();
+		
 		for (int i = vreme; i < 1440 ; i += 30) {
 			System.out.println("ovo je vreme" + i);
 			
@@ -92,18 +94,41 @@ public class SalaKlinikeController {
 				}
 			}
 			
-		/*	for (Zahtev zahtev : zahtevi) {
-				if (datum.equals(zahtev.getDatum())) {
-					int pregledOd = Integer.parseInt(zahtev.getVreme().split(":")[0]) * 60
-							+ Integer.parseInt(zahtev.getVreme().split(":")[1]);
-					int pregledDo = (int) (pregledOd + zahtev.getTrajanjePregleda() * 60);
+			
+			for (Zahtev p : zahtevi) {
+				if (datum.equals(p.getDatum()) && pregled.getId() != p.getId()) {
+					System.out.println(datum);
+					System.out.println(p.getDatum());
+					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(p.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + p.getTrajanjePregleda() * 60);
 					if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
 					 {
+						System.out.println(exist);
 						exist = true;
 						break;
 					}
 				}
-			} */
+			}
+			
+			for (Operacija o : operacije) {
+				if (datum.equals(o.getDatum()) && o.getLekariKlinike().contains(pregled.getLekar())) {
+					System.out.println(datum);
+					System.out.println(o.getDatum());
+					int pregledOd = Integer.parseInt(o.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(o.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + o.getTrajanjeOperacije() * 60);
+					if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+					 {
+						System.out.println(exist);
+						exist = true;
+						break;
+					}
+				}
+			}
+			
+			
+		
 			
 			if (!exist) {
 				int terminOd = i;
@@ -132,6 +157,7 @@ public class SalaKlinikeController {
 		
 		List<Pregled> pregledi = pregledService.findAll();
 		List<DogadjajDTO> datumi = new ArrayList<>();
+		List<Operacija> operacije = operacijaService.findAll();
 		
 		for(Pregled preg : pregledi)
 		{
@@ -166,6 +192,42 @@ public class SalaKlinikeController {
 				datumi.add(new DogadjajDTO(start, end));
 			}
 		};
+		
+		
+		for(Operacija preg : operacije)
+		{
+			if((preg.getSala().getId()).equals(idLong)) {
+				String[] datum = preg.getDatum().split("/");
+				String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
+				
+				String[] vr = preg.getVreme().split(":");
+				double sat = Double.parseDouble(vr[0]);
+				double min = Double.parseDouble(vr[1]);
+				
+				double trajanjeMin = preg.getTrajanjeOperacije() * 60;
+				double trajanjeMinOstatak = trajanjeMin % 60;
+				double trajanjeSat = trajanjeMin / 60;
+				int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak)/60);
+				double krajPregledaMin = min + trajanjeMinOstatak;
+				
+				System.out.println(sat+" "+krajPregledaSat+" "+min+" "+trajanjeMinOstatak);
+				
+				String minStr = "";
+				if (krajPregledaMin == 0) {
+					minStr = "00";
+					krajPregledaSat++;
+				}else {
+					minStr = "30";
+				}
+				
+				
+				
+				String start = datumStr+ ' ' +preg.getVreme();
+				String end = datumStr +' '+ krajPregledaSat+":"+minStr;
+				datumi.add(new DogadjajDTO(start, end));
+			}
+		};
+		
 		return datumi;
 	}
 	
@@ -215,20 +277,55 @@ public class SalaKlinikeController {
 	public ResponseEntity<?> deleteSalu(@PathVariable Long id) {
 
 		SalaKlinike salaKlinike = salaKlinikeService.findOne(id);
+		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
+		List<Zahtev> zahtevi = zahteviService.findAll();
+		boolean flag = false;
+		
 		List<SalaKlinikeDTO> salaDTO = new ArrayList<>();
+		
 		if (salaKlinike != null) {
-			salaKlinikeService.remove(id);
-			List<SalaKlinike> salaKli = salaKlinikeService.findAll();
-
-			for (SalaKlinike sala : salaKli) {
-				if (sala.getKlinika().getId() == salaKlinike.getKlinika().getId()) {
-					salaDTO.add(new SalaKlinikeDTO(sala));
+			
+			for(Pregled p : pregledi) {
+				if(p.getSala().getId() == salaKlinike.getId() && p.getZavrsen() == false) {
+					flag = true;
 				}
 			}
-			return new ResponseEntity<>(salaDTO, HttpStatus.OK);
+			
+			for(Zahtev z : zahtevi) {
+				if(z.getSala() != null) {
+				if(z.getSala().getId() == salaKlinike.getId()) {
+					flag = true;
+				}
+				}
+			}
+			
+			
+			for(Operacija o : operacije) {
+				if(o.getSala().getId() == salaKlinike.getId() && o.getZavrsen() == false) {
+					flag = true;
+				}
+			}
+			if(flag == false) {
+				salaKlinikeService.remove(id);
+				List<SalaKlinike> salaKli = salaKlinikeService.findAll();
+
+				for (SalaKlinike sala : salaKli) {
+					if (sala.getKlinika().getId() == salaKlinike.getKlinika().getId()) {
+						salaDTO.add(new SalaKlinikeDTO(sala));
+					}
+				}
+				return new ResponseEntity<>(salaDTO, HttpStatus.OK);
+			}
+			
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+		
+		if(flag == true) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	
@@ -269,7 +366,8 @@ public class SalaKlinikeController {
 		
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		
-	
+		List<Operacija> operacije = operacijaService.findAll();
+			
 		Long idLongPregled = Long.parseLong(idPregleda);
 		Zahtev zahtev =  zahteviService.findOne(idLongPregled);
 		
@@ -306,6 +404,37 @@ public class SalaKlinikeController {
 							double satP = Double.parseDouble(vremeP[0]);
 							double minP = Double.parseDouble(vremeP[1]);
 							double trajanjeMinP = p.getTrajanjePregleda() * 60;
+							double trajanjeMinOstatakP = trajanjeMinP % 60;
+							double trajanjeSatP = trajanjeMinP / 60;
+							int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);
+							double krajPregledaMinP = minP + trajanjeMinOstatakP;
+							if (krajPregledaMinP == 60) {
+								krajPregledaMinP = 0;
+								krajPregledaSatP++;
+							}
+								double minutiPocetakP = satP*60 + minP;
+								double minutiKrajP = krajPregledaSatP*60 + krajPregledaMinP;
+								System.out.println(minutiPocetakP);
+								System.out.println(minutiKrajP);
+								if(!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP) || (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP)))
+								{
+									flag = true;
+								}
+							
+							
+							
+						} 
+						
+						
+					}
+					
+					
+					for(Operacija o : operacije) {
+						if(o.getDatum().equals(datumStr) && o.getSala().getId() == s.getId()) {
+							String[] vremeP = o.getVreme().split(":");
+							double satP = Double.parseDouble(vremeP[0]);
+							double minP = Double.parseDouble(vremeP[1]);
+							double trajanjeMinP = o.getTrajanjeOperacije() * 60;
 							double trajanjeMinOstatakP = trajanjeMinP % 60;
 							double trajanjeSatP = trajanjeMinP / 60;
 							int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);

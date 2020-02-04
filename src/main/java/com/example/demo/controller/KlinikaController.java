@@ -28,12 +28,14 @@ import com.example.demo.dto.LekarDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.TipPregleda;
 import com.example.demo.model.Zahtev;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PregledService;
 import com.example.demo.service.TipPregledaService;
 import com.example.demo.service.ZahteviService;
@@ -53,6 +55,10 @@ public class KlinikaController {
 	
 	@Autowired
 	private PregledService pregledService;
+	
+	@Autowired
+	private OperacijaService operacijaService;
+	
 	
 	@Autowired
 	private ZahteviService zahteviService;
@@ -88,6 +94,159 @@ public class KlinikaController {
 		return new ResponseEntity<>(klinikadto, HttpStatus.OK);
 	}
 
+	
+	@GetMapping(value = "/getOcena/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<Double> getOcenaK(@PathVariable String id) {
+		
+		Long idLong = Long.parseLong(id);
+		Klinika klinika = klinikaService.findOne(adminKlinikeService.findOne(idLong).getKlinika().getId());
+		
+		KlinikaDTO klinikaDTO = new KlinikaDTO(klinika);
+		Double ocena = klinikaDTO.getOcena();
+		return new ResponseEntity<>(ocena, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/getPrihod/{id}/{datumOdd}/{datumDoo}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<Double> getPrihod(@PathVariable String id,@PathVariable String datumOdd,@PathVariable String datumDoo) {
+		
+		Long idLong = Long.parseLong(id);
+		String datumOd[] = datumOdd.split("-");
+		String datumDo[] = datumDoo.split("-");
+		int danOd =  Integer.parseInt(datumOd[2]);
+		int mesecOd = Integer.parseInt(datumOd[1]);
+		int godinaOd = Integer.parseInt(datumOd[0]);
+		
+		boolean flag = false;
+		int danDo =  Integer.parseInt(datumDo[2]);
+		int mesecDo = Integer.parseInt(datumDo[1]);
+		int godinaDo = Integer.parseInt(datumDo[0]);
+		
+		Klinika klinika = klinikaService.findOne(adminKlinikeService.findOne(idLong).getKlinika().getId());
+		List<Pregled> pregledi = pregledService.findAll(); 
+		List<Operacija> operacije = operacijaService.findAll();
+		Double prihod = 0.0;
+		String pregledDatum[];
+		for(Pregled p : pregledi) {
+			pregledDatum = p.getDatum().split("/");
+			int pregledDan = Integer.parseInt(pregledDatum[0]);
+			int pregledMesec = Integer.parseInt(pregledDatum[1]);
+			int pregledGodina = Integer.parseInt(pregledDatum[2]);
+			if(p.getLekar().getKlinika().getId() == klinika.getId() && p.getZavrsen() == true  && pregledGodina >= godinaOd && pregledGodina <= godinaDo) {
+				if(godinaOd != godinaDo && pregledGodina == godinaDo && pregledMesec <= mesecDo) {
+					if(pregledMesec == mesecDo && pregledDan <= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec < mesecDo) {
+						flag = true;
+					}
+				}
+				else if(godinaOd != godinaDo && pregledGodina == godinaOd && pregledMesec >= mesecOd && pregledDan >= danOd) {
+					if(pregledMesec == mesecOd && pregledDan >= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec > mesecOd) {
+						flag = true;
+					}
+					
+				}
+				else if(godinaOd == godinaDo && pregledMesec >= mesecOd && pregledMesec <= mesecDo) {
+					 if(mesecDo != mesecOd && pregledMesec == mesecDo && pregledDan <= danDo) {
+						 flag = true;
+					 }
+					 else if(mesecDo != mesecOd && pregledMesec == mesecOd && pregledDan >= danOd) {
+						 flag = true;
+						 
+					 }
+					 else if(mesecDo == mesecOd && pregledDan >= danOd && pregledDan <= danDo) {
+						 flag = true;
+						 
+					 }
+				}
+				
+			}
+			if(flag == true) {
+				System.out.println(prihod);
+				prihod += p.getCena();
+				flag = false;
+			}
+		}
+		
+		for(Operacija o : operacije) {
+			pregledDatum = o.getDatum().split("/");
+			int pregledDan = Integer.parseInt(pregledDatum[0]);
+			int pregledMesec = Integer.parseInt(pregledDatum[1]);
+			int pregledGodina = Integer.parseInt(pregledDatum[2]);
+			if(o.getLekariKlinike().get(0).getKlinika().getId() == klinika.getId() && o.getZavrsen() == true &&  pregledGodina >= godinaOd && pregledGodina <= godinaDo) {
+				if(godinaOd != godinaDo && pregledGodina == godinaDo && pregledMesec <= mesecDo) {
+					if(pregledMesec == mesecDo && pregledDan <= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec < mesecDo) {
+						flag = true;
+					}
+				}
+				else if(godinaOd != godinaDo && pregledGodina == godinaOd && pregledMesec >= mesecOd && pregledDan >= danOd) {
+					if(pregledMesec == mesecOd && pregledDan >= danDo) {
+						flag = true;
+					} 
+					if(pregledMesec > mesecOd) {
+						flag = true;
+					}
+					
+				}
+				else if(godinaOd == godinaDo && pregledMesec >= mesecOd && pregledMesec <= mesecDo) {
+					 if(mesecDo != mesecOd && pregledMesec == mesecDo && pregledDan <= danDo) {
+						 flag = true;
+					 }
+					 else if(mesecDo != mesecOd && pregledMesec == mesecOd && pregledDan >= danOd) {
+						 flag = true;
+						 
+					 }
+					 else if(mesecDo == mesecOd && pregledDan >= danOd && pregledDan <= danDo) {
+						 flag = true;
+						 
+					 }
+				}
+				
+			}
+			
+			if(flag == true) {
+				flag = false;
+				prihod += o.getCena();
+			}
+		}
+		
+		
+		return new ResponseEntity<>(prihod, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping(value = "/getPrihodUkupni/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<Double> getPrihodUkupni(@PathVariable String id) {
+		
+		Long idLong = Long.parseLong(id);
+		Klinika klinika = klinikaService.findOne(adminKlinikeService.findOne(idLong).getKlinika().getId());
+		List<Pregled> pregledi = pregledService.findAll(); 
+		List<Operacija> operacije = operacijaService.findAll();
+		Double prihod = 0.0;
+		for(Pregled p : pregledi) {
+			if(p.getLekar().getKlinika().getId() == klinika.getId() && p.getZavrsen() == true) {
+				prihod += p.getCena();
+			}
+		}
+		
+		for(Operacija o : operacije) {
+			if(o.getLekariKlinike().get(0).getKlinika().getId() == klinika.getId() && o.getZavrsen() == true) {
+				prihod += o.getCena();
+			}
+		}
+		
+		
+		return new ResponseEntity<>(prihod, HttpStatus.OK);
+	} 
 	
 	@GetMapping(value = "/postojecaKlinika/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
