@@ -171,6 +171,99 @@ public class LekarController {
 		return datumi;
 	}
 
+	
+	
+	@GetMapping(value = "/obavezeKlinike/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public List<DogadjajDTO> obavezeKlinike(@PathVariable String id) {
+
+		Long idLong = Long.parseLong(id);
+		AdminKlinike adminKlinike = adminKlinikeService.findOne(idLong);
+
+		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
+		List<DogadjajDTO> datumi = new ArrayList<>();
+		List<Lekar> lekari = new ArrayList<>();
+
+		for (Pregled preg : pregledi) {
+			if ((preg.getLekar().getKlinika().getId()).equals(adminKlinike.getKlinika().getId()) && preg.getZavrsen() == true) {
+				String[] datum = preg.getDatum().split("/");
+				String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
+
+				String[] vr = preg.getVreme().split(":");
+				double sat = Double.parseDouble(vr[0]);
+				double min = Double.parseDouble(vr[1]);
+
+				double trajanjeMin = preg.getTrajanjePregleda() * 60;
+				double trajanjeMinOstatak = trajanjeMin % 60;
+				double trajanjeSat = trajanjeMin / 60;
+				int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak) / 60);
+				double krajPregledaMin = min + trajanjeMinOstatak;
+
+				System.out.println(sat + " " + krajPregledaSat + " " + min + " " + trajanjeMinOstatak);
+
+				String minStr = "";
+				if (krajPregledaMin == 60) {
+					minStr = "00";
+					krajPregledaSat++;
+				}else if (krajPregledaMin == 0)
+				{
+					minStr = "00";
+					krajPregledaSat++;
+				} else {
+					minStr = "30";
+				}
+
+				String start = datumStr + ' ' + preg.getVreme();
+				String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
+				datumi.add(new DogadjajDTO(start, end,"",(long) -1));
+			}
+		};
+		for (Operacija o : operacije) {
+			lekari=o.getLekariKlinike();
+			System.out.println(lekari.size());
+			for(int i=0; i<lekari.size(); i++) {
+				if ((lekari.get(i).getKlinika().getId()).equals(adminKlinike.getKlinika().getId()) && o.getZavrsen() == true) {
+					String[] datum = o.getDatum().split("/");
+					String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
+
+					String[] vr = o.getVreme().split(":");
+					double sat = Double.parseDouble(vr[0]);
+					double min = Double.parseDouble(vr[1]);
+
+					double trajanjeMin = o.getTrajanjeOperacije() * 60;
+					double trajanjeMinOstatak = trajanjeMin % 60;
+					double trajanjeSat = trajanjeMin / 60;
+					int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak) / 60);
+					double krajPregledaMin = min + trajanjeMinOstatak;
+
+					System.out.println(sat + " " + krajPregledaSat + " " + min + " " + trajanjeMinOstatak);
+
+					String minStr = "";
+					if (krajPregledaMin == 60) {
+						minStr = "00";
+						krajPregledaSat++;
+					}else if (krajPregledaMin == 0)
+					{
+						minStr = "00";
+						krajPregledaSat++;
+					} else {
+						minStr = "30";
+					}
+
+					String start = datumStr + ' ' + o.getVreme();
+					String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
+					datumi.add(new DogadjajDTO(start, end,"",(long) -1));
+				}
+				
+			}
+			
+		};
+		
+		return datumi;
+	}
+	
+	
 	@PostMapping(value = "/dodajLekara/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<LekarDTO> dodajLekara(@RequestBody LekarDTO lekarDTO1, @PathVariable String id)
@@ -245,13 +338,22 @@ public class LekarController {
 		boolean flag = false;
 		if (lekar != null) {
 			List<Pregled> pregledi = pregledService.findAll();
+			List<Operacija> operacije = operacijaService.findAll();
 			for (Pregled pr : pregledi) {
-				if (pr.getLekar().getId() == id) {
+				if (pr.getLekar().getId() == id && pr.getZavrsen() == false) {
+					flag = true;
+					break;
+				}
+			}
+			
+			for (Operacija o : operacije) {
+				if (o.getLekariKlinike().contains(lekar)&& o.getZavrsen() == false) {
 					flag = true;
 					break;
 				}
 			}
 
+			
 			if (flag == false) {
 				lekarService.remove(id);
 			}
@@ -311,6 +413,7 @@ public class LekarController {
 		AdminKlinike adm = adminKlinikeService.findOne(idLong);
 		List<Pregled> pregledi = pregledService.findAll();
 		List<Zahtev> zahtevi = zahteviService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
 		String datumStr = zahtev.getDatum();
 		//String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
 		String[] vreme = zahtev.getVreme().split(":");
@@ -428,6 +531,38 @@ public class LekarController {
 								flag = true;
 							}
 						    
+					}
+				}
+				
+				
+				
+				for(Operacija o : operacije ) {
+					List<Lekar> lekariOperacije= new ArrayList<>();
+					lekariOperacije= o.getLekariKlinike();
+					for(int i=0; i<lekariOperacije.size(); i++) {
+						if(lekariOperacije.get(i).equals(le) && o.getDatum().equals(datumStr)) {
+							String[] vremeP = o.getVreme().split(":");
+							double satP = Double.parseDouble(vremeP[0]);
+							double minP = Double.parseDouble(vremeP[1]);
+							double trajanjeMinP = o.getTrajanjeOperacije() * 60;
+							double trajanjeMinOstatakP = trajanjeMinP % 60;
+							double trajanjeSatP = trajanjeMinP / 60;
+							int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);
+							double krajPregledaMinP = minP + trajanjeMinOstatakP;
+							if (krajPregledaMinP == 60) {
+								krajPregledaMinP = 0;
+								krajPregledaSatP++;
+						}
+							double minutiPocetakP = satP*60 + minP;
+							double minutiKrajP = krajPregledaSatP*60 + krajPregledaMinP;
+							System.out.println(minutiPocetakP);
+							System.out.println(minutiKrajP);
+							if(!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP) || (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP)))
+							{
+								flag = true;
+							}
+						    
+							}
 					}
 				}
 				
@@ -646,6 +781,108 @@ public class LekarController {
 		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/dostupniTermini/{trajanjePregleda}/{datumPregleda}/{idLekara}")
+	public ResponseEntity<List<String>> getSlobodniTerminiLekar(
+			@PathVariable String trajanjePregleda,
+			@PathVariable String datumPregleda,@PathVariable Long idLekara) {
+		Lekar lekar = lekarService.findOne(idLekara);
+
+		
+		if(trajanjePregleda == "") {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		int odH = Integer.parseInt(lekar.getRadnoOd().split(":")[0]) * 60;
+		int doH = Integer.parseInt(lekar.getRadnoDo().split(":")[0]) * 60;
+
+		String[] yyyymmdd = datumPregleda.split("-");
+		String datum = yyyymmdd[2] + "/" + yyyymmdd[1] + "/" + yyyymmdd[0];
+
+		double trajanje = Double.parseDouble(trajanjePregleda) * 60;
+		
+		System.out.println(trajanjePregleda);
+		List<String> slobodniTermini = new ArrayList<String>();
+
+		List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
+		List<Operacija> operacije = operacijaService.findAll();
+		List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(lekar.getId());
+
+		for (int i = odH; i < doH; i +=trajanje ) {
+	System.out.println("ovo je vreme" + i);
+			
+			boolean exist = false;
+			for (Pregled p : pregledi) {
+				if (datum.equals(p.getDatum())) {
+					System.out.println(datum);
+					System.out.println(p.getDatum());
+					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(p.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + p.getTrajanjePregleda() * 60);
+					if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+					 {
+						System.out.println(exist);
+						
+						i = pregledDo- (int) trajanje ;
+						exist = true;
+						break;
+					}
+				}
+			}
+			
+			
+			for (Zahtev p : zahtevi) {
+				if (datum.equals(p.getDatum())) {
+					System.out.println(datum);
+					System.out.println(p.getDatum());
+					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(p.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + p.getTrajanjePregleda() * 60);
+					if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+					 {
+						System.out.println(exist);
+						i = pregledDo- (int) trajanje ;
+						exist = true;
+						break;
+					}
+				}
+			}
+			
+			for (Operacija o : operacije) {
+				if (datum.equals(o.getDatum()) && o.getLekariKlinike().contains(lekar) ) {
+					System.out.println(datum);
+					System.out.println(o.getDatum());
+					int pregledOd = Integer.parseInt(o.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(o.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + o.getTrajanjeOperacije() * 60);
+					if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+					 {
+						System.out.println(exist);
+						i = pregledDo- (int) trajanje ;
+						exist = true;
+						break;
+					}
+				}
+			}
+			
+			if (!exist) {
+				int terminOd = i;
+				double terminDo = i + Double.parseDouble(trajanjePregleda) *60;
+
+				String terminOdStr = (terminOd / 60) + ":"
+						+ (((terminOd - (terminOd / 60) * 60) == 0) ? "00" : (terminOd - (terminOd / 60) * 60));
+			/*	String terminDoStr = (terminDo / 60) + ":"
+						+ (((terminDo - (terminDo / 60) * 60) == 0) ? "00" : (terminDo - (terminDo / 60) * 60)); */
+
+				slobodniTermini.add(terminOdStr);
+			}
+		}
+
+		return new ResponseEntity<>(slobodniTermini, HttpStatus.OK);
+		
+		
+	}
+
+	
 	@GetMapping(value = "/slobodniTermini/{idLekara}/{datumPregleda}")
 	public ResponseEntity<List<String>> getSlobodniTermini(@PathVariable Long idLekara,
 			@PathVariable String datumPregleda) {
@@ -704,5 +941,6 @@ public class LekarController {
 		}
 
 		return new ResponseEntity<>(slobodniTermini, HttpStatus.OK);
+		
 	}
 }

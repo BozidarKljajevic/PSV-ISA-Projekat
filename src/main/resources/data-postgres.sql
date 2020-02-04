@@ -89,7 +89,7 @@ INSERT INTO public.lekari_operacije(
 
 INSERT INTO public.pacijent(
 	 id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, promenjena_sifra)
-	VALUES (nextval('users_id_seq'), 'Brace Ribnikara 12', '+381/61-1234567', 'Srbija', true, 'Beograd', 'Qacijent', 'pacijent2@gmail.com', 'Prvi', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', true);
+	VALUES (nextval('users_id_seq'), 'Brace Ribnikara 12', '+381/61-1234567', 'Srbija', false, 'Beograd', 'Qacijent', 'pacijent2@gmail.com', 'Prvi', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', true);
 	
 	INSERT INTO public.pacijent(
 	 id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, promenjena_sifra)
