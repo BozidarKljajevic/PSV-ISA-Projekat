@@ -102,7 +102,11 @@ INSERT INTO public.pregledi(
 INSERT INTO public.godisnji(
 	id, datum_do, datum_od, odobren, lekar_id, sestra_id)
 	VALUES (nextval('godisnji_id_seq'), '31/01/2022', '01/01/2022', false, 8, null);
-	
+
+INSERT INTO public.medicinska_sestra(
+	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, promenjena_sifra, sifra, radno_do, radno_od, klinika_id)
+	VALUES (nextval('users_id_seq'), 'Brace Ribnikara 12', '+381/61-1234567', 'Srbija', true, 'Beograd', 'Mara', 'marasestra@gmail.com', 'Maric', true, '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', '20:00', '12:00', 1);
+
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (3, 1);
@@ -114,5 +118,5 @@ INSERT INTO public.user_authority(user_id, authority_id)VALUES (8, 2);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (9, 2);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (10, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (11, 1);
-INSERT INTO public.user_authority(user_id, authority_id)VALUES (12, 2);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (12, 5);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (13, 3);

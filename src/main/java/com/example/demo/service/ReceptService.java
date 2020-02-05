@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.IzvestajOPregleduDTO;
 import com.example.demo.model.IzvestajOPregledu;
 import com.example.demo.model.Lek;
+import com.example.demo.model.MedicinskaSestra;
 import com.example.demo.model.Recept;
 import com.example.demo.repository.IzvestajOPregleduRepository;
 import com.example.demo.repository.ReceptRepository;
@@ -42,4 +43,12 @@ public class ReceptService {
 		
 	}
 */
+
+	public void sestraOverila(Recept recept, MedicinskaSestra sestra) {
+		
+		recept.setSestra(sestra);
+		recept.setOveren(true);
+		receptRepository.save(recept);
+		
+	}
 }

@@ -20,19 +20,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
+import com.example.demo.dto.IzvestajOPregleduDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.MedicinskaSestraDTO;
+import com.example.demo.dto.ReceptDTO;
 import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
+import com.example.demo.model.IzvestajOPregledu;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.MedicinskaSestra;
+import com.example.demo.model.Recept;
 import com.example.demo.model.User;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.IzvestajOPregleduService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.MedicinskaSestraService;
+import com.example.demo.service.ReceptService;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -48,6 +54,11 @@ public class MedicinskaSestraController {
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
 	
+	@Autowired
+	private ReceptService receptService;
+	
+	@Autowired
+	private IzvestajOPregleduService izvestajOPregleduService;
 	
 	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('MEDICINSKASESTRA')")
@@ -168,6 +179,25 @@ public class MedicinskaSestraController {
 		}
 
 		return new ResponseEntity<>(medicinskaSestraDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/recepti/{id}")
+	@PreAuthorize("hasAuthority('MEDICINSKASESTRA')")
+	public ResponseEntity<List<IzvestajOPregleduDTO>> getRecepti(@PathVariable Long id) {
+		
+		List <IzvestajOPregledu> izvestaji = izvestajOPregleduService.findAll();
+		MedicinskaSestra medicinskaSestra = medicinskaSestraService.findOne(id);
+		List<IzvestajOPregleduDTO> izvestajDTO = new ArrayList<>();
+		
+		for(IzvestajOPregledu izvestaj : izvestaji) {
+			if(medicinskaSestra.getKlinika().getId() == izvestaj.getLekara().getKlinika().getId() && izvestaj.getRecept().isOveren()==false) {
+				izvestajDTO.add(new IzvestajOPregleduDTO(izvestaj));
+			}
+			
+		}
+		
+		
+		return new ResponseEntity<>(izvestajDTO, HttpStatus.OK);
 	}
 	
 }
