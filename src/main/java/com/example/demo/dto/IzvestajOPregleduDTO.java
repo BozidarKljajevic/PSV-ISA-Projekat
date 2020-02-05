@@ -13,6 +13,7 @@ public class IzvestajOPregleduDTO {
 		private LekarDTO lekar;
 		private BolestiDTO bolest;
 		private List<LekDTO> lekovi;
+		private ReceptDTO recept;
 		
 		
 		
@@ -27,19 +28,21 @@ public class IzvestajOPregleduDTO {
 			this.pacijent = new PacijentDTO(izvestaj.getPacijenta());
 			this.lekar = new LekarDTO(izvestaj.getLekara());
 			this.bolest = new BolestiDTO(izvestaj.getBolest());
+			this.recept= new ReceptDTO(izvestaj.getRecept());
 			this.lekovi = new ArrayList<LekDTO>();
 			for (Lek lek : izvestaj.getLekoviIzvestaja()) {
 				lekovi.add(new LekDTO(lek));
 			}
 		}
 
-		public IzvestajOPregleduDTO(Long id, PacijentDTO pacijent, LekarDTO lekar, BolestiDTO bolest, List<LekDTO> lekovi) {
+		public IzvestajOPregleduDTO(Long id, PacijentDTO pacijent, LekarDTO lekar, BolestiDTO bolest, List<LekDTO> lekovi, ReceptDTO recept) {
 			super();
 			this.id = id;
 			this.pacijent = pacijent;
 			this.lekar = lekar;
 			this.bolest = bolest;
 			this.lekovi = lekovi;
+			this.recept = recept;
 		}
 
 		public Long getId() {
@@ -51,6 +54,14 @@ public class IzvestajOPregleduDTO {
 		}
 
 		
+
+		public ReceptDTO getRecept() {
+			return recept;
+		}
+
+		public void setRecept(ReceptDTO recept) {
+			this.recept = recept;
+		}
 
 		public PacijentDTO getPacijent() {
 			return pacijent;

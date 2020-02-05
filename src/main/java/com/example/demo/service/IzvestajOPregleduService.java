@@ -14,9 +14,11 @@ import com.example.demo.model.Lekar;
 import com.example.demo.model.Operacija;
 import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
+import com.example.demo.model.Recept;
 import com.example.demo.repository.BolestiRepository;
 import com.example.demo.repository.IzvestajOPregleduRepository;
 import com.example.demo.repository.PacijentRepository;
+import com.example.demo.repository.ReceptRepository;
 
 
 @Service
@@ -28,7 +30,8 @@ public class IzvestajOPregleduService {
 	@Autowired
 	private BolestiRepository bolestiRepository;
 	
-	
+	@Autowired
+	private ReceptRepository receptRepository;
 	
 	public IzvestajOPregledu findOne(Long id) {
 		return izvestajRepository.findById(id).orElseGet(null);
@@ -41,11 +44,17 @@ public class IzvestajOPregleduService {
 	public void zavrsiIzvestaj(Pacijent pacijent, Lekar lekar, Bolesti bolest, List<Lek> lekovi) {
 		
 		IzvestajOPregledu izvestaj = new IzvestajOPregledu();
+		Recept recept = new Recept();
 		
 		izvestaj.setPacijenta(pacijent);
 		izvestaj.setLekara(lekar);
 		izvestaj.setBolest(bolest);
 		izvestaj.setLekoviIzvestaja(lekovi);
+		if(lekovi.size()!=0) {
+			recept.setLekoviRecepta(lekovi);
+			receptRepository.save(recept);
+			izvestaj.setRecept(recept);
+		}
 		
 		izvestajRepository.save(izvestaj);
 	}

@@ -45,6 +45,10 @@ public class IzvestajOPregledu {
 	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@JoinTable(name = "lekovi_izvestaji", joinColumns = @JoinColumn(name = "izvestaj_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "lek_id", referencedColumnName = "sifra"))
 	private List<Lek> lekoviIzvestaja;
+	
+	@OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+	@JoinColumn(name = "recept_id")
+	private Recept recept;
 
 	public Long getId() {
 		return id;
@@ -56,6 +60,14 @@ public class IzvestajOPregledu {
 
 	
 	
+
+	public Recept getRecept() {
+		return recept;
+	}
+
+	public void setRecept(Recept recept) {
+		this.recept = recept;
+	}
 
 	public Pacijent getPacijenta() {
 		return pacijenta;

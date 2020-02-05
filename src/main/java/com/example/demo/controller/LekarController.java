@@ -94,7 +94,7 @@ public class LekarController {
 		List<Lekar> lekari = new ArrayList<>();
 
 		for (Pregled preg : pregledi) {
-			if ((preg.getLekar().getId()).equals(idLong)) {
+			if ((preg.getLekar().getId()).equals(idLong) && preg.getZavrsen()==false) {
 				String[] datum = preg.getDatum().split("/");
 				String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
 				

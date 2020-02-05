@@ -27,6 +27,7 @@ import com.example.demo.service.LekService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.PacijentService;
 import com.example.demo.service.PregledService;
+import com.example.demo.service.ReceptService;
 
 @RestController
 @RequestMapping(value = "izvestajpregleda")
@@ -49,6 +50,9 @@ public class IzvestajOPregleduController {
 
 	@Autowired
 	private IzvestajOPregleduService izvestajOPregleduService;
+	
+	@Autowired
+	private ReceptService receptService;
 
 	@PostMapping(value = "/zavrsi/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('LEKAR')")
@@ -72,6 +76,12 @@ public class IzvestajOPregleduController {
 		for (LekDTO lekDTO : izvestaj.getLekovi()) {
 			lekovi.add(lekService.findOne(lekDTO.getSifra()));
 		}
+		
+		
+		/*
+		if (izvestaj.getLekovi().size()!=0) {
+			
+		}*/
 
 		izvestajOPregleduService.zavrsiIzvestaj(pacijent, lekar, bolest, lekovi);
 
