@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.model.AdminKlinike;
+import com.example.demo.model.Godisnji;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.Operacija;
@@ -33,6 +37,7 @@ import com.example.demo.model.Pregled;
 import com.example.demo.model.TipPregleda;
 import com.example.demo.model.Zahtev;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.OperacijaService;
@@ -65,6 +70,9 @@ public class KlinikaController {
 	
 	@Autowired
 	private TipPregledaService tipPregledaService;
+	
+	@Autowired
+	private GodisnjiService godisnjiService;
 	
 	@GetMapping(value = "/sveKlinike")
 	//@PreAuthorize("hasAuthority('ADMINCENTRA')")
@@ -312,11 +320,14 @@ public class KlinikaController {
 	
 	@PostMapping(value = "/pretraziKlinike/{datumPregleda}/{tipPregleda}")
 	@PreAuthorize("hasAuthority('PACIJENT')")
-	public ResponseEntity<Collection<KlinikaDTO>> pretraziKlinike(@PathVariable String datumPregleda, @PathVariable Long tipPregleda) {
+	public ResponseEntity<Collection<KlinikaDTO>> pretraziKlinike(@PathVariable String datumPregleda, @PathVariable Long tipPregleda) throws ParseException {
 		
 		List<Klinika> klinike = klinikaService.findAll();
 		String[] yyyymmdd = datumPregleda.split("-");
 		String datum = yyyymmdd[2]+"/"+yyyymmdd[1]+"/"+yyyymmdd[0];
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date datumPregledaDate = sdf.parse(datumPregleda);
 		
 		TipPregleda tipPregledaPretraga = tipPregledaService.findOne(tipPregleda);
 
@@ -327,6 +338,21 @@ public class KlinikaController {
 				boolean imaPregledZaZadatiDatum = false;
 				int trajanjePregledaMin = 0;
 				if (lekar.getTipPregleda().getNaziv().toLowerCase().equals(tipPregledaPretraga.getNaziv().toLowerCase())) {
+					
+					List<Godisnji> godisnji = godisnjiService.getGodisnjiOdLekara(lekar.getId());
+					boolean imaGodisnji = false;
+					for (Godisnji godisnjiOdmor : godisnji) {
+				        Date datumOd = sdf.parse(godisnjiOdmor.getDatumOd());
+				        Date datumDo = sdf.parse(godisnjiOdmor.getDatumDo());
+				        if (datumPregledaDate.compareTo(datumOd) >= 0 && datumPregledaDate.compareTo(datumDo) <= 0) {
+				        	imaGodisnji = true;
+						}
+					}
+					
+					if (imaGodisnji) {
+						break;
+					}
+					
 					List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
 					for (Pregled pregled : pregledi) {
 						if (datum.equals(pregled.getDatum())) {
@@ -340,6 +366,14 @@ public class KlinikaController {
 						if (datum.equals(zahtev.getDatum())) {
 							imaPregledZaZadatiDatum = true;
 							trajanjePregledaMin += zahtev.getTrajanjePregleda()*60;
+						}
+					}
+					
+					List<Operacija> operacije = operacijaService.getOperacijeOdLekara(lekar.getId());
+					for (Operacija operacija : operacije) {
+						if (datum.equals(operacija.getDatum())) {
+							imaPregledZaZadatiDatum = true;
+							trajanjePregledaMin += operacija.getTrajanjeOperacije()*60;
 						}
 					}
 					
@@ -373,15 +407,18 @@ public class KlinikaController {
 	}
 	
 	@GetMapping(value = "/slobodniLekari/{datumPregleda}/{tipPregleda}/{idKlinike}")
-	public ResponseEntity<List<LekarDTO>> slobodniLekariKlinike(@PathVariable String datumPregleda, @PathVariable Long tipPregleda, @PathVariable Long idKlinike){
+	public ResponseEntity<List<LekarDTO>> slobodniLekariKlinike(@PathVariable String datumPregleda, @PathVariable Long tipPregleda, @PathVariable Long idKlinike) throws ParseException{
 		List<Lekar> lekari = lekarService.sviLekariKlinike(idKlinike);
 		List<LekarDTO> lekariDTO = new ArrayList<LekarDTO>();
 		
 		String datum = "NONE";
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date datumPregledaDate = sdf.parse("0000-00-00");
 		
 		if (!datumPregleda.equals("NONE")) {
 			String[] yyyymmdd = datumPregleda.split("-");
 			datum = yyyymmdd[2]+"/"+yyyymmdd[1]+"/"+yyyymmdd[0];
+			datumPregledaDate = sdf.parse(datumPregleda);
 		}
 		
 		
@@ -389,6 +426,21 @@ public class KlinikaController {
 			boolean imaPregledZaZadatiDatum = false;
 			int trajanjePregledaMin = 0;
 			if (lekar.getTipPregleda().getId() == tipPregleda || tipPregleda == -1) {
+				
+				List<Godisnji> godisnji = godisnjiService.getGodisnjiOdLekara(lekar.getId());
+				boolean imaGodisnji = false;
+				for (Godisnji godisnjiOdmor : godisnji) {
+			        Date datumOd = sdf.parse(godisnjiOdmor.getDatumOd());
+			        Date datumDo = sdf.parse(godisnjiOdmor.getDatumDo());
+			        if (datumPregledaDate.compareTo(datumOd) >= 0 && datumPregledaDate.compareTo(datumDo) <= 0) {
+			        	imaGodisnji = true;
+					}
+				}
+				
+				if (imaGodisnji) {
+					break;
+				}
+				
 				List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
 				for (Pregled pregled : pregledi) {
 					if (datum.equals(pregled.getDatum())) {
@@ -402,6 +454,14 @@ public class KlinikaController {
 					if (datum.equals(zahtev.getDatum())) {
 						imaPregledZaZadatiDatum = true;
 						trajanjePregledaMin += zahtev.getTrajanjePregleda()*60;
+					}
+				}
+				
+				List<Operacija> operacije = operacijaService.getOperacijeOdLekara(lekar.getId());
+				for (Operacija operacija : operacije) {
+					if (datum.equals(operacija.getDatum())) {
+						imaPregledZaZadatiDatum = true;
+						trajanjePregledaMin += operacija.getTrajanjeOperacije()*60;
 					}
 				}
 				

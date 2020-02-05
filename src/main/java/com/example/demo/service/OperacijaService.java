@@ -65,4 +65,18 @@ public class OperacijaService {
 		
 		return operacijaRepository.findByIdPacijenta(id);
 	}
+
+	public List<Operacija> getOperacijeOdLekara(Long id) {
+		List<Operacija> operacije = new ArrayList<Operacija>();
+		
+		for (Operacija operacija : operacijaRepository.findAll()) {
+			for (Lekar lekar : operacija.getLekariKlinike()) {
+				if (lekar.getId() == id) {
+					operacije.add(operacija);
+				}
+			}
+		}
+		
+		return operacije;
+	}
 }

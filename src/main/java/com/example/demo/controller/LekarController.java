@@ -898,6 +898,7 @@ public class LekarController {
 
 		List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
 		List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(lekar.getId());
+		List<Operacija> operacije = operacijaService.getOperacijeOdLekara(lekar.getId());
 
 		for (int i = odH; i < doH; i += 30) {
 			boolean exist = false;
@@ -919,6 +920,19 @@ public class LekarController {
 					int pregledOd = Integer.parseInt(zahtev.getVreme().split(":")[0]) * 60
 							+ Integer.parseInt(zahtev.getVreme().split(":")[1]);
 					int pregledDo = (int) (pregledOd + zahtev.getTrajanjePregleda() * 60);
+					if ((i == pregledOd || i + 30 == pregledDo)
+							|| ((i > pregledOd && i < pregledDo) && (i + 30 > pregledOd && i + 30 < pregledDo))) {
+						exist = true;
+						break;
+					}
+				}
+			}
+			
+			for (Operacija operacija : operacije) {
+				if (datum.equals(operacija.getDatum())) {
+					int pregledOd = Integer.parseInt(operacija.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(operacija.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + operacija.getTrajanjeOperacije() * 60);
 					if ((i == pregledOd || i + 30 == pregledDo)
 							|| ((i > pregledOd && i < pregledDo) && (i + 30 > pregledOd && i + 30 < pregledDo))) {
 						exist = true;
