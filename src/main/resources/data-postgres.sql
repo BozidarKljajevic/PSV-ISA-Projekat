@@ -98,6 +98,10 @@ INSERT INTO public.pregledi(
 	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
 	VALUES (nextval('pregled_id_seq'), 2000, '31/01/2020', 1, 0.5, '14:00', true, 8, 1, 1);
 	
+INSERT INTO public.karton(
+	id, datum_rodjenja, dioptrija, krvna_grupa, pol, tezina, visina, pacijent_id)
+	VALUES (nextval('karton_id_seq'), '22/08/1997', 0.5, 'A+', 'Muski', 80.5, 187, 2);
+	
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (3, 1);
