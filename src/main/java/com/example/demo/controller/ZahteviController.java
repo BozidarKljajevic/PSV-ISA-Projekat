@@ -1,6 +1,7 @@
 
 package com.example.demo.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,11 +162,12 @@ public class ZahteviController {
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 	
-	@PostMapping(value = "/rezervisiSalu/{idSale}")
+	@PostMapping(value = "/rezervisiSalu/{idSale}/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<?> rezervisiSalu(@RequestBody ZahtevDTO zahtevDTO, @PathVariable Long idSale) throws MailException, InterruptedException {
+	public ResponseEntity<?> rezervisiSalu(@RequestBody ZahtevDTO zahtevDTO, @PathVariable Long idSale, @PathVariable Long id) throws MailException, InterruptedException {
 
 		Zahtev zahtev = zahteviService.findOne(zahtevDTO.getId());
+		AdminKlinike admin = adminKlinikeService.findOne(id);
 		System.out.println(zahtevDTO.getLekar().getIme());
 		zahtev.setLekar(lekarService.findOne(zahtevDTO.getLekar().getId()));
 		zahtev.setDatum(zahtevDTO.getDatum());
@@ -183,7 +185,7 @@ public class ZahteviController {
 		
 		
 		for (Zahtev z : zahtevi) {
-			if (z.getSala() == null) {
+			if (z.getSala() == null && admin.getKlinika() == z.getLekar().getKlinika() && z.isIzbor() == true) {
 				
 				zahteviDTO.add(new ZahtevDTO(z));
 			}
@@ -313,5 +315,4 @@ public class ZahteviController {
 
 		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
 	}
-
 }

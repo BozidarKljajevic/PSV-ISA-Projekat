@@ -1,11 +1,18 @@
 package com.example.demo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 public class Lekar extends User {
@@ -25,6 +32,10 @@ public class Lekar extends User {
 	
 	@Column(name = "radnoDo",nullable = false)
 	private String radnoDo;
+	
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@OneToMany(mappedBy = "lekar", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	private Set<OcenaLekar> ocene = new HashSet<OcenaLekar>();
 
 	public Klinika getKlinika() {
 		return klinika;
@@ -65,5 +76,12 @@ public class Lekar extends User {
 	public void setOcena(String ocena) {
 		this.ocena = ocena;
 	}
-	
+
+	public Set<OcenaLekar> getOcene() {
+		return ocene;
+	}
+
+	public void setOcene(Set<OcenaLekar> ocene) {
+		this.ocene = ocene;
+	}
 }

@@ -77,7 +77,4 @@ public class ReceptDTO {
 	public void setLekovi(List<LekDTO> lekovi) {
 		this.lekovi = lekovi;
 	}
-	
-	
-	
 }

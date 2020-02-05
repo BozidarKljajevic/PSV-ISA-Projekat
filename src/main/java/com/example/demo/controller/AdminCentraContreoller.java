@@ -69,7 +69,7 @@ public class AdminCentraContreoller {
 		}
 		
 
-		emailService.sendNotificaitionAsync(user, "http://localhost:8081/#/aktivacijaPacijenta/"+user.getId());
+		emailService.sendNotificaitionAsync(user, "Kliknite na link kako bi aktivirali nalog --> http://localhost:8081/#/aktivacijaPacijenta/"+user.getId());
 		
 		List<Pacijent> pacijenti = pacijentService.findAll();
 

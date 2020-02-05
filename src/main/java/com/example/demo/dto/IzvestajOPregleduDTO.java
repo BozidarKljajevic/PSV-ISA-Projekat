@@ -14,6 +14,7 @@ public class IzvestajOPregleduDTO {
 		private BolestiDTO bolest;
 		private List<LekDTO> lekovi;
 		private ReceptDTO recept;
+		private KartonDTO karton;
 		
 		
 		
@@ -33,9 +34,10 @@ public class IzvestajOPregleduDTO {
 			for (Lek lek : izvestaj.getLekoviIzvestaja()) {
 				lekovi.add(new LekDTO(lek));
 			}
+			this.karton = new KartonDTO(izvestaj.getKarton());
 		}
 
-		public IzvestajOPregleduDTO(Long id, PacijentDTO pacijent, LekarDTO lekar, BolestiDTO bolest, List<LekDTO> lekovi, ReceptDTO recept) {
+		public IzvestajOPregleduDTO(Long id, PacijentDTO pacijent, LekarDTO lekar, BolestiDTO bolest, List<LekDTO> lekovi, ReceptDTO recept, KartonDTO karton) {
 			super();
 			this.id = id;
 			this.pacijent = pacijent;
@@ -43,6 +45,7 @@ public class IzvestajOPregleduDTO {
 			this.bolest = bolest;
 			this.lekovi = lekovi;
 			this.recept = recept;
+			this.karton = karton;
 		}
 
 		public Long getId() {
@@ -94,10 +97,12 @@ public class IzvestajOPregleduDTO {
 		public void setLekovi(List<LekDTO> lekovi) {
 			this.lekovi = lekovi;
 		}
-		
 
-		
+		public KartonDTO getKarton() {
+			return karton;
+		}
 
-	
-	
+		public void setKarton(KartonDTO karton) {
+			this.karton = karton;
+		}
 }

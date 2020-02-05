@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
@@ -49,6 +50,9 @@ public class IzvestajOPregledu {
 	@OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
 	@JoinColumn(name = "recept_id")
 	private Recept recept;
+	
+	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+	private Karton karton;
 
 	public Long getId() {
 		return id;
@@ -100,6 +104,12 @@ public class IzvestajOPregledu {
 	public void setLekoviIzvestaja(List<Lek> lekoviIzvestaja) {
 		this.lekoviIzvestaja = lekoviIzvestaja;
 	}
-	
-	
+
+	public Karton getKarton() {
+		return karton;
+	}
+
+	public void setKarton(Karton karton) {
+		this.karton = karton;
+	}
 }

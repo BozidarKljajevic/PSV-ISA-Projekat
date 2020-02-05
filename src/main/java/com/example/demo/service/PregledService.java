@@ -87,10 +87,12 @@ public class PregledService {
 
 		Zahtev zahtev = new Zahtev();
 
+		String[] yyyymmdd = zahtevDTO.getDatum().split("-");
+		String datum = yyyymmdd[2] + "/" + yyyymmdd[1] + "/" + yyyymmdd[0];
 		zahtev.setLekar(lekarRepository.findById(zahtevDTO.getLekar().getId()).orElse(null));
 		zahtev.setIdPacijenta(zahtevDTO.getIdPacijenta());
 		zahtev.setCena(zahtevDTO.getCena());
-		zahtev.setDatum(zahtevDTO.getDatum());
+		zahtev.setDatum(datum);
 		zahtev.setVreme(zahtevDTO.getVreme());
 		zahtev.setTrajanjePregleda(zahtevDTO.getTrajanjePregleda());
 		zahtev.setIzbor(zahtevDTO.isIzbor());
@@ -102,6 +104,10 @@ public class PregledService {
 
 	public List<Pregled> getPregledeOdLekara(Long id) {
 		return pregledRepository.findByLekarId(id);
+	}
+
+	public void izrisiPregled(Pregled pregled) {
+		pregledRepository.delete(pregled);		
 	}
 
 	public void zavrsiPregled(Pregled pregled) {
