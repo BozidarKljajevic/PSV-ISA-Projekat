@@ -110,4 +110,9 @@ public class PregledService {
 		pregledRepository.delete(pregled);		
 	}
 
+	public void zavrsiPregled(Pregled pregled) {
+		pregled.setZavrsen(true);
+		pregledRepository.save(pregled);
+	}
+
 }

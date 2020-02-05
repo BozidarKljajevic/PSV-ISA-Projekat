@@ -94,7 +94,7 @@ public class LekarController {
 		List<Lekar> lekari = new ArrayList<>();
 
 		for (Pregled preg : pregledi) {
-			if ((preg.getLekar().getId()).equals(idLong)) {
+			if ((preg.getLekar().getId()).equals(idLong) && preg.getZavrsen()==false) {
 				String[] datum = preg.getDatum().split("/");
 				String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
 				
@@ -956,5 +956,15 @@ public class LekarController {
 
 		return new ResponseEntity<>(slobodniTermini, HttpStatus.OK);
 		
+	}
+	
+	@GetMapping(value = "/lekarPregleda/{id}")
+	public ResponseEntity<LekarDTO> lekarPregleda(@PathVariable Long id){
+		
+		Pregled pregled = pregledService.findOne(id);
+		
+		LekarDTO lekarDTO = new LekarDTO(pregled.getLekar());
+		
+		return new ResponseEntity<>(lekarDTO ,HttpStatus.OK);
 	}
 }
