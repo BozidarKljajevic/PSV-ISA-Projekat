@@ -14,6 +14,7 @@ import com.example.demo.model.Pacijent;
 import com.example.demo.model.Zahtev;
 import com.example.demo.repository.GodisnjiRepository;
 import com.example.demo.repository.LekarRepository;
+import com.example.demo.repository.MedicinskaSestraRepository;
 import com.example.demo.repository.ZahteviRepository;
 
 @Service
@@ -25,6 +26,8 @@ public class GodisnjiService {
 	@Autowired
 	private LekarRepository lekarRepository;
 	
+	@Autowired
+	private MedicinskaSestraRepository sestraRepository;
 	
 	public List<Godisnji> findAll() {
 		return godisnjiRepository.findAll();
@@ -52,6 +55,21 @@ public class GodisnjiService {
 
 		godisnjiRepository.save(godisnji);
 
+	}
+
+	public void dodajZahtevGodisnjiSestra(GodisnjiDTO godisnjiDTO) {
+		
+		Godisnji godisnji = new Godisnji();
+
+		godisnji.setSestra(sestraRepository.findById(godisnjiDTO.getSestra().getId()).orElse(null));
+		
+		godisnji.setDatumOd(godisnjiDTO.getDatumOd());
+		godisnji.setDatumDo(godisnjiDTO.getDatumDo());
+		godisnji.setOdobren(false);
+		
+
+		godisnjiRepository.save(godisnji);
+		
 	}
 
 	public List<Godisnji> getGodisnjiOdLekara(Long id) {
