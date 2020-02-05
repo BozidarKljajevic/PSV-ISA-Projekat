@@ -106,4 +106,8 @@ public class PregledService {
 		return pregledRepository.findByLekarId(id);
 	}
 
+	public void izrisiPregled(Pregled pregled) {
+		pregledRepository.delete(pregled);		
+	}
+
 }
