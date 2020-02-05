@@ -53,6 +53,10 @@ public class GodisnjiService {
 		godisnjiRepository.save(godisnji);
 
 	}
+
+	public List<Godisnji> getGodisnjiOdLekara(Long id) {
+		return godisnjiRepository.findByLekarId(id);
+	}
 	
 }
 

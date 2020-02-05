@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.ValidationException;
@@ -45,7 +48,7 @@ public class PregledController {
 
 	@Autowired
 	private PregledService pregledService;
-	
+
 	@Autowired
 	private ZahteviService zahteviService;
 
@@ -55,9 +58,6 @@ public class PregledController {
 	@Autowired
 	private EmailService emailService;
 
-	
-	
-	
 	@PostMapping(value = "/dodajPregled", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PregledDTO> dodajPregled(@RequestBody PregledDTO pregledDTO) {
@@ -68,131 +68,125 @@ public class PregledController {
 		String[] radnoOd = pregledDTO.getLekar().getRadnoOd().split(":");
 		double satOd = Double.parseDouble(radnoOd[0]);
 		double minOd = Double.parseDouble(radnoOd[1]);
-		double minutiRadnoOd = satOd*60 + minOd;
-		
+		double minutiRadnoOd = satOd * 60 + minOd;
+
 		String[] radnoDo = pregledDTO.getLekar().getRadnoDo().split(":");
 		double satDo = Double.parseDouble(radnoDo[0]);
 		double minDo = Double.parseDouble(radnoDo[1]);
-		double minutiRadnoDo = satDo*60 + minDo;
-		
-		
-		
+		double minutiRadnoDo = satDo * 60 + minDo;
+
 		List<Pregled> pregledi = pregledService.findAll();
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		String datumStr = pregledDTO.getDatum();
-		//String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
+		// String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
 		String[] vreme = pregledDTO.getVreme().split(":");
 		double sat = Double.parseDouble(vreme[0]);
 		double min = Double.parseDouble(vreme[1]);
-		
+
 		double trajanjeMin = pregledDTO.getTrajanjePregleda() * 60;
 		double trajanjeMinOstatak = trajanjeMin % 60;
 		double trajanjeSat = trajanjeMin / 60;
-		int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak)/60);
+		int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak) / 60);
 		double krajPregledaMin = min + trajanjeMinOstatak;
-		
+
 		if (krajPregledaMin == 60) {
 			krajPregledaMin = 0;
 			krajPregledaSat++;
 		}
-		
-		double minutiPocetak = sat*60 + min;
-		double minutiKraj = krajPregledaSat*60 + krajPregledaMin;
-		
-		 if(minutiPocetak < minutiRadnoOd || minutiKraj > minutiRadnoDo)
-			{
-				flag = true;
-				System.out.println("pocetka pregleda" + minutiPocetak);
-				System.out.println("kraj pregleda" + minutiKraj);
-				System.out.println("radno do" + minutiRadnoOd);
-				System.out.println("radno od" +minutiRadnoDo);
-			}
-		
-		 
-		
-			for (Pregled p : pregledi) {
-				if (pregledDTO.getDatum().equals(p.getDatum())
-						&& (p.getSala().getId() == pregledDTO.getSala().getId() || p.getLekar().getId() == pregledDTO.getLekar().getId())) {
-					String[] vremeP = p.getVreme().split(":");
-					double satP = Double.parseDouble(vremeP[0]);
-					double minP = Double.parseDouble(vremeP[1]);
-					double trajanjeMinP = p.getTrajanjePregleda() * 60;
-					double trajanjeMinOstatakP = trajanjeMinP % 60;
-					double trajanjeSatP = trajanjeMinP / 60;
-					int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);
-					double krajPregledaMinP = minP + trajanjeMinOstatakP;
-					if (krajPregledaMinP == 60) {
-						krajPregledaMinP = 0;
-						krajPregledaSatP++;
-					}
-						double minutiPocetakP = satP*60 + minP;
-						double minutiKrajP = krajPregledaSatP*60 + krajPregledaMinP;
-						System.out.println(minutiPocetakP);
-						System.out.println(minutiKrajP);
-						if(!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP) || (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP)))
-						{
-							flag = true;
-						}
+
+		double minutiPocetak = sat * 60 + min;
+		double minutiKraj = krajPregledaSat * 60 + krajPregledaMin;
+
+		if (minutiPocetak < minutiRadnoOd || minutiKraj > minutiRadnoDo) {
+			flag = true;
+			System.out.println("pocetka pregleda" + minutiPocetak);
+			System.out.println("kraj pregleda" + minutiKraj);
+			System.out.println("radno do" + minutiRadnoOd);
+			System.out.println("radno od" + minutiRadnoDo);
+		}
+
+		for (Pregled p : pregledi) {
+			if (pregledDTO.getDatum().equals(p.getDatum()) && (p.getSala().getId() == pregledDTO.getSala().getId()
+					|| p.getLekar().getId() == pregledDTO.getLekar().getId())) {
+				String[] vremeP = p.getVreme().split(":");
+				double satP = Double.parseDouble(vremeP[0]);
+				double minP = Double.parseDouble(vremeP[1]);
+				double trajanjeMinP = p.getTrajanjePregleda() * 60;
+				double trajanjeMinOstatakP = trajanjeMinP % 60;
+				double trajanjeSatP = trajanjeMinP / 60;
+				int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP) / 60);
+				double krajPregledaMinP = minP + trajanjeMinOstatakP;
+				if (krajPregledaMinP == 60) {
+					krajPregledaMinP = 0;
+					krajPregledaSatP++;
+				}
+				double minutiPocetakP = satP * 60 + minP;
+				double minutiKrajP = krajPregledaSatP * 60 + krajPregledaMinP;
+				System.out.println(minutiPocetakP);
+				System.out.println(minutiKrajP);
+				if (!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP)
+						|| (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP))) {
+					flag = true;
 				}
 			}
-			
-			for(Zahtev z : zahtevi) {
-				if(z.getSala() != null) { 
-					
-				if(pregledDTO.getDatum().equals(z.getDatum()) && (pregledDTO.getLekar().getId() == z.getLekar().getId() || pregledDTO.getSala().getId() == z.getSala().getId() )) {
+		}
+
+		for (Zahtev z : zahtevi) {
+			if (z.getSala() != null) {
+
+				if (pregledDTO.getDatum().equals(z.getDatum()) && (pregledDTO.getLekar().getId() == z.getLekar().getId()
+						|| pregledDTO.getSala().getId() == z.getSala().getId())) {
 					String[] vremeZ = z.getVreme().split(":");
 					double satZ = Double.parseDouble(vremeZ[0]);
 					double minZ = Double.parseDouble(vremeZ[1]);
-					
+
 					double trajanjeMinZ = z.getTrajanjePregleda() * 60;
 					double trajanjeMinOstatakZ = trajanjeMinZ % 60;
 					double trajanjeSatZ = trajanjeMinZ / 60;
-					int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ)/60);
+					int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ) / 60);
 					double krajPregledaMinZ = minZ + trajanjeMinOstatakZ;
-					
+
 					if (krajPregledaMinZ == 60) {
 						krajPregledaMinZ = 0;
 						krajPregledaSatZ++;
 					}
-					
-					double minutiPocetakZ = satZ*60 + minZ;
-					double minutiKrajZ = krajPregledaSatZ*60 + krajPregledaMinZ;
+
+					double minutiPocetakZ = satZ * 60 + minZ;
+					double minutiKrajZ = krajPregledaSatZ * 60 + krajPregledaMinZ;
 					System.out.println(minutiPocetakZ);
 					System.out.println(minutiKrajZ);
-					if(!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ) || (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ)))
-					{
+					if (!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ)
+							|| (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ))) {
 						flag = true;
 					}
 				}
+			} else if (pregledDTO.getDatum().equals(z.getDatum())
+					&& pregledDTO.getLekar().getId() == z.getLekar().getId()) {
+				String[] vremeZ = z.getVreme().split(":");
+				double satZ = Double.parseDouble(vremeZ[0]);
+				double minZ = Double.parseDouble(vremeZ[1]);
+
+				double trajanjeMinZ = z.getTrajanjePregleda() * 60;
+				double trajanjeMinOstatakZ = trajanjeMinZ % 60;
+				double trajanjeSatZ = trajanjeMinZ / 60;
+				int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ) / 60);
+				double krajPregledaMinZ = minZ + trajanjeMinOstatakZ;
+
+				if (krajPregledaMinZ == 60) {
+					krajPregledaMinZ = 0;
+					krajPregledaSatZ++;
 				}
-				else if(pregledDTO.getDatum().equals(z.getDatum()) && pregledDTO.getLekar().getId() == z.getLekar().getId()) {
-					String[] vremeZ = z.getVreme().split(":");
-					double satZ = Double.parseDouble(vremeZ[0]);
-					double minZ = Double.parseDouble(vremeZ[1]);
-					
-					double trajanjeMinZ = z.getTrajanjePregleda() * 60;
-					double trajanjeMinOstatakZ = trajanjeMinZ % 60;
-					double trajanjeSatZ = trajanjeMinZ / 60;
-					int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ)/60);
-					double krajPregledaMinZ = minZ + trajanjeMinOstatakZ;
-					
-					if (krajPregledaMinZ == 60) {
-						krajPregledaMinZ = 0;
-						krajPregledaSatZ++;
-					}
-					
-					double minutiPocetakZ = satZ*60 + minZ;
-					double minutiKrajZ = krajPregledaSatZ*60 + krajPregledaMinZ;
-					System.out.println(minutiPocetakZ);
-					System.out.println(minutiKrajZ);
-					if(!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ) || (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ)))
-					{
-						flag = true;
-					}
+
+				double minutiPocetakZ = satZ * 60 + minZ;
+				double minutiKrajZ = krajPregledaSatZ * 60 + krajPregledaMinZ;
+				System.out.println(minutiPocetakZ);
+				System.out.println(minutiKrajZ);
+				if (!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ)
+						|| (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ))) {
+					flag = true;
 				}
 			}
-			
-			
+		}
 
 		if (flag == false) {
 			pregleddto = pregledService.dodajPregled(pregledDTO);
@@ -227,15 +221,16 @@ public class PregledController {
 
 		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/PreglediLekar/{id}/{idPac}")
-	public ResponseEntity<?> getPreglediLekar(@PathVariable Long id,@PathVariable Long idPac) {
+	public ResponseEntity<?> getPreglediLekar(@PathVariable Long id, @PathVariable Long idPac) {
 
 		List<Pregled> pregledi = pregledService.findAll();
 		List<PregledDTO> preglediDTO = new ArrayList<>();
 
 		for (Pregled pregled : pregledi) {
-			if (pregled.getIdPacijenta() != null && pregled.getLekar().getId() == id && pregled.getIdPacijenta() == idPac && pregled.getZavrsen() == false ) {
+			if (pregled.getIdPacijenta() != null && pregled.getLekar().getId() == id
+					&& pregled.getIdPacijenta() == idPac && pregled.getZavrsen() == false) {
 				preglediDTO.add(new PregledDTO(pregled));
 			}
 		}
@@ -312,7 +307,7 @@ public class PregledController {
 
 		zahtevDTO.setIzbor(true);
 		zahtevDTO.setTipPregleda(zahtevDTO.getLekar().getTipPregleda());
-		
+
 		pregledService.dodajZahtev(zahtevDTO);
 
 		List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();
@@ -327,156 +322,138 @@ public class PregledController {
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/podnesiZahtevLekar/{id}")
 	@PreAuthorize("hasAuthority('LEKAR')")
-	public ResponseEntity<?> podnesiZahtevLekar(@RequestBody ZahtevDTO zahtevDTO,@PathVariable Long id)
+	public ResponseEntity<?> podnesiZahtevLekar(@RequestBody ZahtevDTO zahtevDTO, @PathVariable Long id)
 			throws MailException, InterruptedException {
 
-		
 		Pregled pregled = pregledService.findOne(id);
 		boolean flag = false;
 		zahtevDTO.setLekar(new LekarDTO(pregled.getLekar()));
 		zahtevDTO.setTipPregleda(new TipPregledaDTO(pregled.getLekar().getTipPregleda()));
 		zahtevDTO.setIdPacijenta(pregled.getIdPacijenta());
 		zahtevDTO.setCena(Double.parseDouble(pregled.getTipPregleda().getCena()));
-		
-		
-		
+
 		String[] radnoOd = pregled.getLekar().getRadnoOd().split(":");
 		double satOd = Double.parseDouble(radnoOd[0]);
 		double minOd = Double.parseDouble(radnoOd[1]);
-		double minutiRadnoOd = satOd*60 + minOd;
-		
+		double minutiRadnoOd = satOd * 60 + minOd;
+
 		String[] radnoDo = pregled.getLekar().getRadnoDo().split(":");
 		double satDo = Double.parseDouble(radnoDo[0]);
 		double minDo = Double.parseDouble(radnoDo[1]);
-		double minutiRadnoDo = satDo*60 + minDo;
-		
-		
-		
+		double minutiRadnoDo = satDo * 60 + minDo;
+
 		List<Pregled> pregledi = pregledService.findAll();
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		String datumStr = zahtevDTO.getDatum();
-		//String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
+		// String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
 		String[] vreme = zahtevDTO.getVreme().split(":");
 		double sat = Double.parseDouble(vreme[0]);
 		double min = Double.parseDouble(vreme[1]);
-		
+
 		double trajanjeMin = zahtevDTO.getTrajanjePregleda() * 60;
 		double trajanjeMinOstatak = trajanjeMin % 60;
 		double trajanjeSat = trajanjeMin / 60;
-		int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak)/60);
+		int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak) / 60);
 		double krajPregledaMin = min + trajanjeMinOstatak;
-		
+
 		if (krajPregledaMin == 60) {
 			krajPregledaMin = 0;
 			krajPregledaSat++;
 		}
-		
-		double minutiPocetak = sat*60 + min;
-		double minutiKraj = krajPregledaSat*60 + krajPregledaMin;
-		
-		 if(minutiPocetak < minutiRadnoOd || minutiKraj > minutiRadnoDo)
-			{
-				flag = true;
-				System.out.println("pocetka pregleda" + minutiPocetak);
-				System.out.println("kraj pregleda" + minutiKraj);
-				System.out.println("radno do" + minutiRadnoOd);
-				System.out.println("radno od" +minutiRadnoDo);
-			}
-		
-	/*	String[] RadnoOd = pregled.getLekar().getRadnoOd().split(":");
-		double radnoP = Double.parseDouble(RadnoOd[0]);
-		String[] RadnoDo = pregled.getLekar().getRadnoDo().split(":");
-		double radnoK = Double.parseDouble(RadnoDo[0]);
-		
-		
-		String[] vrP = zahtevDTO.getVreme().split(":");
-		double satP = Double.parseDouble(vrP[0]);
-		double minP = Double.parseDouble(vrP[1]);
-		double pocetakPregledaP = 0;
-		if (minP % 60 != 0) {
-			pocetakPregledaP = satP + 0.5;
-		} else {
-			pocetakPregledaP = satP;
-		}
-		double trajanjeMinP = zahtevDTO.getTrajanjePregleda() * 60;
-		double trajanjeMinOstatakP = trajanjeMinP % 60;
-		double trajanjeSatP = trajanjeMinP / 60;
-		double krajPregledaSatP = satP + trajanjeSatP;
-		double krajPregledaMinP = minP + trajanjeMinOstatakP;
 
-		if (krajPregledaMinP % 60 != 0) {
-			krajPregledaSatP++;
-			krajPregledaMinP = 0;
-		} else {
-			krajPregledaSatP += 0.5;
+		double minutiPocetak = sat * 60 + min;
+		double minutiKraj = krajPregledaSat * 60 + krajPregledaMin;
+
+		if (minutiPocetak < minutiRadnoOd || minutiKraj > minutiRadnoDo) {
+			flag = true;
+			System.out.println("pocetka pregleda" + minutiPocetak);
+			System.out.println("kraj pregleda" + minutiKraj);
+			System.out.println("radno do" + minutiRadnoOd);
+			System.out.println("radno od" + minutiRadnoDo);
 		}
-		*/
-		
+
+		/*
+		 * String[] RadnoOd = pregled.getLekar().getRadnoOd().split(":"); double radnoP
+		 * = Double.parseDouble(RadnoOd[0]); String[] RadnoDo =
+		 * pregled.getLekar().getRadnoDo().split(":"); double radnoK =
+		 * Double.parseDouble(RadnoDo[0]);
+		 * 
+		 * 
+		 * String[] vrP = zahtevDTO.getVreme().split(":"); double satP =
+		 * Double.parseDouble(vrP[0]); double minP = Double.parseDouble(vrP[1]); double
+		 * pocetakPregledaP = 0; if (minP % 60 != 0) { pocetakPregledaP = satP + 0.5; }
+		 * else { pocetakPregledaP = satP; } double trajanjeMinP =
+		 * zahtevDTO.getTrajanjePregleda() * 60; double trajanjeMinOstatakP =
+		 * trajanjeMinP % 60; double trajanjeSatP = trajanjeMinP / 60; double
+		 * krajPregledaSatP = satP + trajanjeSatP; double krajPregledaMinP = minP +
+		 * trajanjeMinOstatakP;
+		 * 
+		 * if (krajPregledaMinP % 60 != 0) { krajPregledaSatP++; krajPregledaMinP = 0; }
+		 * else { krajPregledaSatP += 0.5; }
+		 */
+
 		for (Pregled p : pregledi) {
-			 if (zahtevDTO.getDatum().equals(p.getDatum())
-					&& p.getLekar().getId() == zahtevDTO.getLekar().getId()) 
-			 {
-				 String[] vremeP = p.getVreme().split(":");
-					double satP = Double.parseDouble(vremeP[0]);
-					double minP = Double.parseDouble(vremeP[1]);
-					double trajanjeMinP = p.getTrajanjePregleda() * 60;
-					double trajanjeMinOstatakP = trajanjeMinP % 60;
-					double trajanjeSatP = trajanjeMinP / 60;
-					int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);
-					double krajPregledaMinP = minP + trajanjeMinOstatakP;
-					if (krajPregledaMinP == 60) {
-						krajPregledaMinP = 0;
-						krajPregledaSatP++;
-					}
-						double minutiPocetakP = satP*60 + minP;
-						double minutiKrajP = krajPregledaSatP*60 + krajPregledaMinP;
-						System.out.println(minutiPocetakP);
-						System.out.println(minutiKrajP);
-						if(!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP) || (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP)))
-						{
-							flag = true;
-						}
-			 }
-				 
+			if (zahtevDTO.getDatum().equals(p.getDatum()) && p.getLekar().getId() == zahtevDTO.getLekar().getId()) {
+				String[] vremeP = p.getVreme().split(":");
+				double satP = Double.parseDouble(vremeP[0]);
+				double minP = Double.parseDouble(vremeP[1]);
+				double trajanjeMinP = p.getTrajanjePregleda() * 60;
+				double trajanjeMinOstatakP = trajanjeMinP % 60;
+				double trajanjeSatP = trajanjeMinP / 60;
+				int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP) / 60);
+				double krajPregledaMinP = minP + trajanjeMinOstatakP;
+				if (krajPregledaMinP == 60) {
+					krajPregledaMinP = 0;
+					krajPregledaSatP++;
+				}
+				double minutiPocetakP = satP * 60 + minP;
+				double minutiKrajP = krajPregledaSatP * 60 + krajPregledaMinP;
+				System.out.println(minutiPocetakP);
+				System.out.println(minutiKrajP);
+				if (!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP)
+						|| (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP))) {
+					flag = true;
+				}
+			}
+
 		}
-		
-		for(Zahtev z : zahtevi) {
-			if(zahtevDTO.getDatum().equals(z.getDatum()) && zahtevDTO.getLekar().getId() == z.getLekar().getId()) {
+
+		for (Zahtev z : zahtevi) {
+			if (zahtevDTO.getDatum().equals(z.getDatum()) && zahtevDTO.getLekar().getId() == z.getLekar().getId()) {
 				String[] vremeZ = z.getVreme().split(":");
 				double satZ = Double.parseDouble(vremeZ[0]);
 				double minZ = Double.parseDouble(vremeZ[1]);
-				
+
 				double trajanjeMinZ = z.getTrajanjePregleda() * 60;
 				double trajanjeMinOstatakZ = trajanjeMinZ % 60;
 				double trajanjeSatZ = trajanjeMinZ / 60;
-				int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ)/60);
+				int krajPregledaSatZ = (int) (satZ + (trajanjeMinZ - trajanjeMinOstatakZ) / 60);
 				double krajPregledaMinZ = minZ + trajanjeMinOstatakZ;
-				
+
 				if (krajPregledaMinZ == 60) {
 					krajPregledaMinZ = 0;
 					krajPregledaSatZ++;
 				}
-				
-				double minutiPocetakZ = satZ*60 + minZ;
-				double minutiKrajZ = krajPregledaSatZ*60 + krajPregledaMinZ;
+
+				double minutiPocetakZ = satZ * 60 + minZ;
+				double minutiKrajZ = krajPregledaSatZ * 60 + krajPregledaMinZ;
 				System.out.println(minutiPocetakZ);
 				System.out.println(minutiKrajZ);
-				if(!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ) || (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ)))
-				{
+				if (!((minutiPocetak < minutiPocetakZ && minutiKraj <= minutiPocetakZ)
+						|| (minutiPocetak >= minutiKrajZ && minutiKraj > minutiKrajZ))) {
 					flag = true;
 				}
 			}
 		}
-		
-		
+
 		if (flag == true) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		if(flag == false) {
+
+		if (flag == false) {
 			pregledService.dodajZahtev(zahtevDTO);
 
 			List<AdminKlinike> adminiKlinika = adminKlinikeService.findAll();
@@ -489,10 +466,38 @@ public class PregledController {
 				}
 			}
 
-			
-			
 		}
-		
+
 		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/otkaziPregledPacijent/{idPregled}/{idPacijent}")
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> otkaziZahtevPacijent(@PathVariable Long idPregled, @PathVariable Long idPacijent)
+			throws ParseException {
+		Pregled pregled = pregledService.findOne(idPregled);
+
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		Date vremePregleda = formatter.parse(pregled.getDatum() + " " + pregled.getVreme());
+		Date vremeTrenutno = new Date();
+
+		if (Math.abs((vremePregleda.getTime() - vremeTrenutno.getTime()) / 1000 / 60 / 60) > 23 && pregled.getZavrsen() == false
+				&& pregled.getIdPacijenta() == idPacijent) {
+			pregledService.izrisiPregled(pregled);
+			
+			List<Pregled> pregledi = pregledService.findAll();
+			List<PregledDTO> preglediDTO = new ArrayList<>();
+
+			for (Pregled pregledTemp : pregledi) {
+				if (pregledTemp.getIdPacijenta() == idPacijent) {
+					preglediDTO.add(new PregledDTO(pregledTemp));
+				}
+			}
+
+			return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<>("Ne mozete otkazati pregled, izvrsava se za manje od 24h", HttpStatus.BAD_REQUEST);
+		}
 	}
 }

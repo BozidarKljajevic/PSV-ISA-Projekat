@@ -9,5 +9,7 @@ import com.example.demo.model.Zahtev;
 
 public interface GodisnjiRepository extends JpaRepository<Godisnji, Long> {
 
+	List<Godisnji> findByLekarId(Long id);
+
 
 }

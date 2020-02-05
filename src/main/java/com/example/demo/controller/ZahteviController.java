@@ -1,6 +1,7 @@
 
 package com.example.demo.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -314,5 +315,4 @@ public class ZahteviController {
 
 		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
 	}
-
 }

@@ -94,7 +94,7 @@ public class LekarController {
 		List<Lekar> lekari = new ArrayList<>();
 
 		for (Pregled preg : pregledi) {
-			if ((preg.getLekar().getId()).equals(idLong)) {
+			if ((preg.getLekar().getId()).equals(idLong) && preg.getZavrsen()==false) {
 				String[] datum = preg.getDatum().split("/");
 				String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
 				
@@ -898,6 +898,7 @@ public class LekarController {
 
 		List<Pregled> pregledi = pregledService.getPregledeOdLekara(lekar.getId());
 		List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(lekar.getId());
+		List<Operacija> operacije = operacijaService.getOperacijeOdLekara(lekar.getId());
 
 		for (int i = odH; i < doH; i += 30) {
 			boolean exist = false;
@@ -927,6 +928,19 @@ public class LekarController {
 				}
 			}
 			
+			for (Operacija operacija : operacije) {
+				if (datum.equals(operacija.getDatum())) {
+					int pregledOd = Integer.parseInt(operacija.getVreme().split(":")[0]) * 60
+							+ Integer.parseInt(operacija.getVreme().split(":")[1]);
+					int pregledDo = (int) (pregledOd + operacija.getTrajanjeOperacije() * 60);
+					if ((i == pregledOd || i + 30 == pregledDo)
+							|| ((i > pregledOd && i < pregledDo) && (i + 30 > pregledOd && i + 30 < pregledDo))) {
+						exist = true;
+						break;
+					}
+				}
+			}
+			
 			if (!exist) {
 				int terminOd = i;
 				int terminDo = i + 30;
@@ -942,5 +956,15 @@ public class LekarController {
 
 		return new ResponseEntity<>(slobodniTermini, HttpStatus.OK);
 		
+	}
+	
+	@GetMapping(value = "/lekarPregleda/{id}")
+	public ResponseEntity<LekarDTO> lekarPregleda(@PathVariable Long id){
+		
+		Pregled pregled = pregledService.findOne(id);
+		
+		LekarDTO lekarDTO = new LekarDTO(pregled.getLekar());
+		
+		return new ResponseEntity<>(lekarDTO ,HttpStatus.OK);
 	}
 }
