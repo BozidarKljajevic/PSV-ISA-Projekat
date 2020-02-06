@@ -263,8 +263,43 @@ public class SalaKlinikeController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<SalaKlinikeDTO> izmeniPodatkeSaleKlinike(@RequestBody SalaKlinikeDTO salaKlinikeDTO) {
 
+	
+		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
+		List<Zahtev> zahtevi = zahteviService.findAll();
+		boolean flag = false;
+		
+		
 		try {
-			salaKlinikeService.izmeniSaluKlinike(salaKlinikeDTO);
+			
+			for(Pregled p : pregledi) {
+				if(p.getSala().getId() == salaKlinikeDTO.getId() && p.getZavrsen() == false) {
+					flag = true;
+				}
+			}
+			
+			for(Zahtev z : zahtevi) {
+				if(z.getSala() != null) {
+				if(z.getSala().getId() == salaKlinikeDTO.getId()) {
+					flag = true;
+				}
+				}
+			}
+			
+			
+			for(Operacija o : operacije) {
+				if(o.getSala().getId() == salaKlinikeDTO.getId() && o.getZavrsen() == false) {
+					flag = true;
+				}
+			}
+			
+			if(flag == false) {
+				salaKlinikeService.izmeniSaluKlinike(salaKlinikeDTO);
+			}
+			else {
+				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
 		} catch (ValidationException e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

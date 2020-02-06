@@ -54,5 +54,9 @@ public class GodisnjiService {
 
 	}
 	
+	public List<Godisnji> getGodisnjiOdLekara(Long id) {
+		return godisnjiRepository.findByLekarId(id);
+	}
+	
 }
 

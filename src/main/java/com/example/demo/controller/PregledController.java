@@ -1,6 +1,10 @@
 package com.example.demo.controller;
 
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.ValidationException;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.GodisnjiDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.MedicinskaSestraDTO;
@@ -28,11 +33,15 @@ import com.example.demo.dto.ZahtevDTO;
 import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.PregledRepository;
 import com.example.demo.model.AdminKlinike;
+import com.example.demo.model.Godisnji;
 import com.example.demo.model.MedicinskaSestra;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pregled;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.EmailService;
+import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.KlinikaService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.model.SalaKlinike;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
@@ -48,6 +57,11 @@ public class PregledController {
 	
 	@Autowired
 	private ZahteviService zahteviService;
+	@Autowired
+	private OperacijaService operacijaService;
+	
+	@Autowired
+	private GodisnjiService godisnjiService;
 
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
@@ -60,11 +74,15 @@ public class PregledController {
 	
 	@PostMapping(value = "/dodajPregled", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<PregledDTO> dodajPregled(@RequestBody PregledDTO pregledDTO) {
+	public ResponseEntity<PregledDTO> dodajPregled(@RequestBody PregledDTO pregledDTO) throws ParseException {
 
 		PregledDTO pregleddto = new PregledDTO();
 		boolean flag = false;
 
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String[] datum = pregledDTO.getDatum().split("/");
+		Date datumPregledaDate = sdf.parse(datum[2] + "-" + datum[1] + "-" + datum[0]);
+		
 		String[] radnoOd = pregledDTO.getLekar().getRadnoOd().split(":");
 		double satOd = Double.parseDouble(radnoOd[0]);
 		double minOd = Double.parseDouble(radnoOd[1]);
@@ -79,6 +97,7 @@ public class PregledController {
 		
 		List<Pregled> pregledi = pregledService.findAll();
 		List<Zahtev> zahtevi = zahteviService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
 		String datumStr = pregledDTO.getDatum();
 		//String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
 		String[] vreme = pregledDTO.getVreme().split(":");
@@ -106,8 +125,20 @@ public class PregledController {
 				System.out.println("kraj pregleda" + minutiKraj);
 				System.out.println("radno do" + minutiRadnoOd);
 				System.out.println("radno od" +minutiRadnoDo);
+				
 			}
 		
+		 
+		 List<Godisnji> godisnji = godisnjiService.getGodisnjiOdLekara(pregledDTO.getLekar().getId());
+		 
+		 
+		 for (Godisnji godisnjiOdmor : godisnji) {
+		        Date datumOd = sdf.parse(godisnjiOdmor.getDatumOd());
+		        Date datumDo = sdf.parse(godisnjiOdmor.getDatumDo());
+		        if (datumPregledaDate.compareTo(datumOd) >= 0 && datumPregledaDate.compareTo(datumDo) <= 0) {
+		        	flag = true;
+				}
+			}
 		 
 		
 			for (Pregled p : pregledi) {
@@ -117,6 +148,33 @@ public class PregledController {
 					double satP = Double.parseDouble(vremeP[0]);
 					double minP = Double.parseDouble(vremeP[1]);
 					double trajanjeMinP = p.getTrajanjePregleda() * 60;
+					double trajanjeMinOstatakP = trajanjeMinP % 60;
+					double trajanjeSatP = trajanjeMinP / 60;
+					int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);
+					double krajPregledaMinP = minP + trajanjeMinOstatakP;
+					if (krajPregledaMinP == 60) {
+						krajPregledaMinP = 0;
+						krajPregledaSatP++;
+					}
+						double minutiPocetakP = satP*60 + minP;
+						double minutiKrajP = krajPregledaSatP*60 + krajPregledaMinP;
+						System.out.println(minutiPocetakP);
+						System.out.println(minutiKrajP);
+						if(!((minutiPocetak < minutiPocetakP && minutiKraj <= minutiPocetakP) || (minutiPocetak >= minutiKrajP && minutiKraj > minutiKrajP)))
+						{
+							flag = true;
+						}
+				}
+			}
+			
+			
+			for (Operacija o : operacije) {
+				if (pregledDTO.getDatum().equals(o.getDatum())
+						&& (o.getSala().getId() == pregledDTO.getSala().getId() || o.getLekariKlinike().contains(pregledDTO.getLekar()))) {
+					String[] vremeP = o.getVreme().split(":");
+					double satP = Double.parseDouble(vremeP[0]);
+					double minP = Double.parseDouble(vremeP[1]);
+					double trajanjeMinP = o.getTrajanjeOperacije() * 60;
 					double trajanjeMinOstatakP = trajanjeMinP % 60;
 					double trajanjeSatP = trajanjeMinP / 60;
 					int krajPregledaSatP = (int) (satP + (trajanjeMinP - trajanjeMinOstatakP)/60);
@@ -221,6 +279,22 @@ public class PregledController {
 
 		for (Pregled pregled : pregledi) {
 			if (pregled.getIdPacijenta() == null) {
+				preglediDTO.add(new PregledDTO(pregled));
+			}
+		}
+
+		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping(value = "/slobodniPregledi/{id}")
+	public ResponseEntity<?> getSlobodniPregledi(@PathVariable Long id) {
+
+		List<Pregled> pregledi = pregledService.findAll();
+		List<PregledDTO> preglediDTO = new ArrayList<>();
+		AdminKlinike admin = adminKlinikeService.findOne(id);
+		for (Pregled pregled : pregledi) {
+			if (pregled.getIdPacijenta() == null && admin.getKlinika().getId() == pregled.getLekar().getKlinika().getId()) {
 				preglediDTO.add(new PregledDTO(pregled));
 			}
 		}
@@ -386,34 +460,7 @@ public class PregledController {
 				System.out.println("radno od" +minutiRadnoDo);
 			}
 		
-	/*	String[] RadnoOd = pregled.getLekar().getRadnoOd().split(":");
-		double radnoP = Double.parseDouble(RadnoOd[0]);
-		String[] RadnoDo = pregled.getLekar().getRadnoDo().split(":");
-		double radnoK = Double.parseDouble(RadnoDo[0]);
 		
-		
-		String[] vrP = zahtevDTO.getVreme().split(":");
-		double satP = Double.parseDouble(vrP[0]);
-		double minP = Double.parseDouble(vrP[1]);
-		double pocetakPregledaP = 0;
-		if (minP % 60 != 0) {
-			pocetakPregledaP = satP + 0.5;
-		} else {
-			pocetakPregledaP = satP;
-		}
-		double trajanjeMinP = zahtevDTO.getTrajanjePregleda() * 60;
-		double trajanjeMinOstatakP = trajanjeMinP % 60;
-		double trajanjeSatP = trajanjeMinP / 60;
-		double krajPregledaSatP = satP + trajanjeSatP;
-		double krajPregledaMinP = minP + trajanjeMinOstatakP;
-
-		if (krajPregledaMinP % 60 != 0) {
-			krajPregledaSatP++;
-			krajPregledaMinP = 0;
-		} else {
-			krajPregledaSatP += 0.5;
-		}
-		*/
 		
 		for (Pregled p : pregledi) {
 			 if (zahtevDTO.getDatum().equals(p.getDatum())
