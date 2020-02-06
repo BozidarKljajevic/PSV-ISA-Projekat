@@ -35,12 +35,16 @@ public class PregledService {
 	@Autowired
 	private TipPregledaRepository tipPregledaRepository;
 
+	
+
+	
 	public PregledDTO dodajPregled(PregledDTO pregledDTO) {
 		Pregled pregled = new Pregled();
 
 		pregled.setDatum(pregledDTO.getDatum());
 		pregled.setVreme(pregledDTO.getVreme());
-		pregled.setCena(pregledDTO.getCena());
+		Double cenaP = Double.parseDouble(pregledDTO.getTipPregleda().getCena());
+		pregled.setCena(cenaP);
 		pregled.setLekar(lekarRepository.findById(pregledDTO.getLekar().getId()).orElse(null));
 		pregled.setSala(salaKlinikeRepository.getOne(pregledDTO.getSala().getId()));
 		pregled.setTipPregleda(tipPregledaRepository.getOne(pregledDTO.getTipPregleda().getId()));
@@ -106,6 +110,7 @@ public class PregledService {
 		return pregledRepository.findByLekarId(id);
 	}
 
+
 	public void izrisiPregled(Pregled pregled) {
 		pregledRepository.delete(pregled);		
 	}
@@ -114,5 +119,6 @@ public class PregledService {
 		pregled.setZavrsen(true);
 		pregledRepository.save(pregled);
 	}
+
 
 }

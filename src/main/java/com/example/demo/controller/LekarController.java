@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.ValidationException;
@@ -24,8 +27,11 @@ import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.DogadjajDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
+import com.example.demo.dto.PregledDTO;
 import com.example.demo.dto.SifraDTO;
+import com.example.demo.dto.ZahtevDTO;
 import com.example.demo.model.AdminKlinike;
+import com.example.demo.model.Godisnji;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.Operacija;
@@ -34,6 +40,7 @@ import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.OperacijaService;
@@ -56,6 +63,9 @@ public class LekarController {
 
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
+	
+	@Autowired
+	private GodisnjiService godisnjiService;
 	
 	@Autowired
 	private ZahteviService zahteviService;
@@ -317,6 +327,25 @@ public class LekarController {
 
 		return new ResponseEntity<>(lekarDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/zahteviLekar/{id}")
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> getZahtevi(@PathVariable String id) {
+
+		Long idLong = Long.parseLong(id);
+		Lekar lekar = lekarService.findOne(idLong);
+		List<PregledDTO> pregleddto = new ArrayList<>();
+		List<Pregled> pregledi = pregledService.findAll();
+		
+		for(Pregled p : pregledi) {
+			if(p.getLekar().getId() == lekar.getId()) {
+				pregleddto.add(new PregledDTO(p));
+			}
+		}
+		
+
+		return new ResponseEntity<>(pregleddto, HttpStatus.OK);
+	}
 
 	@GetMapping(value = "/postojeciLekarAdmin/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
@@ -339,6 +368,7 @@ public class LekarController {
 		if (lekar != null) {
 			List<Pregled> pregledi = pregledService.findAll();
 			List<Operacija> operacije = operacijaService.findAll();
+			List<Zahtev> zahtevi = zahteviService.findAll();
 			for (Pregled pr : pregledi) {
 				if (pr.getLekar().getId() == id && pr.getZavrsen() == false) {
 					flag = true;
@@ -353,6 +383,12 @@ public class LekarController {
 				}
 			}
 
+			for (Zahtev z : zahtevi) {
+				if (z.getLekar().getId() == id) {
+					flag = true;
+					break;
+				}
+			}
 			
 			if (flag == false) {
 				lekarService.remove(id);
@@ -404,7 +440,7 @@ public class LekarController {
 	
 	@GetMapping(value = "/moguciLekariZaPregled/{id}/{idPregleda}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<List<LekarDTO>> getMoguciLekariZaPregled(@PathVariable String id,@PathVariable String idPregleda) {
+	public ResponseEntity<List<LekarDTO>> getMoguciLekariZaPregled(@PathVariable String id,@PathVariable String idPregleda) throws ParseException {
 		
 		List<Lekar> lekar = lekarService.findAll();
 		Long idd = Long.parseLong(idPregleda);
@@ -462,7 +498,22 @@ public class LekarController {
 			
 			
 			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			
+			String[] datum = zahtev.getDatum().split("/");
+			Date datumPregledaDate = sdf.parse(datum[2] + "-" + datum[1] + "-" + datum[0]);
+			
+			
+			List<Godisnji> godisnji = godisnjiService.getGodisnjiOdLekara(le.getId());
+			 
+			 
+			 for (Godisnji godisnjiOdmor : godisnji) {
+			        Date datumOd = sdf.parse(godisnjiOdmor.getDatumOd());
+			        Date datumDo = sdf.parse(godisnjiOdmor.getDatumDo());
+			        if (datumPregledaDate.compareTo(datumOd) >= 0 && datumPregledaDate.compareTo(datumDo) <= 0) {
+			        	flag = true;
+					}
+				}
 			
 			
 			 if(le.getKlinika().getId() == adm.getKlinika().getId() && le.getTipPregleda() == zahtev.getTipPregleda()) {
@@ -782,16 +833,40 @@ public class LekarController {
 	}
 	
 	@GetMapping(value = "/dostupniTermini/{trajanjePregleda}/{datumPregleda}/{idLekara}")
-	public ResponseEntity<List<String>> getSlobodniTerminiLekar(
+	public ResponseEntity<?> getSlobodniTerminiLekar(
 			@PathVariable String trajanjePregleda,
-			@PathVariable String datumPregleda,@PathVariable Long idLekara) {
+			@PathVariable String datumPregleda,@PathVariable Long idLekara) throws ParseException {
 		Lekar lekar = lekarService.findOne(idLekara);
 
+		boolean flagGodisnji = false;
+	
 		
-		if(trajanjePregleda == "") {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		
+		Date datumPregledaDate = sdf.parse(datumPregleda);
+		
+		List<Godisnji> godisnji = godisnjiService.getGodisnjiOdLekara(idLekara);
+		 
+		 
+		 for (Godisnji godisnjiOdmor : godisnji) {
+		        Date datumOd = sdf.parse(godisnjiOdmor.getDatumOd());
+		        Date datumDo = sdf.parse(godisnjiOdmor.getDatumDo());
+		        if (datumPregledaDate.compareTo(datumOd) >= 0 && datumPregledaDate.compareTo(datumDo) <= 0) {
+		        	flagGodisnji = true;
+				}
+			}
+		 
+		 if(flagGodisnji == true) {
+			 System.out.println("prvi if");
+			 return new ResponseEntity<>("morate promeniti datum posto ste tad na godisnjem", HttpStatus.INTERNAL_SERVER_ERROR); 
+		 }
+		
+		
+			if(trajanjePregleda.equals("NONE")) {
+				 System.out.println("drugi if");
+				return new ResponseEntity<>("morate uneti trajanje pregleda da bi ste dobili moguca vremena", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		 
 		int odH = Integer.parseInt(lekar.getRadnoOd().split(":")[0]) * 60;
 		int doH = Integer.parseInt(lekar.getRadnoDo().split(":")[0]) * 60;
 
@@ -958,6 +1033,37 @@ public class LekarController {
 		
 	}
 	
+
+	@PostMapping(value = "/otkaziPregledLekar/{idPregled}/{idLekar}")
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> otkaziZahtevPacijent(@PathVariable Long idPregled,@PathVariable Long idLekar)
+			throws ParseException {
+		Pregled pregled = pregledService.findOne(idPregled);
+
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		Date vremePregleda = formatter.parse(pregled.getDatum() + " " + pregled.getVreme());
+		Date vremeTrenutno = new Date();
+
+		if (Math.abs((vremePregleda.getTime() - vremeTrenutno.getTime()) / 1000 / 60 / 60) > 23 && pregled.getZavrsen() == false
+				) {
+			pregledService.izrisiPregled(pregled);
+			
+			List<Pregled> pregledi = pregledService.findAll();
+			List<PregledDTO> preglediDTO = new ArrayList<>();
+
+			for (Pregled pregledTemp : pregledi) {
+				if (pregledTemp.getLekar().getId() == idLekar) {
+					preglediDTO.add(new PregledDTO(pregledTemp));
+				}
+			}
+
+			return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<>("Ne mozete otkazati pregled, izvrsava se za manje od 24h", HttpStatus.BAD_REQUEST);
+		}
+	}
+
 	@GetMapping(value = "/lekarPregleda/{id}")
 	public ResponseEntity<LekarDTO> lekarPregleda(@PathVariable Long id){
 		
@@ -966,5 +1072,6 @@ public class LekarController {
 		LekarDTO lekarDTO = new LekarDTO(pregled.getLekar());
 		
 		return new ResponseEntity<>(lekarDTO ,HttpStatus.OK);
+
 	}
 }

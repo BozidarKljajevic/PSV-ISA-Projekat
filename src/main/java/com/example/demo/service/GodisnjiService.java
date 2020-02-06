@@ -76,5 +76,7 @@ public class GodisnjiService {
 		return godisnjiRepository.findByLekarId(id);
 	}
 	
+	
+	
 }
 
