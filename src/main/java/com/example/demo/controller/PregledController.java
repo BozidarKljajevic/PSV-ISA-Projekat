@@ -34,6 +34,7 @@ import com.example.demo.repository.KlinikaRepository;
 import com.example.demo.repository.PregledRepository;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Godisnji;
+import com.example.demo.model.Lekar;
 import com.example.demo.model.MedicinskaSestra;
 import com.example.demo.model.Operacija;
 import com.example.demo.model.Pregled;
@@ -41,6 +42,7 @@ import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.KlinikaService;
+import com.example.demo.service.LekarService;
 import com.example.demo.service.OperacijaService;
 import com.example.demo.model.SalaKlinike;
 import com.example.demo.model.User;
@@ -54,6 +56,9 @@ public class PregledController {
 
 	@Autowired
 	private PregledService pregledService;
+	
+	@Autowired
+	private LekarService lekarService;
 
 	@Autowired
 	private ZahteviService zahteviService;
@@ -75,10 +80,13 @@ public class PregledController {
 
 		PregledDTO pregleddto = new PregledDTO();
 		boolean flag = false;
-
+		
+		String[] yyyymmdd = pregledDTO.getDatum().split("-");
+		String datum = yyyymmdd[2] + "/" + yyyymmdd[1] + "/" + yyyymmdd[0];
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String[] datum = pregledDTO.getDatum().split("/");
-		Date datumPregledaDate = sdf.parse(datum[2] + "-" + datum[1] + "-" + datum[0]);
+		//String[] datum = pregledDTO.getDatum().split("/");
+		Date datumPregledaDate = sdf.parse(pregledDTO.getDatum());
 		
 		String[] radnoOd = pregledDTO.getLekar().getRadnoOd().split(":");
 		double satOd = Double.parseDouble(radnoOd[0]);
@@ -93,7 +101,7 @@ public class PregledController {
 		List<Pregled> pregledi = pregledService.findAll();
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		List<Operacija> operacije = operacijaService.findAll();
-		String datumStr = pregledDTO.getDatum();
+		//String datumStr = pregledDTO.getDatum();
 		// String datumStr = datum[2]+"/"+datum[1]+"/"+datum[0];
 		String[] vreme = pregledDTO.getVreme().split(":");
 		double sat = Double.parseDouble(vreme[0]);
@@ -138,7 +146,7 @@ public class PregledController {
 		 
 		
 			for (Pregled p : pregledi) {
-				if (pregledDTO.getDatum().equals(p.getDatum())
+				if (datum.equals(p.getDatum())
 						&& (p.getSala().getId() == pregledDTO.getSala().getId() || p.getLekar().getId() == pregledDTO.getLekar().getId())) {
 					String[] vremeP = p.getVreme().split(":");
 					double satP = Double.parseDouble(vremeP[0]);
@@ -165,7 +173,7 @@ public class PregledController {
 			
 			
 			for (Operacija o : operacije) {
-				if (pregledDTO.getDatum().equals(o.getDatum())
+				if (datum.equals(o.getDatum())
 						&& (o.getSala().getId() == pregledDTO.getSala().getId() || o.getLekariKlinike().contains(pregledDTO.getLekar()))) {
 					String[] vremeP = o.getVreme().split(":");
 					double satP = Double.parseDouble(vremeP[0]);
@@ -193,7 +201,7 @@ public class PregledController {
 			for(Zahtev z : zahtevi) {
 				if(z.getSala() != null) { 
 					
-				if(pregledDTO.getDatum().equals(z.getDatum()) && (pregledDTO.getLekar().getId() == z.getLekar().getId() || pregledDTO.getSala().getId() == z.getSala().getId() )) {
+				if(datum.equals(z.getDatum()) && (pregledDTO.getLekar().getId() == z.getLekar().getId() || pregledDTO.getSala().getId() == z.getSala().getId() )) {
 
 					String[] vremeZ = z.getVreme().split(":");
 					double satZ = Double.parseDouble(vremeZ[0]);
@@ -219,7 +227,7 @@ public class PregledController {
 						flag = true;
 					}
 				}
-			} else if (pregledDTO.getDatum().equals(z.getDatum())
+			} else if (datum.equals(z.getDatum())
 					&& pregledDTO.getLekar().getId() == z.getLekar().getId()) {
 				String[] vremeZ = z.getVreme().split(":");
 				double satZ = Double.parseDouble(vremeZ[0]);
@@ -313,6 +321,34 @@ public class PregledController {
 		}
 
 		return new ResponseEntity<>(preglediDTO, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping(value = "/PostojiKarton/{id}/{idPac}")
+	public ResponseEntity<?> getKarton(@PathVariable Long id, @PathVariable Long idPac) {
+
+		List<Pregled> pregledi = pregledService.findAll();
+		Lekar lekar = lekarService.findOne(id);
+		List<Operacija> operacije = operacijaService.findAll();
+		List<PregledDTO> preglediDTO = new ArrayList<>();
+        Boolean karton = false;
+		for (Pregled pregled : pregledi) {
+			if (pregled.getIdPacijenta() != null && pregled.getLekar().getId() == id
+					&& pregled.getIdPacijenta() == idPac && pregled.getZavrsen() == true) {
+
+					karton = true;
+			}
+		}
+		
+		for (Operacija o : operacije) {
+			if (o.getIdPacijenta() != null && o.getLekariKlinike().contains(lekar)
+					&& o.getIdPacijenta() == idPac && o.getZavrsen() == true) {
+
+					karton = true;
+			}
+		}
+
+		return new ResponseEntity<>(karton, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/predefinisaniPreglediKlinike/{id}")
