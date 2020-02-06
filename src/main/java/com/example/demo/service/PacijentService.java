@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,11 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.RegisterDTO;
 import com.example.demo.model.Authority;
+import com.example.demo.model.IzvestajOPregledu;
+import com.example.demo.model.Karton;
 import com.example.demo.model.Pacijent;
 import com.example.demo.repository.AuthorityRepository;
+import com.example.demo.repository.KartonRepository;
 import com.example.demo.repository.PacijentRepository;
 
 @Service
@@ -19,6 +23,9 @@ public class PacijentService {
 
 	@Autowired
 	private PacijentRepository pacijentRepository;
+	
+	@Autowired
+	private KartonRepository kartonRepository;
 
 	@Autowired
 	private AuthorityRepository authorityRepository;
@@ -70,6 +77,17 @@ public class PacijentService {
 		
 		exisPacijent.setEnabled(true);
 		this.pacijentRepository.save(exisPacijent);
+		
+		Karton karton = new Karton();
+		karton.setPacijent(exisPacijent);
+		karton.setDatumRodjenja("Potrebno uneti");
+		karton.setDioptrija(0.0);
+		karton.setKrvnaGrupa("Potreno uneti");
+		karton.setPol("Potreno uneti");
+		karton.setTezina(0.0);
+		karton.setVisina(0.0);
+		karton.setIzvestajiOPregledima(new HashSet<IzvestajOPregledu>());
+		this.kartonRepository.save(karton);
 		
 	}
 

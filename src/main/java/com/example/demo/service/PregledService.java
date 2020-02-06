@@ -36,9 +36,7 @@ public class PregledService {
 	private TipPregledaRepository tipPregledaRepository;
 
 	
-	public void izrisiPregled(Pregled pregled) {
-		pregledRepository.delete(pregled);		
-	}
+
 	
 	public PregledDTO dodajPregled(PregledDTO pregledDTO) {
 		Pregled pregled = new Pregled();
@@ -112,6 +110,15 @@ public class PregledService {
 		return pregledRepository.findByLekarId(id);
 	}
 
-	
-	
+
+	public void izrisiPregled(Pregled pregled) {
+		pregledRepository.delete(pregled);		
+	}
+
+	public void zavrsiPregled(Pregled pregled) {
+		pregled.setZavrsen(true);
+		pregledRepository.save(pregled);
+	}
+
+
 }
