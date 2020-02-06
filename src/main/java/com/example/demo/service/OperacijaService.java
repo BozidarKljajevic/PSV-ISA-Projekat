@@ -79,4 +79,8 @@ public class OperacijaService {
 		
 		return operacije;
 	}
+	
+	public void izbrisiOperaciju(Operacija operacija) {
+		operacijaRepository.delete(operacija);		
+	}
 }

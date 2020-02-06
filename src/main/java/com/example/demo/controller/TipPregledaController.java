@@ -79,12 +79,31 @@ public class TipPregledaController {
 		return new ResponseEntity<>(tipDTO, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/izmeniPodatkeTipaPregleda", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/izmeniPodatkeTipaPregleda/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<TipPregledaDTO> izmeniPodatkeTipaPregleda(@RequestBody TipPregledaDTO tipPregledaDTO) {
+	public ResponseEntity<TipPregledaDTO> izmeniPodatkeTipaPregleda(@PathVariable Long id,@RequestBody TipPregledaDTO tipPregledaDTO) {
 
+		
+		
+		
+		AdminKlinike adm = adminKlinikeService.findOne(id);
+		List<Lekar> lekari = lekarService.findAll();
+		boolean flag = false;
+		
 		try {
-			tipPregledaService.izmeniTipPregleda(tipPregledaDTO);
+			for (Lekar lekar : lekari) {
+				if ( lekar.getTipPregleda().getId() == tipPregledaDTO.getId()) {
+					flag = true;
+				}
+			}
+			
+			if(flag == false) {
+				tipPregledaService.izmeniTipPregleda(tipPregledaDTO);
+			}
+			else {
+				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
 		} catch (ValidationException e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

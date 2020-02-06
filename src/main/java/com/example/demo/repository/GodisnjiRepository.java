@@ -11,5 +11,4 @@ public interface GodisnjiRepository extends JpaRepository<Godisnji, Long> {
 
 	List<Godisnji> findByLekarId(Long id);
 
-
 }

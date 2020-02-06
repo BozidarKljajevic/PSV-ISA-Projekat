@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,13 +21,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.PorukaDTO;
 import com.example.demo.dto.SifraDTO;
+import com.example.demo.model.Lekar;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.service.EmailService;
+import com.example.demo.service.LekarService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PacijentService;
 import com.example.demo.service.PregledService;
 
@@ -36,10 +44,19 @@ public class PacijentController {
 	private PacijentService pacijentService;
 	
 	@Autowired
+	private LekarService lekarService;
+	
+	@Autowired
+	private OperacijaService operacijaService;
+	
+	@Autowired
 	private PregledService pregledService;
 	
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
 	@GetMapping(value = "/preuzmi/{id}")
 	//@PreAuthorize("hasAuthority('PACIJENT')")
@@ -122,6 +139,39 @@ public class PacijentController {
 		return new ResponseEntity<>(pacijentiDTO, HttpStatus.OK);
 	}
 	
+	
+	@GetMapping(value = "/pacijentiKlinike/{id}")
+	public ResponseEntity<List<PacijentDTO>> getPacijentiKlinike(@PathVariable Long id) {
+		Lekar lekar = lekarService.findOne(id);
+		List<Pacijent> pacijenti = pacijentService.findAll();
+		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
+		List<Pregled> preglediKlinike = new ArrayList<>();
+		List<PacijentDTO> pacijentiDTO = new ArrayList<>();
+		for(Pregled p : pregledi) {
+			if(p.getLekar().getKlinika() == lekar.getKlinika()) {
+				Pacijent pac = pacijentService.findOne(p.getIdPacijenta());
+				pacijentiDTO.add(new PacijentDTO(pac));
+			}
+		}
+		
+		
+		for(Operacija o : operacije) {
+			for(Lekar l : o.getLekariKlinike()) {
+				if(l.getKlinika().getId() == lekar.getKlinika().getId()) {
+					Pacijent pac = pacijentService.findOne(o.getIdPacijenta());
+					pacijentiDTO.add(new PacijentDTO(pac));
+					
+				}
+				break;
+			}
+		}
+		
+		
+
+		return new ResponseEntity<>(pacijentiDTO, HttpStatus.OK);
+	}
+	
 	@PostMapping(value = "/ibrisiNeaktivnogPacijenta/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMINCENTRA')")
 	public ResponseEntity<List<PacijentDTO>> izbrisiPacijenta(@RequestBody PorukaDTO poruka, @PathVariable String id) throws MailException, InterruptedException {
@@ -145,6 +195,30 @@ public class PacijentController {
 		} else {
 			
 			return new ResponseEntity<>(pacijentiDTO,HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@PostMapping(value = "/promeniSifruPacijent/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> promeniSifruPacijenta(@PathVariable Long id, @RequestBody IzmenaSifreDTO sifra)
+	{
+		Pacijent pacijent = pacijentService.findOne(id);
+		
+		final Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(pacijent.getMail(),
+						sifra.getStara()));
+		
+		User user = (User) authentication.getPrincipal();
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+		
+		boolean success = pacijentService.izmeniSifru(pacijent, sifra);
+		
+		if (success) {
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
 	}
 }
