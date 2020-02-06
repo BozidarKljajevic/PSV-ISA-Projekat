@@ -25,10 +25,14 @@ import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.PorukaDTO;
 import com.example.demo.dto.SifraDTO;
+import com.example.demo.model.Lekar;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.service.EmailService;
+import com.example.demo.service.LekarService;
+import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PacijentService;
 import com.example.demo.service.PregledService;
 
@@ -38,6 +42,12 @@ public class PacijentController {
 
 	@Autowired
 	private PacijentService pacijentService;
+	
+	@Autowired
+	private LekarService lekarService;
+	
+	@Autowired
+	private OperacijaService operacijaService;
 	
 	@Autowired
 	private PregledService pregledService;
@@ -125,6 +135,39 @@ public class PacijentController {
 				pacijentiDTO.add(new PacijentDTO(pacijent));
 			}
 		}
+
+		return new ResponseEntity<>(pacijentiDTO, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping(value = "/pacijentiKlinike/{id}")
+	public ResponseEntity<List<PacijentDTO>> getPacijentiKlinike(@PathVariable Long id) {
+		Lekar lekar = lekarService.findOne(id);
+		List<Pacijent> pacijenti = pacijentService.findAll();
+		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
+		List<Pregled> preglediKlinike = new ArrayList<>();
+		List<PacijentDTO> pacijentiDTO = new ArrayList<>();
+		for(Pregled p : pregledi) {
+			if(p.getLekar().getKlinika() == lekar.getKlinika()) {
+				Pacijent pac = pacijentService.findOne(p.getIdPacijenta());
+				pacijentiDTO.add(new PacijentDTO(pac));
+			}
+		}
+		
+		
+		for(Operacija o : operacije) {
+			for(Lekar l : o.getLekariKlinike()) {
+				if(l.getKlinika().getId() == lekar.getKlinika().getId()) {
+					Pacijent pac = pacijentService.findOne(o.getIdPacijenta());
+					pacijentiDTO.add(new PacijentDTO(pac));
+					
+				}
+				break;
+			}
+		}
+		
+		
 
 		return new ResponseEntity<>(pacijentiDTO, HttpStatus.OK);
 	}

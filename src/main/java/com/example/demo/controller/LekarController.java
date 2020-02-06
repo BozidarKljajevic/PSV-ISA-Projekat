@@ -27,6 +27,7 @@ import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.DogadjajDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
+import com.example.demo.dto.OperacijaDTO;
 import com.example.demo.dto.PregledDTO;
 import com.example.demo.dto.SifraDTO;
 import com.example.demo.dto.ZahtevDTO;
@@ -338,7 +339,7 @@ public class LekarController {
 		List<Pregled> pregledi = pregledService.findAll();
 		
 		for(Pregled p : pregledi) {
-			if(p.getLekar().getId() == lekar.getId()) {
+			if(p.getLekar().getId() == lekar.getId() && p.getZavrsen() == false) {
 				pregleddto.add(new PregledDTO(p));
 			}
 		}
@@ -347,6 +348,27 @@ public class LekarController {
 		return new ResponseEntity<>(pregleddto, HttpStatus.OK);
 	}
 
+	
+	
+	@GetMapping(value = "/operacijeLekar/{id}")
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> getOperacije(@PathVariable String id) {
+
+		Long idLong = Long.parseLong(id);
+		Lekar lekar = lekarService.findOne(idLong);
+		List<OperacijaDTO> operacijeDTO = new ArrayList<>();
+		List<Operacija> operacije = operacijaService.findAll();
+		
+		for(Operacija o : operacije) {
+			if(o.getLekariKlinike().contains(lekar)  && o.getZavrsen() == false) {
+				operacijeDTO.add(new OperacijaDTO(o));
+			}
+		}
+		
+
+		return new ResponseEntity<>(operacijeDTO, HttpStatus.OK);
+	}
+	
 	@GetMapping(value = "/postojeciLekarAdmin/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<LekarDTO> getLekarAdmin(@PathVariable String id) {
@@ -1052,7 +1074,7 @@ public class LekarController {
 			List<PregledDTO> preglediDTO = new ArrayList<>();
 
 			for (Pregled pregledTemp : pregledi) {
-				if (pregledTemp.getLekar().getId() == idLekar) {
+				if (pregledTemp.getLekar().getId() == idLekar && pregledTemp.getZavrsen() == false) {
 					preglediDTO.add(new PregledDTO(pregledTemp));
 				}
 			}
@@ -1061,6 +1083,37 @@ public class LekarController {
 			
 		}else {
 			return new ResponseEntity<>("Ne mozete otkazati pregled, izvrsava se za manje od 24h", HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
+	@PostMapping(value = "/otkaziOperacijuLekar/{idOperacije}/{idLekar}")
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> otkaziOperacijuPacijent(@PathVariable Long idOperacije,@PathVariable Long idLekar)
+			throws ParseException {
+		Operacija operacija = operacijaService.findOne(idOperacije);
+		Lekar lekar = lekarService.findOne(idLekar);
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		Date vremePregleda = formatter.parse(operacija.getDatum() + " " + operacija.getVreme());
+		Date vremeTrenutno = new Date();
+
+		if (Math.abs((vremePregleda.getTime() - vremeTrenutno.getTime()) / 1000 / 60 / 60) > 23 && operacija.getZavrsen() == false
+				) {
+			operacijaService.izbrisiOperaciju(operacija);
+			
+			List<Operacija> operacije = operacijaService.findAll();
+			List<OperacijaDTO> operacijaDTO = new ArrayList<>();
+
+			for (Operacija operacijaTemp : operacije) {
+				if (operacijaTemp.getLekariKlinike().contains(lekar) && operacijaTemp.getZavrsen() == false) {
+					operacijaDTO.add(new OperacijaDTO(operacijaTemp));
+				}
+			}
+
+			return new ResponseEntity<>(operacijaDTO, HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<>("Ne mozete otkazati operaciju, izvrsava se za manje od 24h", HttpStatus.BAD_REQUEST);
 		}
 	}
 

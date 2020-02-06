@@ -41,7 +41,9 @@ public class PregledService {
 	public PregledDTO dodajPregled(PregledDTO pregledDTO) {
 		Pregled pregled = new Pregled();
 
-		pregled.setDatum(pregledDTO.getDatum());
+		String[] yyyymmdd = pregledDTO.getDatum().split("-");
+		String datum = yyyymmdd[2] + "/" + yyyymmdd[1] + "/" + yyyymmdd[0];
+		pregled.setDatum(datum);
 		pregled.setVreme(pregledDTO.getVreme());
 		Double cenaP = Double.parseDouble(pregledDTO.getTipPregleda().getCena());
 		pregled.setCena(cenaP);
@@ -91,8 +93,13 @@ public class PregledService {
 
 		Zahtev zahtev = new Zahtev();
 
+		System.out.println(zahtevDTO.getDatum());
+		String datum = zahtevDTO.getDatum();
 		String[] yyyymmdd = zahtevDTO.getDatum().split("-");
-		String datum = yyyymmdd[2] + "/" + yyyymmdd[1] + "/" + yyyymmdd[0];
+		if (yyyymmdd.length != 1) {
+			datum = yyyymmdd[2] + "/" + yyyymmdd[1] + "/" + yyyymmdd[0];
+		}
+		
 		zahtev.setLekar(lekarRepository.findById(zahtevDTO.getLekar().getId()).orElse(null));
 		zahtev.setIdPacijenta(zahtevDTO.getIdPacijenta());
 		zahtev.setCena(zahtevDTO.getCena());
