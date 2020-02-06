@@ -74,6 +74,7 @@ public class LekarController {
 	@Autowired
 	private OperacijaService operacijaService;
 
+
 	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('LEKAR')")
 	public ResponseEntity<?> izmeniGenerickuSifru(@RequestBody SifraDTO sifra, @PathVariable Long id) {
@@ -668,7 +669,7 @@ public class LekarController {
 	
 	@GetMapping(value = "/moguciLekariZaOperaciju/{id}/{idOperacije}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<List<LekarDTO>> getMoguciLekariZaOperaciju(@PathVariable String id,@PathVariable String idOperacije) {
+	public ResponseEntity<List<LekarDTO>> getMoguciLekariZaOperaciju(@PathVariable String id,@PathVariable String idOperacije) throws ParseException {
 		
 		List<Lekar> lekar = lekarService.findAll();
 		Long idd = Long.parseLong(idOperacije);
@@ -711,7 +712,9 @@ public class LekarController {
 			 }
 		}
 		
-		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String[] yyyymmdd = datumStr.split("/");
+		Date datumPregledaDate = sdf.parse(yyyymmdd[2]+"-"+yyyymmdd[1]+"-"+yyyymmdd[0]);
 		
 		for (Lekar le : lekar) {
 			String[] radnoOd = le.getRadnoOd().split(":");
@@ -724,10 +727,14 @@ public class LekarController {
 			double minDo = Double.parseDouble(radnoDo[1]);
 			double minutiRadnoDo = satDo*60 + minDo;
 			
-			
-			
-			
-			
+			List<Godisnji> godisnji = godisnjiService.getGodisnjiOdLekara(le.getId());
+			for (Godisnji godisnjiOdmor : godisnji) {
+		        Date datumOd = sdf.parse(godisnjiOdmor.getDatumOd());
+		        Date datumDo = sdf.parse(godisnjiOdmor.getDatumDo());
+		        if (datumPregledaDate.compareTo(datumOd) >= 0 && datumPregledaDate.compareTo(datumDo) <= 0) {
+		        	flag = true;
+				}
+			}
 			
 			 if(le.getKlinika().getId() == adm.getKlinika().getId() && le.getTipPregleda() == zahtev.getTipPregleda()) {
 				 if(minutiPocetak < minutiRadnoOd || minutiKraj > minutiRadnoDo)
