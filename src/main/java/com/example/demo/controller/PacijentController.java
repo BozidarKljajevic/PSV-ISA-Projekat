@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.PorukaDTO;
 import com.example.demo.dto.SifraDTO;
@@ -40,6 +44,9 @@ public class PacijentController {
 	
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
 	@GetMapping(value = "/preuzmi/{id}")
 	//@PreAuthorize("hasAuthority('PACIJENT')")
@@ -145,6 +152,30 @@ public class PacijentController {
 		} else {
 			
 			return new ResponseEntity<>(pacijentiDTO,HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@PostMapping(value = "/promeniSifruPacijent/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> promeniSifruPacijenta(@PathVariable Long id, @RequestBody IzmenaSifreDTO sifra)
+	{
+		Pacijent pacijent = pacijentService.findOne(id);
+		
+		final Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(pacijent.getMail(),
+						sifra.getStara()));
+		
+		User user = (User) authentication.getPrincipal();
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+		
+		boolean success = pacijentService.izmeniSifru(pacijent, sifra);
+		
+		if (success) {
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
 	}
 }
