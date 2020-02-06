@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.ValidationException;
@@ -26,6 +29,7 @@ import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
+import com.example.demo.model.Godisnji;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.Operacija;
@@ -34,6 +38,7 @@ import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
 import com.example.demo.service.OperacijaService;
@@ -62,6 +67,9 @@ public class LekarController {
 	
 	@Autowired
 	private OperacijaService operacijaService;
+	
+	@Autowired
+	private GodisnjiService godisnjiService;
 
 	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('LEKAR')")
@@ -595,7 +603,7 @@ public class LekarController {
 	
 	@GetMapping(value = "/moguciLekariZaOperaciju/{id}/{idOperacije}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<List<LekarDTO>> getMoguciLekariZaOperaciju(@PathVariable String id,@PathVariable String idOperacije) {
+	public ResponseEntity<List<LekarDTO>> getMoguciLekariZaOperaciju(@PathVariable String id,@PathVariable String idOperacije) throws ParseException {
 		
 		List<Lekar> lekar = lekarService.findAll();
 		Long idd = Long.parseLong(idOperacije);
@@ -638,7 +646,9 @@ public class LekarController {
 			 }
 		}
 		
-		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String[] yyyymmdd = datumStr.split("/");
+		Date datumPregledaDate = sdf.parse(yyyymmdd[2]+"-"+yyyymmdd[1]+"-"+yyyymmdd[0]);
 		
 		for (Lekar le : lekar) {
 			String[] radnoOd = le.getRadnoOd().split(":");
@@ -651,10 +661,14 @@ public class LekarController {
 			double minDo = Double.parseDouble(radnoDo[1]);
 			double minutiRadnoDo = satDo*60 + minDo;
 			
-			
-			
-			
-			
+			List<Godisnji> godisnji = godisnjiService.getGodisnjiOdLekara(le.getId());
+			for (Godisnji godisnjiOdmor : godisnji) {
+		        Date datumOd = sdf.parse(godisnjiOdmor.getDatumOd());
+		        Date datumDo = sdf.parse(godisnjiOdmor.getDatumDo());
+		        if (datumPregledaDate.compareTo(datumOd) >= 0 && datumPregledaDate.compareTo(datumDo) <= 0) {
+		        	flag = true;
+				}
+			}
 			
 			 if(le.getKlinika().getId() == adm.getKlinika().getId() && le.getTipPregleda() == zahtev.getTipPregleda()) {
 				 if(minutiPocetak < minutiRadnoOd || minutiKraj > minutiRadnoDo)

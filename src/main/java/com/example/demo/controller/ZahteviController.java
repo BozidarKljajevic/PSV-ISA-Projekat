@@ -282,17 +282,18 @@ public class ZahteviController {
 	}
 	
 
-	@GetMapping(value = "/zahteviZaOperacije")
-	public ResponseEntity<List<ZahtevDTO>> getZakazaneOperacije() {
+	@GetMapping(value = "/zahteviZaOperacije/{id}")
+	public ResponseEntity<List<ZahtevDTO>> getZakazaneOperacije(@PathVariable Long id) {
 
 		List<Zahtev> zahtevi = zahteviService.findAll();
 		List<ZahtevDTO> zahtevDTO = new ArrayList<>();
 
+		AdminKlinike admin = adminKlinikeService.findOne(id);
 		List<SalaKlinike> sale= salaKlinikeService.findAll();
 		List<TipPregleda> tipovi= tipPregledaService.findAll();
 		
 		for (Zahtev zahtev : zahtevi) {
-			if (zahtev.isIzbor() == false && zahtev.getSala() == null) {
+			if (zahtev.isIzbor() == false && zahtev.getSala() == null && admin.getKlinika() == zahtev.getLekar().getKlinika()) {
 				//zahtev.setSala(sale.get(0));
 				//zahtev.setTipPregleda(tipovi.get(0));
 				zahtevDTO.add(new ZahtevDTO(zahtev));

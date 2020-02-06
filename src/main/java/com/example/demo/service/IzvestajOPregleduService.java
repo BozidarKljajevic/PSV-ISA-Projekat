@@ -3,9 +3,13 @@ package com.example.demo.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+import javax.validation.ValidationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.IzvestajOPregleduDTO;
 import com.example.demo.dto.LekDTO;
 import com.example.demo.model.Bolesti;
 import com.example.demo.model.IzvestajOPregledu;
@@ -16,6 +20,7 @@ import com.example.demo.model.Operacija;
 import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.Recept;
+import com.example.demo.model.SalaKlinike;
 import com.example.demo.repository.BolestiRepository;
 import com.example.demo.repository.IzvestajOPregleduRepository;
 import com.example.demo.repository.KartonRepository;
@@ -70,6 +75,23 @@ public class IzvestajOPregleduService {
 	public List<IzvestajOPregledu> getIzvestajeKartona(Long id) {
 		
 		return izvestajRepository.findByKartonId(id);
+	}
+
+	public void izmeniIzvestaj(IzvestajOPregleduDTO izvestajDTO) {
+		IzvestajOPregledu izvestaj = izvestajRepository.findById(izvestajDTO.getId()).orElse(null);
+		
+		if(izvestaj == null) {
+			throw new ValidationException("Izvestaj sa zadatim id-jem ne postoji");
+		}
+		try {
+			izvestaj = izvestajRepository.getOne(izvestajDTO.getId());
+			Bolesti bolest = bolestiRepository.getOne(izvestajDTO.getBolest().getSifra());
+			izvestaj.setBolest(bolest);
+			izvestajRepository.save(izvestaj);
+		} catch (EntityNotFoundException e) {
+			throw new ValidationException("Izvestaj sa tim idijem ne postoji");
+		}
+		
 	}
 	
 	

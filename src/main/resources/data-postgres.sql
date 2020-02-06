@@ -69,6 +69,9 @@ INSERT INTO public.pregledi(
 	VALUES (nextval('pregled_id_seq'), 2000, '30/01/2020', null, 1.5, '13:00', false, 8, 1, 1);
 INSERT INTO public.pregledi(
 	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
+	VALUES (nextval('pregled_id_seq'),5000, '10/05/2020', null, 1.5, '15:00', false, 8, 1, 1);
+INSERT INTO public.pregledi(
+	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
 	VALUES (nextval('pregled_id_seq'), 5000, '21/12/2019', null, 0.5, '13:00', false, 9, 2, 2);
 
 INSERT INTO public.operacija(
@@ -111,7 +114,26 @@ INSERT INTO public.karton(
 	id, datum_rodjenja, dioptrija, krvna_grupa, pol, tezina, visina, pacijent_id)
 	VALUES (nextval('karton_id_seq'), '22/08/1997', 0.5, 'A+', 'Muski', 80.5, 187, 2);
 	
+INSERT INTO public.lek(
+	sifra, naziv)
+	VALUES (11, 'Andol');
+	
+INSERT INTO public.lek(
+	sifra, naziv)
+	VALUES (22, 'Paracetamol');
+	
+INSERT INTO public.bolesti(
+	sifra, naziv)
+	VALUES (1, 'Sida');
 
+INSERT INTO public.lekar(
+	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, ocena, radno_do, radno_od, klinika_id, tip_pregleda_id, promenjena_sifra)
+	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Marko', 'lekarneki@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '16:00', '13:00', 1, 1, true);
+
+INSERT INTO public.pregledi(
+	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
+	VALUES (nextval('pregled_id_seq'),7000, '11/03/2020', null, 1.5, '14:00', false, 13, 1, 1);
+	
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (3, 1);
@@ -124,4 +146,4 @@ INSERT INTO public.user_authority(user_id, authority_id)VALUES (9, 2);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (10, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (11, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (12, 5);
-INSERT INTO public.user_authority(user_id, authority_id)VALUES (13, 3);
+INSERT INTO public.user_authority(user_id, authority_id)VALUES (13, 2);
