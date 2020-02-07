@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.DogadjajDTO;
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.OperacijaDTO;
@@ -40,7 +45,9 @@ import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
+import com.example.demo.repository.AuthorityRepository;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.EmailService;
 import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
@@ -73,8 +80,16 @@ public class LekarController {
 	
 	@Autowired
 	private OperacijaService operacijaService;
+	
+	@Autowired
+	private EmailService emailService;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
 
-
+	
+	
 	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('LEKAR')")
 	public ResponseEntity<?> izmeniGenerickuSifru(@RequestBody SifraDTO sifra, @PathVariable Long id) {
@@ -1134,4 +1149,30 @@ public class LekarController {
 		return new ResponseEntity<>(lekarDTO ,HttpStatus.OK);
 
 	}
+	
+	@PostMapping(value = "/promeniSifruLekar/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> promeniSifruAdmin(@PathVariable Long id, @RequestBody IzmenaSifreDTO sifra)
+	{
+		Lekar lekar = lekarService.findOne(id);
+		
+		final Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(lekar.getMail(),
+						sifra.getStara()));
+		
+		User user = (User) authentication.getPrincipal();
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+		
+		boolean success = lekarService.izmeniSifru(lekar, sifra);
+		
+		if (success) {
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
 }
