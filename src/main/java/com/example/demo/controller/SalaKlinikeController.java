@@ -189,7 +189,7 @@ public class SalaKlinikeController {
 				
 				String start = datumStr+ ' ' +preg.getVreme();
 				String end = datumStr +' '+ krajPregledaSat+":"+minStr;
-				datumi.add(new DogadjajDTO(start, end, "", preg.getId()));
+				datumi.add(new DogadjajDTO(start, end, "", preg.getId(), preg.getIdPacijenta()));
 			}
 		};
 		
@@ -224,7 +224,7 @@ public class SalaKlinikeController {
 				
 				String start = datumStr+ ' ' +preg.getVreme();
 				String end = datumStr +' '+ krajPregledaSat+":"+minStr;
-				datumi.add(new DogadjajDTO(start, end,"",(long) -1));
+				datumi.add(new DogadjajDTO(start, end,"",(long) -1, (long) -1));
 			}
 		};
 		

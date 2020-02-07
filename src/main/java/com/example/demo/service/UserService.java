@@ -31,4 +31,14 @@ public class UserService {
 		
 		this.userRepository.save(user);
 	}
+
+	public void aktiviran(User user) {
+		User user1 = userRepository.findById(user.getId()).orElse(null);
+		
+		user1 = userRepository.getOne(user.getId());
+		user1.setEnabled(true);
+		userRepository.save(user1);
+	}
+	
+	
 }

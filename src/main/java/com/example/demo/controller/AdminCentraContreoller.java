@@ -63,11 +63,13 @@ public class AdminCentraContreoller {
 	public ResponseEntity<?> aktivirajPacijenta(@PathVariable Long id) throws MailException, InterruptedException {
 		
 		User user = userService.findOne(id);
+
 		
 		if (user == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
+		userService.aktiviran(user);
 
 		emailService.sendNotificaitionAsync(user, "Kliknite na link kako bi aktivirali nalog --> http://localhost:8081/#/aktivacijaPacijenta/"+user.getId());
 		
