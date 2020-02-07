@@ -196,7 +196,7 @@ public class ZahteviController {
 		
 				String message = "Dobili ste salu, da li vam odgovara ovaj termin i ovaj lekar, ako da odgovorite ? "
 						+"lekar: "+ zahtevDTO.getLekar().getIme() + " datum: " + zahtevDTO.getDatum() + " vreme: " + zahtevDTO.getVreme()
-						+ " link: localhost:8081/#/potvrdaZahteva/" + zahtevDTO.getId();
+						+ " link:  http://localhost:8081/#/potvrdaZahteva/" + zahtevDTO.getId();
 				emailService.sendNotificaitionAsync((User) pacijent, message);
 				
 				String message2 = "Dobili ste salu, da li vam odgovara ovaj termin, ako da odgovorite ? "

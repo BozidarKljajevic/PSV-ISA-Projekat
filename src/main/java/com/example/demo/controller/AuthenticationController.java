@@ -106,10 +106,12 @@ public class AuthenticationController {
 		Long id = Long.parseLong(code);
 		Pacijent exisPacijent = this.pacijentService.findOne(id);
 		if (exisPacijent == null) {
-			throw new Exception("Alredy exist");
+			throw new Exception("Don't exist");
 		}
-
-		this.pacijentService.aktivirajPacijenta(exisPacijent);
+		
+		if (exisPacijent.isEnabled() == false) {
+			this.pacijentService.aktivirajPacijenta(exisPacijent);
+		}
 
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
