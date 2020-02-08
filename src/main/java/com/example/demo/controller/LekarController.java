@@ -429,6 +429,12 @@ public class LekarController {
 			}
 			
 			if (flag == false) {
+				List<Godisnji> godisnji = godisnjiService.findAll();
+				for(Godisnji g : godisnji) {
+					if(g.getLekar().getId() == id) {
+						godisnjiService.remove(g);
+					}
+				}
 				lekarService.remove(id);
 			}
 

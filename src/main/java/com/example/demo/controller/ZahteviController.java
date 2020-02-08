@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import com.example.demo.dto.SalaKlinikeDTO;
 import com.example.demo.dto.ZahtevDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pacijent;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +43,7 @@ import com.example.demo.model.SalaKlinike;
 import com.example.demo.model.TipPregleda;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
+import com.example.demo.repository.ZahteviRepository;
 import com.example.demo.service.AdminKlinikeService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.LekarService;
@@ -69,6 +72,9 @@ public class ZahteviController {
 	
 	@Autowired
 	private LekarService lekarService;
+	
+	@Autowired
+	private ZahteviRepository zahteviRepository;
 	
 	@Autowired
 	private EmailService emailService;
@@ -316,4 +322,117 @@ public class ZahteviController {
 
 		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
 	}
+	
+	@Scheduled(cron = "5 24 * * * ?")
+	public void sistemskoPregled() {
+		System.out.println("heloo");
+		List<Zahtev> zahtevi = zahteviService.findAll();
+		List<SalaKlinike> sale = salaKlinikeService.findAll();
+		List<SalaKlinikeDTO> salaDTO = new ArrayList<>();
+		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
+		boolean exist = false;
+		Boolean slZahtev = false;
+		for(Zahtev z : zahtevi) {
+			slZahtev = false;
+			System.out.println("sledeci zahtev" + slZahtev);
+			for (SalaKlinike s : sale) {
+				if(z.getLekar().getKlinika().getId() == s.getKlinika().getId()) {
+					salaDTO.add(new SalaKlinikeDTO(s));
+				}
+			}
+			if(z.getSala() == null) {
+				int vreme = Integer.parseInt(z.getVreme().split(":")[0]) * 60 + Integer.parseInt(z.getVreme().split(":")[1]);
+				double trajanje = z.getTrajanjePregleda() * 60;
+
+				String[] yyyymmdd = z.getDatum().split("-");
+				String datum = z.getDatum();
+				for (int i = vreme; i < 1440 ; i += 30) {
+					for(SalaKlinikeDTO s : salaDTO) {
+						
+						if(slZahtev == false) {
+							exist = false;
+					System.out.println("ovo je vreme" + i);
+					
+					
+					for (Pregled p : pregledi) {
+						if (datum.equals(p.getDatum()) && z.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId() && p.getSala().getId() == s.getId()) {
+							System.out.println(datum);
+							System.out.println(p.getDatum());
+							int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
+									+ Integer.parseInt(p.getVreme().split(":")[1]);
+							int pregledDo = (int) (pregledOd + p.getTrajanjePregleda() * 60);
+							if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+							 {
+								System.out.println(exist);
+								exist = true;
+								break;
+							}
+						}
+					}
+					
+					
+					
+					for (Zahtev p : zahtevi) {
+						if(p.getSala() != null) {
+						if (datum.equals(p.getDatum()) && z.getId() != p.getId() && z.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId() && p.getSala().getId() == s.getId()) {
+							System.out.println(datum);
+							System.out.println(p.getDatum());
+							int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
+									+ Integer.parseInt(p.getVreme().split(":")[1]);
+							int pregledDo = (int) (pregledOd + p.getTrajanjePregleda() * 60);
+							if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+							 {
+								System.out.println(exist);
+								exist = true;
+								break;
+							}
+					}
+				}
+			}
+					
+					
+					
+					for (Operacija o : operacije) {
+						if (datum.equals(o.getDatum()) && z.getLekar().getKlinika().getId() == o.getLekariKlinike().get(0).getKlinika().getId() && o.getSala().getId() == s.getId()) {
+							System.out.println(datum);
+							System.out.println(o.getDatum());
+							int pregledOd = Integer.parseInt(o.getVreme().split(":")[0]) * 60
+									+ Integer.parseInt(o.getVreme().split(":")[1]);
+							int pregledDo = (int) (pregledOd + o.getTrajanjeOperacije() * 60);
+							if(!((i < pregledOd && i+trajanje <= pregledOd) || (i >= pregledDo && i+trajanje > pregledDo)))
+							 {
+								System.out.println(exist);
+								exist = true;
+								break;
+							}
+						}
+					}
+					
+					
+					
+					
+					if (!exist) {
+					
+						List<SalaKlinike> sale2 = salaKlinikeService.findAll();
+						for(SalaKlinike sa : sale2) {
+							if( s.getId() == sa.getId()) {
+								z.setSala(sa);
+								zahteviRepository.save(z);
+								System.out.println("dodeljena sala"+ z.getSala().getId());
+								slZahtev = true;
+								
+							}
+						}
+					}
+				}
+				}
+			}
+				
+		}
+			
+			
+		}
+		return;
+	} 
 }

@@ -90,7 +90,7 @@ public class SalaKlinikeController {
 			
 			boolean exist = false;
 			for (Pregled p : pregledi) {
-				if (datum.equals(p.getDatum()) && pregled.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId()) {
+				if (datum.equals(p.getDatum()) && pregled.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId() && p.getSala().getId() == s.getId()) {
 					System.out.println(datum);
 					System.out.println(p.getDatum());
 					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
@@ -110,7 +110,8 @@ public class SalaKlinikeController {
 			}
 			
 			for (Zahtev p : zahtevi) {
-				if (datum.equals(p.getDatum()) && pregled.getId() != p.getId() && pregled.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId()) {
+				if(p.getSala() != null) {
+				if (datum.equals(p.getDatum()) && pregled.getId() != p.getId() && pregled.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId() && p.getSala().getId() == s.getId()) {
 					System.out.println(datum);
 					System.out.println(p.getDatum());
 					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
@@ -123,6 +124,7 @@ public class SalaKlinikeController {
 						break;
 					}
 				}
+				}
 			}
 			
 			if(exist == true) {
@@ -130,7 +132,7 @@ public class SalaKlinikeController {
 			}
 			
 			for (Operacija o : operacije) {
-				if (datum.equals(o.getDatum()) && pregled.getLekar().getKlinika().getId() == o.getLekariKlinike().get(0).getKlinika().getId()) {
+				if (datum.equals(o.getDatum()) && pregled.getLekar().getKlinika().getId() == o.getLekariKlinike().get(0).getKlinika().getId() && o.getSala().getId() == s.getId()) {
 					System.out.println(datum);
 					System.out.println(o.getDatum());
 					int pregledOd = Integer.parseInt(o.getVreme().split(":")[0]) * 60
