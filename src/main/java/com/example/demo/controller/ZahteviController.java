@@ -323,7 +323,7 @@ public class ZahteviController {
 		return new ResponseEntity<>(zahteviDTO, HttpStatus.OK);
 	}
 	
-	@Scheduled(cron = "5 24 * * * ?")
+	@Scheduled(cron = "0 0 0 * * ?")
 	public void sistemskoPregled() {
 		System.out.println("heloo");
 		List<Zahtev> zahtevi = zahteviService.findAll();
