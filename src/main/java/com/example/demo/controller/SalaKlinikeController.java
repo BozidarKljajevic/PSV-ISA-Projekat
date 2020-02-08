@@ -70,16 +70,27 @@ public class SalaKlinikeController {
 		String slobodniTermin = "";
 
 		
-		List<Pregled> pregledi = pregledService.getPregledeOdLekara(pregled.getLekar().getId());
-		List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(pregled.getLekar().getId());
+		//List<Pregled> pregledi = pregledService.getPregledeOdLekara(pregled.getLekar().getId());
+		List<Pregled> pregledi = pregledService.findAll();
+		//List<Zahtev> zahtevi = zahteviService.getZahteveOdLekara(pregled.getLekar().getId());
+		List<Zahtev> zahtevi = zahteviService.findAll();
 		List<Operacija> operacije = operacijaService.findAll();
+		List<SalaKlinike> sale = salaKlinikeService.findAll();
+		List<SalaKlinikeDTO> salaDTO = new ArrayList<>();
+		
+		for (SalaKlinike s : sale) {
+			if(pregled.getLekar().getKlinika().getId() == s.getKlinika().getId()) {
+				salaDTO.add(new SalaKlinikeDTO(s));
+			}
+		}
 		
 		for (int i = vreme; i < 1440 ; i += 30) {
+			for(SalaKlinikeDTO s : salaDTO) {
 			System.out.println("ovo je vreme" + i);
 			
 			boolean exist = false;
 			for (Pregled p : pregledi) {
-				if (datum.equals(p.getDatum())) {
+				if (datum.equals(p.getDatum()) && pregled.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId() && p.getSala().getId() == s.getId()) {
 					System.out.println(datum);
 					System.out.println(p.getDatum());
 					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
@@ -94,9 +105,13 @@ public class SalaKlinikeController {
 				}
 			}
 			
+			if(exist == true) {
+				break;
+			}
 			
 			for (Zahtev p : zahtevi) {
-				if (datum.equals(p.getDatum()) && pregled.getId() != p.getId()) {
+				if(p.getSala() != null) {
+				if (datum.equals(p.getDatum()) && pregled.getId() != p.getId() && pregled.getLekar().getKlinika().getId() == p.getLekar().getKlinika().getId() && p.getSala().getId() == s.getId()) {
 					System.out.println(datum);
 					System.out.println(p.getDatum());
 					int pregledOd = Integer.parseInt(p.getVreme().split(":")[0]) * 60
@@ -109,10 +124,15 @@ public class SalaKlinikeController {
 						break;
 					}
 				}
+				}
+			}
+			
+			if(exist == true) {
+				break;
 			}
 			
 			for (Operacija o : operacije) {
-				if (datum.equals(o.getDatum()) && o.getLekariKlinike().contains(pregled.getLekar())) {
+				if (datum.equals(o.getDatum()) && pregled.getLekar().getKlinika().getId() == o.getLekariKlinike().get(0).getKlinika().getId() && o.getSala().getId() == s.getId()) {
 					System.out.println(datum);
 					System.out.println(o.getDatum());
 					int pregledOd = Integer.parseInt(o.getVreme().split(":")[0]) * 60
@@ -128,11 +148,11 @@ public class SalaKlinikeController {
 			}
 			
 			
-		
+			
 			
 			if (!exist) {
 				int terminOd = i;
-			
+			    
 				System.out.println("usao u exist" + terminOd);
 
 				String terminOdStr = (terminOd / 60) + ":"
@@ -142,6 +162,7 @@ public class SalaKlinikeController {
 				slobodniTermin = terminOdStr;
 				return new ResponseEntity<>(slobodniTermin, HttpStatus.OK);
 			}
+		}
 		}
 
 		return new ResponseEntity<>(slobodniTermin, HttpStatus.INTERNAL_SERVER_ERROR);
