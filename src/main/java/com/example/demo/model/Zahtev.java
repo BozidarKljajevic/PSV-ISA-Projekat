@@ -155,4 +155,17 @@ public class Zahtev{
 	public void setTrajanjePregleda(Double trajanjePregleda) {
 		this.trajanjePregleda = trajanjePregleda;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		Zahtev zahtev = (Zahtev) obj;
+		if(zahtev.getId()==this.id) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	
 }

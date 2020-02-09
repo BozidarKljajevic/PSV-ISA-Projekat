@@ -27,18 +27,26 @@ import com.example.demo.repository.ZahteviRepository;
 @Service
 public class ZahteviService {
 
-	@Autowired
-	private ZahteviRepository zahteviRepository;
 	
-	@Autowired
-	private SalaKlinikeRepository salaKlinikeRepository;
+	private final ZahteviRepository zahteviRepository;
 	
-	@Autowired
-	private TipPregledaRepository tipPregledaRepository;
+	private final SalaKlinikeRepository salaKlinikeRepository;
 	
-	@Autowired
-	private OperacijRepository operacijaRepository;
+	private final TipPregledaRepository tipPregledaRepository;
 	
+	private final OperacijRepository operacijaRepository;
+	
+	
+	
+	public ZahteviService(ZahteviRepository zahteviRepository, SalaKlinikeRepository salaKlinikeRepository,
+			TipPregledaRepository tipPregledaRepository, OperacijRepository operacijaRepository) {
+		super();
+		this.zahteviRepository = zahteviRepository;
+		this.salaKlinikeRepository = salaKlinikeRepository;
+		this.tipPregledaRepository = tipPregledaRepository;
+		this.operacijaRepository = operacijaRepository;
+	}
+
 	public List<Zahtev> findAll() {
 		return zahteviRepository.findAll();
 	}
