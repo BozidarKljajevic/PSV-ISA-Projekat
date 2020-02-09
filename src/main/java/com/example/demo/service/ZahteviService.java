@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
@@ -10,9 +11,14 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.SalaKlinikeDTO;
 import com.example.demo.dto.ZahtevDTO;
+import com.example.demo.model.Lekar;
+import com.example.demo.model.Operacija;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.SalaKlinike;
 import com.example.demo.model.Zahtev;
+import com.example.demo.repository.OperacijRepository;
+import com.example.demo.repository.SalaKlinikeRepository;
+import com.example.demo.repository.TipPregledaRepository;
 import com.example.demo.repository.ZahteviRepository;
 
 
@@ -23,6 +29,15 @@ public class ZahteviService {
 
 	@Autowired
 	private ZahteviRepository zahteviRepository;
+	
+	@Autowired
+	private SalaKlinikeRepository salaKlinikeRepository;
+	
+	@Autowired
+	private TipPregledaRepository tipPregledaRepository;
+	
+	@Autowired
+	private OperacijRepository operacijaRepository;
 	
 	public List<Zahtev> findAll() {
 		return zahteviRepository.findAll();
@@ -59,6 +74,29 @@ public class ZahteviService {
 
 	public void remove(Long id) {
 		zahteviRepository.deleteById(id);
+		
+	}
+
+	public void premestiUOperacije(Zahtev z) {
+		
+		Operacija operacija = new Operacija();
+		operacija.setDatum(z.getDatum());
+		operacija.setVreme(z.getVreme());
+		operacija.setCena(z.getCena());
+		
+		operacija.setSala(salaKlinikeRepository.getOne(z.getSala().getId()));
+		operacija.setTrajanjeOperacije(z.getTrajanjePregleda());
+		operacija.setIdPacijenta(z.getIdPacijenta());
+		operacija.setTipOperacije(tipPregledaRepository.getOne(z.getTipPregleda().getId()));
+		operacija.setZavrsen(false);
+		List<Lekar> lekariKlinike = new ArrayList<>();
+		lekariKlinike.add(z.getLekar());
+		
+		operacija.setLekariKlinike(lekariKlinike);
+		
+		operacijaRepository.save(operacija);
+		
+		
 		
 	}
 }
