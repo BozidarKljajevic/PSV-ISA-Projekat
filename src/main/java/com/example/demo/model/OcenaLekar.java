@@ -14,8 +14,8 @@ import javax.persistence.SequenceGenerator;
 public class OcenaLekar {
 
 	@Id
-	@SequenceGenerator(name = "ocenaLekar_id_seq", sequenceName = "ocenaLekar_id_seq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ocenaLekar_id_seq")
+	@SequenceGenerator(name = "ocenalekar_id_seq", sequenceName = "ocenalekar_id_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ocenalekar_id_seq")
 	private Long id;
 	
 	@ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)

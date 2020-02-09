@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,104 +80,52 @@ public class GodisnjiController {
 	
 	@PostMapping(value = "/zahtevGodisnjiLekar/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('LEKAR')")
-	public ResponseEntity<?> dodajZahtevZaGodisnji(@RequestBody GodisnjiDTO godisnjiDTO,@PathVariable Long id) {
+	public ResponseEntity<?> dodajZahtevZaGodisnji(@RequestBody GodisnjiDTO godisnjiDTO,@PathVariable Long id) throws ParseException {
 		
-		GodisnjiDTO godisnjiDTO2 = new GodisnjiDTO();
 		Lekar lekar = lekarService.findOne(id);
-		String datumOd[] = godisnjiDTO.getDatumOd().split("-");
-		String datumDo[] = godisnjiDTO.getDatumDo().split("-");
-		int danOd =  Integer.parseInt(datumOd[2]);
-		int mesecOd = Integer.parseInt(datumOd[1]);
-		int godinaOd = Integer.parseInt(datumOd[0]);
-		System.out.println(danOd);
-		System.out.println(mesecOd);
-		System.out.println(godinaOd);
+		
 		boolean flag = false;
-		int danDo =  Integer.parseInt(datumDo[2]);
-		int mesecDo = Integer.parseInt(datumDo[1]);
-		int godinaDo = Integer.parseInt(datumDo[0]);
-		System.out.println(danDo);
-		System.out.println(mesecDo);
-		System.out.println(godinaDo);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date datumOdDate = sdf.parse(godisnjiDTO.getDatumOd());
+		Date datumDoDate = sdf.parse(godisnjiDTO.getDatumDo());
+
 		List<Pregled> pregledi = pregledService.findAll();
 		List<Operacija> operacije = operacijaService.findAll();
 		List<Zahtev> zahtevi = zahteviService.findAll();
-		String pregledDatum[];
-		String zahtevDatum[];
-		for (Pregled p : pregledi) {
-			pregledDatum = p.getDatum().split("/");
-			int pregledDan = Integer.parseInt(pregledDatum[0]);
-			int pregledMesec = Integer.parseInt(pregledDatum[1]);
-			int pregledGodina = Integer.parseInt(pregledDatum[2]);
-			if(lekar.getId() == p.getLekar().getId() && pregledGodina >= godinaOd && pregledGodina <= godinaDo) {
-				if(godinaOd != godinaDo && pregledGodina == godinaDo && pregledMesec <= mesecDo) {
-					if(pregledMesec == mesecDo && pregledDan <= danDo) {
-						flag = true;
-					} 
-					if(pregledMesec < mesecDo) {
-						flag = true;
-					}
-				}
-				else if(godinaOd != godinaDo && pregledGodina == godinaOd && pregledMesec >= mesecOd && pregledDan >= danOd) {
-					if(pregledMesec == mesecOd && pregledDan >= danDo) {
-						flag = true;
-					} 
-					if(pregledMesec > mesecOd) {
-						flag = true;
-					}
-					
-				}
-				else if(godinaOd == godinaDo && pregledMesec >= mesecOd && pregledMesec <= mesecDo) {
-					 if(mesecDo != mesecOd && pregledMesec == mesecDo && pregledDan <= danDo) {
-						 flag = true;
-					 }
-					 else if(mesecDo != mesecOd && pregledMesec == mesecOd && pregledDan >= danOd) {
-						 flag = true;
-						 
-					 }
-					 else if(mesecDo == mesecOd && pregledDan >= danOd && pregledDan <= danDo) {
-						 flag = true;
-						 
-					 }
+		
+		for (Pregled pregled : pregledi) {
+			String[] datumPregleda = pregled.getDatum().split("/");
+			String datum = datumPregleda[2]+"-"+datumPregleda[1]+"-"+datumPregleda[0];
+			Date datumPregledaDate = sdf.parse(datum);
+			if (lekar.getId() == pregled.getLekar().getId() && pregled.getZavrsen() == false) {
+				if (datumPregledaDate.compareTo(datumOdDate) >= 0 && datumPregledaDate.compareTo(datumDoDate) <= 0) {
+					flag = true;
+					break;
 				}
 			}
 		}
 		
-		for (Operacija o : operacije) {
-			pregledDatum = o.getDatum().split("/");
-			int pregledDan = Integer.parseInt(pregledDatum[0]);
-			int pregledMesec = Integer.parseInt(pregledDatum[1]);
-			int pregledGodina = Integer.parseInt(pregledDatum[2]);
-			if(o.getLekariKlinike().contains(lekar) && pregledGodina >= godinaOd && pregledGodina <= godinaDo) {
-				if(godinaOd != godinaDo && pregledGodina == godinaDo && pregledMesec <= mesecDo) {
-					if(pregledMesec == mesecDo && pregledDan <= danDo) {
-						flag = true;
-					} 
-					if(pregledMesec < mesecDo) {
-						flag = true;
-					}
+		for (Operacija operacija : operacije) {
+			String[] datumPregleda = operacija.getDatum().split("/");
+			String datum = datumPregleda[2]+"-"+datumPregleda[1]+"-"+datumPregleda[0];
+			Date datumPregledaDate = sdf.parse(datum);
+			if (lekar.getId() == operacija.getLekariKlinike().get(0).getId() && operacija.getZavrsen() == false) {
+				if (datumPregledaDate.compareTo(datumOdDate) >= 0 && datumPregledaDate.compareTo(datumDoDate) <= 0) {
+					flag = true;
+					break;
 				}
-				else if(godinaOd != godinaDo && pregledGodina == godinaOd && pregledMesec >= mesecOd && pregledDan >= danOd) {
-					if(pregledMesec == mesecOd && pregledDan >= danDo) {
-						flag = true;
-					} 
-					if(pregledMesec > mesecOd) {
-						flag = true;
-					}
-					
-				}
-				else if(godinaOd == godinaDo && pregledMesec >= mesecOd && pregledMesec <= mesecDo) {
-					 if(mesecDo != mesecOd && pregledMesec == mesecDo && pregledDan <= danDo) {
-						 flag = true;
-					 }
-					 else if(mesecDo != mesecOd && pregledMesec == mesecOd && pregledDan >= danOd) {
-						 flag = true;
-						 
-					 }
-					 else if(mesecDo == mesecOd && pregledDan >= danOd && pregledDan <= danDo) {
-						 flag = true;
-						 
-					 }
+			}
+		}
+		
+		for (Zahtev zahtev : zahtevi) {
+			String[] datumPregleda = zahtev.getDatum().split("/");
+			String datum = datumPregleda[2]+"-"+datumPregleda[1]+"-"+datumPregleda[0];
+			Date datumPregledaDate = sdf.parse(datum);
+			if (lekar.getId() == zahtev.getLekar().getId()) {
+				if (datumPregledaDate.compareTo(datumOdDate) >= 0 && datumPregledaDate.compareTo(datumDoDate) <= 0) {
+					flag = true;
+					break;
 				}
 			}
 		}
@@ -311,7 +262,7 @@ public class GodisnjiController {
 			List<Godisnji> godisnji = godisnjiService.findAll();
 
 			for (Godisnji g : godisnji) {
-				if(god.getLekar() != null && admin.getKlinika() == god.getLekar().getKlinika() && god.getOdobren() == false) {
+				if(g.getLekar() != null && admin.getKlinika() == g.getLekar().getKlinika() && g.getOdobren() == false) {
 					godisnjiDTO.add(new GodisnjiDTO(g));
 					System.out.println(g.getId());
 				}
@@ -338,7 +289,7 @@ public class GodisnjiController {
 			List<Godisnji> godisnji = godisnjiService.findAll();
 
 			for (Godisnji g : godisnji) {
-				if(god.getSestra() != null && admin.getKlinika() == god.getSestra().getKlinika() && god.getOdobren() == false) {
+				if(g.getSestra() != null && admin.getKlinika() == g.getSestra().getKlinika() && g.getOdobren() == false) {
 					godisnjiDTO.add(new GodisnjiDTO(g));
 					System.out.println(g.getId());
 				}
