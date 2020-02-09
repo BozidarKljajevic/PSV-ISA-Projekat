@@ -6,20 +6,30 @@ public class DogadjajDTO {
 	String end;
 	String title;
 	Long idPregleda;
+	Long idPacijenta;
 	
 	
 	public DogadjajDTO() {
 	}
 
-	public DogadjajDTO(String start, String end, String title, Long idPregleda) {
+	public DogadjajDTO(String start, String end, String title, Long idPregleda, Long idPacijenta) {
 		this.start = start;
 		this.end = end;
 		this.title=title;
 		this.idPregleda=idPregleda;
+		this.idPacijenta=idPacijenta;
 	}
 
 	
 	
+	public Long getIdPacijenta() {
+		return idPacijenta;
+	}
+
+	public void setIdPacijenta(Long idPacijenta) {
+		this.idPacijenta = idPacijenta;
+	}
+
 	public String getTitle() {
 		return title;
 	}

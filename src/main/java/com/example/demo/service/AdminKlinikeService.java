@@ -65,6 +65,7 @@ public class AdminKlinikeService {
 	    auths.add(auth);
 		admin.setAuthorities(auths);
 		admin.setIme(adminklinikeDTO.getIme());
+		admin.setEnabled(true);
 		admin.setPrezime(adminklinikeDTO.getPrezime());
 		admin.setMail(adminklinikeDTO.getMail());
 		admin.setAdresa(adminklinikeDTO.getAdresa());
