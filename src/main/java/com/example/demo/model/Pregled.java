@@ -135,4 +135,18 @@ public class Pregled {
 	public void setTrajanjePregleda(Double trajanjePregleda) {
 		this.trajanjePregleda = trajanjePregleda;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Pregled p = (Pregled) obj;
+		if(this.id ==  p.id ) {
+			return true;
+		}
+		else {
+			return false;
+		}
+		
+	}
+	
 }
