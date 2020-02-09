@@ -55,14 +55,14 @@ INSERT INTO public.sala_klinike(
 	VALUES (nextval('salaklinike_id_seq'), 201, 'Sok Soba', 1);
 INSERT INTO public.sala_klinike(
 	id, broj, naziv, klinika_id)
-	VALUES (nextval('salaklinike_id_seq'), 100, '100', 2);
+	VALUES (nextval('salaklinike_id_seq'), 100, 'Sala 1', 1);
 
 INSERT INTO public.lekar(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, ocena, radno_do, radno_od, klinika_id, tip_pregleda_id, promenjena_sifra)
 	VALUES (nextval('users_id_seq'), 'Danila Kisa 5', '+381/65-5504205', 'Srbija', true, 'Novi Sad', 'Damjan', 'lekar@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '16:00', '13:00', 1, 1, true);
 INSERT INTO public.lekar(
 	id, adresa, broj_telefona, drzava, enabled, grad, ime, mail, prezime, sifra, ocena, radno_do, radno_od, klinika_id, tip_pregleda_id, promenjena_sifra)
-	VALUES (nextval('users_id_seq'), 'Janka Veska 12', '+381/65-5504205', 'Srbija', true, 'Beograd', 'Bolo', 'lekar2@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '14:00', '12:00', 2, 2, true);
+	VALUES (nextval('users_id_seq'), 'Janka Veska 12', '+381/65-5504205', 'Srbija', true, 'Beograd', 'Bolo', 'lekar2@gmail.com', 'Banjac', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 1, '14:00', '12:00', 1, 2, true);
 
 
 	
@@ -135,7 +135,14 @@ INSERT INTO public.lekar(
 INSERT INTO public.pregledi(
 	id, cena, datum, id_pacijenta, trajanje_pregleda, vreme, zavrsen, lekar_id, sala_klinike_id, tip_pregleda_id)
 	VALUES (nextval('pregled_id_seq'),7000, '11/03/2020', null, 1.5, '14:00', false, 13, 1, 1);
+
+INSERT INTO public.zahtev(
+	id, cena, datum, id_pacijenta, izbor, trajanje_pregleda, vreme, lekar_id, lekar1_id, lekar2_id, sala_klinike_id, tip_pregleda_id)
+	VALUES (nextval('zahtev_id_seq'), 200,'14/02/2020', 1,true, 1, '13:00', 8, null, null, null, 1);
 	
+INSERT INTO public.zahtev(
+	id, cena, datum, id_pacijenta, izbor, trajanje_pregleda, vreme, lekar_id, lekar1_id, lekar2_id, sala_klinike_id, tip_pregleda_id)
+	VALUES (nextval('zahtev_id_seq'), 200,'14/02/2020', 1,false, 1, '13:00', 9, null, null, null, 1);
 
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (1, 1);
 INSERT INTO public.user_authority(user_id, authority_id)VALUES (2, 1);

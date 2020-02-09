@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.RegisterDTO;
 import com.example.demo.model.AdminKlinike;
@@ -52,6 +53,8 @@ public class LekarService {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	
 
 	
 	public Lekar findOne(Long id) {
@@ -180,4 +183,13 @@ public class LekarService {
 		return null;
 	}
 	
+	public boolean izmeniSifru(Lekar lekar, IzmenaSifreDTO sifra) {
+
+		if (sifra.getNova().equals(sifra.getPotvrda())) {
+			lekar.setSifra(passwordEncoder.encode(sifra.getNova()));
+			lekarRepository.save(lekar);
+			return true;
+		}
+		return false;
+	}
 }
