@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.IzvestajOPregleduDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
@@ -31,6 +35,7 @@ import com.example.demo.model.IzvestajOPregledu;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.MedicinskaSestra;
+import com.example.demo.model.Pacijent;
 import com.example.demo.model.Recept;
 import com.example.demo.model.User;
 import com.example.demo.service.AdminKlinikeService;
@@ -59,6 +64,9 @@ public class MedicinskaSestraController {
 	
 	@Autowired
 	private IzvestajOPregleduService izvestajOPregleduService;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
 	
 	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('MEDICINSKASESTRA')")
@@ -198,6 +206,30 @@ public class MedicinskaSestraController {
 		
 		
 		return new ResponseEntity<>(izvestajDTO, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/promeniSifruSestra/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('MEDICINSKASESTRA')")
+	public ResponseEntity<?> promeniSifruSestre(@PathVariable Long id, @RequestBody IzmenaSifreDTO sifra)
+	{
+		MedicinskaSestra sestra = medicinskaSestraService.findOne(id);
+		
+		final Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(sestra.getMail(),
+						sifra.getStara()));
+		
+		User user = (User) authentication.getPrincipal();
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+		
+		boolean success = medicinskaSestraService.izmeniSifru(sestra, sifra);
+		
+		if (success) {
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 }

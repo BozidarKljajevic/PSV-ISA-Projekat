@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.demo.dto.AdminKlinikeDTO;
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.model.AdminKlinike;
 
 import com.example.demo.model.Authority;
@@ -64,6 +65,7 @@ public class AdminKlinikeService {
 	    auths.add(auth);
 		admin.setAuthorities(auths);
 		admin.setIme(adminklinikeDTO.getIme());
+		admin.setEnabled(true);
 		admin.setPrezime(adminklinikeDTO.getPrezime());
 		admin.setMail(adminklinikeDTO.getMail());
 		admin.setAdresa(adminklinikeDTO.getAdresa());
@@ -98,5 +100,15 @@ public class AdminKlinikeService {
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Admin sa tim idijem nepostoji");
 		}
+	}
+	
+	public boolean izmeniSifru(AdminKlinike admin, IzmenaSifreDTO sifra) {
+
+		if (sifra.getNova().equals(sifra.getPotvrda())) {
+			admin.setSifra(passwordEncoder.encode(sifra.getNova()));
+			adminKlinikeRepository.save(admin);
+			return true;
+		}
+		return false;
 	}
 }

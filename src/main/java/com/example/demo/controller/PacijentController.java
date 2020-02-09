@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.PorukaDTO;
+import com.example.demo.dto.PregledDTO;
 import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.Lekar;
 import com.example.demo.model.Operacija;
@@ -58,6 +59,39 @@ public class PacijentController {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	
+	@GetMapping(value = "/dozvola/{idPac}/{id}")
+	//@PreAuthorize("hasAuthority('PACIJENT')")
+	public ResponseEntity<?> dozvola(@PathVariable Long idPac,@PathVariable Long id) {
+		
+		
+		Lekar lekar = lekarService.findOne(id);
+		
+		List<Pregled> pregledi = pregledService.findAll();
+		
+		List<Operacija> operacije = operacijaService.findAll();
+		
+        Boolean prikazi = false;
+		for (Pregled pregled : pregledi) {
+			if (pregled.getIdPacijenta() != null && pregled.getLekar().getId() == id
+					&& pregled.getIdPacijenta() == idPac) {
+
+					prikazi = true;
+			}
+		}
+		
+		for (Operacija o : operacije) {
+			if (o.getIdPacijenta() != null && o.getLekariKlinike().contains(lekar)
+					&& o.getIdPacijenta() == idPac ) {
+
+					prikazi = true;
+			}
+		}
+
+		return new ResponseEntity<>(prikazi, HttpStatus.OK);
+	}
+	
+	
 	@GetMapping(value = "/preuzmi/{id}")
 	//@PreAuthorize("hasAuthority('PACIJENT')")
 	public ResponseEntity<?> getPostojeciPacijent(@PathVariable Long id) {
@@ -143,6 +177,7 @@ public class PacijentController {
 	@GetMapping(value = "/pacijentiKlinike/{id}")
 	public ResponseEntity<List<PacijentDTO>> getPacijentiKlinike(@PathVariable Long id) {
 		Lekar lekar = lekarService.findOne(id);
+		Boolean flag = false;
 		List<Pacijent> pacijenti = pacijentService.findAll();
 		List<Pregled> pregledi = pregledService.findAll();
 		List<Operacija> operacije = operacijaService.findAll();
@@ -151,7 +186,16 @@ public class PacijentController {
 		for(Pregled p : pregledi) {
 			if(p.getLekar().getKlinika() == lekar.getKlinika()) {
 				Pacijent pac = pacijentService.findOne(p.getIdPacijenta());
-				pacijentiDTO.add(new PacijentDTO(pac));
+				for(PacijentDTO pacijent : pacijentiDTO) {
+					if(pacijent.getId() == pac.getId()) {
+						flag = true;
+						break;
+					}
+				}
+				if(flag == false) {
+					pacijentiDTO.add(new PacijentDTO(pac));
+				}
+				
 			}
 		}
 		
@@ -160,10 +204,20 @@ public class PacijentController {
 			for(Lekar l : o.getLekariKlinike()) {
 				if(l.getKlinika().getId() == lekar.getKlinika().getId()) {
 					Pacijent pac = pacijentService.findOne(o.getIdPacijenta());
-					pacijentiDTO.add(new PacijentDTO(pac));
+					for(PacijentDTO pacijent : pacijentiDTO) {
+						
+						if(pacijent.getId() == pac.getId()) {
+							flag = true;
+							break;
+						}
+					}
+					if(flag == false) {
+						pacijentiDTO.add(new PacijentDTO(pac));
+					}
+					
 					
 				}
-				break;
+				
 			}
 		}
 		

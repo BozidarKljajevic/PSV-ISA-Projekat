@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.MedicinskaSestraDTO;
 import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Authority;
@@ -101,5 +101,15 @@ public class MedicinskaSestraService {
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Medicinsko osoblje sa tim idijem nepostoji");
 		}
+	}
+
+	public boolean izmeniSifru(MedicinskaSestra sestra, IzmenaSifreDTO sifra) {
+		
+		if (sifra.getNova().equals(sifra.getPotvrda())) {
+			sestra.setSifra(passwordEncoder.encode(sifra.getNova()));
+			medicinskaSestraRepository.save(sestra);
+			return true;
+		}
+		return false;
 	}
 }

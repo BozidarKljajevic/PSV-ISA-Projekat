@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,11 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.AdminKlinike;
+import com.example.demo.model.Pacijent;
 import com.example.demo.model.User;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.EmailService;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -30,6 +36,12 @@ public class AdminKlinikeController {
 
 	@Autowired
 	private AdminKlinikeService adminKlinikeService;
+	
+	@Autowired
+	private EmailService emailService;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
 	
 	@Autowired
 	private UserService userService;
@@ -93,5 +105,29 @@ public class AdminKlinikeController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return new ResponseEntity<>(admindto, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/promeniSifruAdminKlinike/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<?> promeniSifruAdmin(@PathVariable Long id, @RequestBody IzmenaSifreDTO sifra)
+	{
+		AdminKlinike admin = adminKlinikeService.findOne(id);
+		
+		final Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(admin.getMail(),
+						sifra.getStara()));
+		
+		User user = (User) authentication.getPrincipal();
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+		
+		boolean success = adminKlinikeService.izmeniSifru(admin, sifra);
+		
+		if (success) {
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
 	}
 }

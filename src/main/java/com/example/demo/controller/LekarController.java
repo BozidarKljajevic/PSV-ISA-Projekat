@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.DogadjajDTO;
+import com.example.demo.dto.IzmenaSifreDTO;
 import com.example.demo.dto.KlinikaDTO;
 import com.example.demo.dto.LekarDTO;
 import com.example.demo.dto.OperacijaDTO;
@@ -35,15 +40,19 @@ import com.example.demo.model.AdminKlinike;
 import com.example.demo.model.Godisnji;
 import com.example.demo.model.Klinika;
 import com.example.demo.model.Lekar;
+import com.example.demo.model.MedicinskaSestra;
 import com.example.demo.model.Operacija;
 import com.example.demo.model.Pacijent;
 import com.example.demo.model.Pregled;
 import com.example.demo.model.User;
 import com.example.demo.model.Zahtev;
+import com.example.demo.repository.AuthorityRepository;
 import com.example.demo.service.AdminKlinikeService;
+import com.example.demo.service.EmailService;
 import com.example.demo.service.GodisnjiService;
 import com.example.demo.service.KlinikaService;
 import com.example.demo.service.LekarService;
+import com.example.demo.service.MedicinskaSestraService;
 import com.example.demo.service.OperacijaService;
 import com.example.demo.service.PregledService;
 import com.example.demo.service.UserService;
@@ -73,6 +82,15 @@ public class LekarController {
 	
 	@Autowired
 	private OperacijaService operacijaService;
+	
+	@Autowired
+	private EmailService emailService;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private MedicinskaSestraService medicinskaSestraService;
 
 
 	@PostMapping(value = "/izmeniGenerickuSifru/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -136,7 +154,7 @@ public class LekarController {
 
 				String start = datumStr + ' ' + preg.getVreme();
 				String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-				datumi.add(new DogadjajDTO(start, end, "pregled", preg.getId()));
+				datumi.add(new DogadjajDTO(start, end, "pregled", preg.getId(), preg.getIdPacijenta()));
 			}
 		};
 		for (Operacija o : operacije) {
@@ -173,7 +191,7 @@ public class LekarController {
 
 					String start = datumStr + ' ' + o.getVreme();
 					String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-					datumi.add(new DogadjajDTO(start, end, "operacija", o.getId()));
+					datumi.add(new DogadjajDTO(start, end, "operacija", o.getId(), o.getIdPacijenta()));
 				}
 				
 			}
@@ -183,6 +201,95 @@ public class LekarController {
 		return datumi;
 	}
 
+	@GetMapping(value = "/obavezeLekaraKodSestre/{id}")
+	@PreAuthorize("hasAuthority('MEDICINSKASESTRA')")
+	public List<DogadjajDTO> obavezeLekaraKodSestre(@PathVariable String id) {
+
+		Long idLong = Long.parseLong(id);
+		MedicinskaSestra sestra = medicinskaSestraService.findOne(idLong);
+		
+		List<Pregled> pregledi = pregledService.findAll();
+		List<Operacija> operacije = operacijaService.findAll();
+		List<DogadjajDTO> datumi = new ArrayList<>();
+		List<Lekar> lekari = new ArrayList<>();
+
+		for (Pregled preg : pregledi) {
+			if (preg.getLekar().getKlinika().getId() == sestra.getKlinika().getId() && preg.getZavrsen()==false) {
+				String[] datum = preg.getDatum().split("/");
+				String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
+				
+				String[] vr = preg.getVreme().split(":");
+				double sat = Double.parseDouble(vr[0]);
+				double min = Double.parseDouble(vr[1]);
+
+				double trajanjeMin = preg.getTrajanjePregleda() * 60;
+				double trajanjeMinOstatak = trajanjeMin % 60;
+				double trajanjeSat = trajanjeMin / 60;
+				int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak) / 60);
+				double krajPregledaMin = min + trajanjeMinOstatak;
+
+				System.out.println(sat + " " + krajPregledaSat + " " + min + " " + trajanjeMinOstatak);
+
+				String minStr = "";
+				if (krajPregledaMin == 60) {
+					minStr = "00";
+					krajPregledaSat++;
+				}else if (krajPregledaMin == 0)
+				{
+					minStr = "00";
+					krajPregledaSat++;
+				} else {
+					minStr = "30";
+				}
+
+				String start = datumStr + ' ' + preg.getVreme();
+				String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
+				datumi.add(new DogadjajDTO(start, end, "pregled", preg.getId(), preg.getIdPacijenta()));
+			}
+		};
+		for (Operacija o : operacije) {
+			lekari=o.getLekariKlinike();
+			System.out.println(lekari.size());
+			for(int i=0; i<lekari.size(); i++) {
+				if(sestra.getKlinika().getId() == lekari.get(i).getKlinika().getId()) {
+					String[] datum = o.getDatum().split("/");
+					String datumStr = datum[2] + "/" + datum[1] + "/" + datum[0];
+
+					String[] vr = o.getVreme().split(":");
+					double sat = Double.parseDouble(vr[0]);
+					double min = Double.parseDouble(vr[1]);
+
+					double trajanjeMin = o.getTrajanjeOperacije() * 60;
+					double trajanjeMinOstatak = trajanjeMin % 60;
+					double trajanjeSat = trajanjeMin / 60;
+					int krajPregledaSat = (int) (sat + (trajanjeMin - trajanjeMinOstatak) / 60);
+					double krajPregledaMin = min + trajanjeMinOstatak;
+
+					System.out.println(sat + " " + krajPregledaSat + " " + min + " " + trajanjeMinOstatak);
+
+					String minStr = "";
+					if (krajPregledaMin == 60) {
+						minStr = "00";
+						krajPregledaSat++;
+					}else if (krajPregledaMin == 0)
+					{
+						minStr = "00";
+						krajPregledaSat++;
+					} else {
+						minStr = "30";
+					}
+
+					String start = datumStr + ' ' + o.getVreme();
+					String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
+					datumi.add(new DogadjajDTO(start, end, "operacija", o.getId(), o.getIdPacijenta()));
+				
+				}
+			}
+			
+		};
+		
+		return datumi;
+	}
 	
 	
 	@GetMapping(value = "/obavezeKlinike/{id}")
@@ -228,7 +335,7 @@ public class LekarController {
 
 				String start = datumStr + ' ' + preg.getVreme();
 				String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-				datumi.add(new DogadjajDTO(start, end,"",(long) -1));
+				datumi.add(new DogadjajDTO(start, end,"",(long) -1,(long) -1));
 			}
 		};
 		for (Operacija o : operacije) {
@@ -265,7 +372,7 @@ public class LekarController {
 
 					String start = datumStr + ' ' + o.getVreme();
 					String end = datumStr + ' ' + krajPregledaSat + ":" + minStr;
-					datumi.add(new DogadjajDTO(start, end,"",(long) -1));
+					datumi.add(new DogadjajDTO(start, end,"",(long) -1, (long) -1));
 				}
 				
 			}
@@ -414,6 +521,12 @@ public class LekarController {
 			}
 			
 			if (flag == false) {
+				List<Godisnji> godisnji = godisnjiService.findAll();
+				for(Godisnji g : godisnji) {
+					if(g.getLekar().getId() == id) {
+						godisnjiService.remove(g);
+					}
+				}
 				lekarService.remove(id);
 			}
 
@@ -1134,4 +1247,30 @@ public class LekarController {
 		return new ResponseEntity<>(lekarDTO ,HttpStatus.OK);
 
 	}
+	
+	@PostMapping(value = "/promeniSifruLekar/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('LEKAR')")
+	public ResponseEntity<?> promeniSifruAdmin(@PathVariable Long id, @RequestBody IzmenaSifreDTO sifra)
+	{
+		Lekar lekar = lekarService.findOne(id);
+		
+		final Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(lekar.getMail(),
+						sifra.getStara()));
+		
+		User user = (User) authentication.getPrincipal();
+		if (user == null) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+		
+		boolean success = lekarService.izmeniSifru(lekar, sifra);
+		
+		if (success) {
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
 }
