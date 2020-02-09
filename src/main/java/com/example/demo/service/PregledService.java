@@ -20,24 +20,27 @@ import com.example.demo.repository.ZahteviRepository;
 @Service
 public class PregledService {
 
-	@Autowired
-	private PregledRepository pregledRepository;
+	private final PregledRepository pregledRepository;
 
-	@Autowired
-	private ZahteviRepository zahteviRepository;
+	private final ZahteviRepository zahteviRepository;
 
-	@Autowired
-	private LekarRepository lekarRepository;
+	private final LekarRepository lekarRepository;
 
-	@Autowired
-	private SalaKlinikeRepository salaKlinikeRepository;
+	private final SalaKlinikeRepository salaKlinikeRepository;
 
-	@Autowired
-	private TipPregledaRepository tipPregledaRepository;
-
+	private final TipPregledaRepository tipPregledaRepository;
 	
+	public PregledService(PregledRepository pregledRepository, ZahteviRepository zahteviRepository,
+			LekarRepository lekarRepository, SalaKlinikeRepository salaKlinikeRepository,
+			TipPregledaRepository tipPregledaRepository) {
+		super();
+		this.pregledRepository = pregledRepository;
+		this.zahteviRepository = zahteviRepository;
+		this.lekarRepository = lekarRepository;
+		this.salaKlinikeRepository = salaKlinikeRepository;
+		this.tipPregledaRepository = tipPregledaRepository;
+	}
 
-	
 	public PregledDTO dodajPregled(PregledDTO pregledDTO) {
 		Pregled pregled = new Pregled();
 
@@ -93,7 +96,6 @@ public class PregledService {
 
 		Zahtev zahtev = new Zahtev();
 
-		System.out.println(zahtevDTO.getDatum());
 		String datum = zahtevDTO.getDatum();
 		String[] yyyymmdd = zahtevDTO.getDatum().split("-");
 		if (yyyymmdd.length != 1) {
