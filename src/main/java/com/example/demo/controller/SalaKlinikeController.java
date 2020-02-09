@@ -201,7 +201,6 @@ public class SalaKlinikeController {
 				String minStr = "";
 				if (krajPregledaMin == 0) {
 					minStr = "00";
-					krajPregledaSat++;
 				}else {
 					minStr = "30";
 				}
@@ -236,7 +235,6 @@ public class SalaKlinikeController {
 				String minStr = "";
 				if (krajPregledaMin == 0) {
 					minStr = "00";
-					krajPregledaSat++;
 				}else {
 					minStr = "30";
 				}

@@ -73,7 +73,7 @@ public class AdminCentraContreoller {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
-		userService.aktiviran(user);
+		//userService.aktiviran(user);
 
 		emailService.sendNotificaitionAsync(user, "Kliknite na link kako bi aktivirali nalog --> http://localhost:8081/#/aktivacijaPacijenta/"+user.getId());
 		

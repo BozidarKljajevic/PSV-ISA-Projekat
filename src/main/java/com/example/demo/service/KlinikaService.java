@@ -70,6 +70,7 @@ public class KlinikaService {
 			klinika.setBrojTelefona(klinikaDTO.getBrojTelefona());
 			klinika.setGrad(klinikaDTO.getGrad());
 			klinika.setDrzava(klinikaDTO.getDrzava());
+			klinika.setOpis(klinikaDTO.getOpis());
 			klinikaRepository.save(klinika);
 		} catch (EntityNotFoundException e) {
 			throw new ValidationException("Klinika sa tim idijem nepostoji");
