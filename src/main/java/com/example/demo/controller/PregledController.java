@@ -55,28 +55,37 @@ import com.example.demo.service.ZahteviService;
 @RequestMapping(value = "/pregled")
 public class PregledController {
 
-	@Autowired
-	private PregledService pregledService;
+	private final PregledService pregledService;
 
-	@Autowired
-	private LekarService lekarService;
+	private final LekarService lekarService;
 
-	@Autowired
-	private ZahteviService zahteviService;
-	@Autowired
-	private OperacijaService operacijaService;
+	private final ZahteviService zahteviService;
 
-	@Autowired
-	private GodisnjiService godisnjiService;
+	private final OperacijaService operacijaService;
 
-	@Autowired
-	private AdminKlinikeService adminKlinikeService;
+	private final GodisnjiService godisnjiService;
 
-	@Autowired
-	private PacijentService pacijentService;
+	private final AdminKlinikeService adminKlinikeService;
 
-	@Autowired
-	private EmailService emailService;
+	private final PacijentService pacijentService;
+
+	private final EmailService emailService;
+	
+	
+
+	public PregledController(PregledService pregledService, LekarService lekarService, ZahteviService zahteviService,
+			OperacijaService operacijaService, GodisnjiService godisnjiService, AdminKlinikeService adminKlinikeService,
+			PacijentService pacijentService, EmailService emailService) {
+		super();
+		this.pregledService = pregledService;
+		this.lekarService = lekarService;
+		this.zahteviService = zahteviService;
+		this.operacijaService = operacijaService;
+		this.godisnjiService = godisnjiService;
+		this.adminKlinikeService = adminKlinikeService;
+		this.pacijentService = pacijentService;
+		this.emailService = emailService;
+	}
 
 	@PostMapping(value = "/dodajPregled", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('ADMIN')")
