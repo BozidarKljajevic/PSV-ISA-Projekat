@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.ValidationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.AdminCentraDTO;
+import com.example.demo.dto.AdminKlinikeDTO;
 import com.example.demo.dto.PacijentDTO;
 import com.example.demo.dto.SifraDTO;
 import com.example.demo.model.Pacijent;
@@ -85,5 +89,22 @@ public class AdminCentraContreoller {
 		return new ResponseEntity<>(pacijentiDTO, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/dodajAdminaCentra", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('ADMINCENTRA')")
+	public ResponseEntity<AdminCentraDTO> dodajAdminaKlinike(@RequestBody AdminCentraDTO adminDTO) throws Exception {
+		
+		User existUser = this.adminCentraService.findOneM(adminDTO.getMail());
+		if (existUser != null) {
+			throw new Exception("Alredy exist");
+		}
+		
+		AdminCentraDTO admindto = new AdminCentraDTO();
+		try {
+			admindto = adminCentraService.dodajAdminaCentar(adminDTO);
+		}catch (ValidationException e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>(admindto, HttpStatus.OK);
+	}
 
 }
